@@ -1,3 +1,0 @@
-#! /bin/sh
-set -e
-cd $ROOT && bundle exec rails decidim:mailers:notifications_digest_daily

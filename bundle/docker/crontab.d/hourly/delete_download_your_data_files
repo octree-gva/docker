@@ -1,3 +1,0 @@
-#! /bin/sh
-set -e
-cd $ROOT && bundle exec rails decidim:delete_download_your_data_files

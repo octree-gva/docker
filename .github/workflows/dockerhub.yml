@@ -21,31 +21,9 @@ jobs:
       - name: Build and publish images
         run: |
           npm install -g doctoc
-          ./update "${{ secrets.DOCKERHUB_USERNAME }}/decidim"
-          ls *.versions
-          for file in $(find bundle -type f -name "Dockerfile-*"); do
-            default_tag=$(basename "$file" | sed 's/^Dockerfile-//')
-            default_destination="${{ secrets.DOCKERHUB_USERNAME }}/decidim:$default_tag"
-            stable_version=$(echo "$default_tag" | cut -d'-' -f1)
-            echo "$stable_version: build 'decidim/$default_tag' with $file"
-            docker build -t $default_destination -f "$file" ./bundle
-            if [ -f "$stable_version.versions" ]; then
-              while read version; do
-                destination_tag=$(echo $default_tag | sed -e "s/$stable_version/$version/")
-                destination="${{ secrets.DOCKERHUB_USERNAME }}/decidim:$destination_tag"
-                docker tag $default_destination $destination
-                docker push $destination
-              done < "$stable_version.versions"
-            else
-              echo "No $stable_version.versions file, push to default destination"
-              docker push $default_destination
-            fi
-            if [ $default_tag == "develop-dev" ]; then
-              latest="${{ secrets.DOCKERHUB_USERNAME }}/decidim:latest"
-              docker tag $default_destination $latest
-              docker push $latest
-            fi
-          done
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DECIDIM_VERSION_BRANCHES=
+          ./update-registery.rb
 
       - name: Commit and push changes
         run: |
