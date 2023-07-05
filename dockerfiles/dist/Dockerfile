@@ -3,8 +3,9 @@ ARG FROM_IMAGE
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
+
+FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
-ARG FROM_IMAGE
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -28,7 +29,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
-    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" FROM_IMAGE=${FROM_IMAGE}
+    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app"
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -83,17 +84,17 @@ WORKDIR $ROOT
 
 # Copy directories that are needed to run decidim
 # We copy one by one to take advantage of docker cache
-COPY --from=$FROM_IMAGE $ROOT/vendor/cache ./vendor/cache
-COPY --from=$FROM_IMAGE /usr/share/mime  /usr/share/mime
-COPY --from=$FROM_IMAGE $ROOT/config.ru $ROOT/Rakefile ./
-COPY --from=$FROM_IMAGE $ROOT/public ./public
-COPY --from=$FROM_IMAGE $ROOT/storage ./storage
-COPY --from=$FROM_IMAGE $ROOT/lib ./lib
-COPY --from=$FROM_IMAGE $ROOT/bin ./bin
-COPY --from=$FROM_IMAGE $ROOT/db ./db
-COPY --from=$FROM_IMAGE $ROOT/config ./config
-COPY --from=$FROM_IMAGE $ROOT/Gemfile* ./
-COPY --from=$FROM_IMAGE $ROOT/app ./app
+COPY --from=builder $ROOT/vendor/cache ./vendor/cache
+COPY --from=builder /usr/share/mime  /usr/share/mime
+COPY --from=builder $ROOT/config.ru $ROOT/Rakefile ./
+COPY --from=builder $ROOT/public ./public
+COPY --from=builder $ROOT/storage ./storage
+COPY --from=builder $ROOT/lib ./lib
+COPY --from=builder $ROOT/bin ./bin
+COPY --from=builder $ROOT/db ./db
+COPY --from=builder $ROOT/config ./config
+COPY --from=builder $ROOT/Gemfile* ./
+COPY --from=builder $ROOT/app ./app
 
 # Backup directories that will be mounted in volumes
 # because several Docker infrastructure will clean the 

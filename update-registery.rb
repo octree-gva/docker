@@ -36,21 +36,26 @@ supported_versions.map do |version|
     is_stable = docker.decidim_version.github_branch.include?("stable")
     node_major_version = docker.decidim_version.node_version[0]
 
-    `docker build -t #{source_tag}-build \
+    docker_cmd = "docker build -t #{source_tag}-build \
             #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
             --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
             --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
-        -f ./dockerfiles/build/Dockerfile .`
-    `docker build -t #{source_tag}-dist \
+        -f ./dockerfiles/build/Dockerfile ."
+    puts docker_cmd
+    system(docker_cmd)
+    docker_cmd = `docker build -t #{source_tag}-dist \
             --build-arg FROM_IMAGE=#{source_tag}-build \
             --build-arg BASE_IMAGE=ruby:#{docker.slim_buster_tag} \
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/dist/Dockerfile .`
+    puts docker_cmd
+    system(docker_cmd)
+    
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker.decidim_version.version) do |version|
