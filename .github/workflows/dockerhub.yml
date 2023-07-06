@@ -18,11 +18,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and publish images
+      - name: Publish 0.27
         run: |
           npm install -g doctoc
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DECIDIM_VERSION_BRANCHES=release/0.27-stable,develop
+          export DECIDIM_VERSION_BRANCHES=release/0.27-stable
+          export DOCKERHUB_PUSH=true
+          ./update-registery.rb
+
+      - name: Publish edge
+        run: |
+          npm install -g doctoc
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DECIDIM_VERSION_BRANCHES=develop
           export DOCKERHUB_PUSH=true
           ./update-registery.rb
 
