@@ -3,20 +3,10 @@
 require_relative 'lib/decidim_version'
 require_relative 'lib/ruby_buster_repo'
 require_relative 'lib/docker_image'
+require_relative 'lib/helpers'
 
 DOCKERHUB_USERNAME = ENV.fetch("DOCKERHUB_USERNAME", "decidim")
 DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
-def push_to_dockerhub?
-    ["1", "true", "enable"].include?(ENV.fetch("DOCKERHUB_PUSH", "false"))
-end
-
-def tag_versions(decidim_versions)
-    prev_version = decidim_versions.first
-    decidim_versions[1..].each do |version_seg| 
-        prev_version = "#{prev_version}.#{version_seg}"
-        yield(prev_version)
-    end
-end
 
 supported_versions = []
 begin

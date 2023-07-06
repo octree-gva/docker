@@ -100,9 +100,9 @@ COPY --from=builder $ROOT/app ./app
 # because several Docker infrastructure will clean the 
 # directories on volumes mounts.
 RUN mkdir -p ./tmp/pids ./log \
-  && tar -cfvz db ./tmp/db.bak.tar.gz \
-  && tar -cfvz public ./tmp/public.bak.tar.gz \
-  && tar -cfvz config ./tmp/config.bak.tar.gz
+  && tar cfvz ./tmp/db.bak.tar.gz db \
+  && tar cfvz ./tmp/public.bak.tar.gz public \
+  && tar cfvz ./tmp/config.bak.tar.gz config
 
 VOLUME db
 VOLUME public
