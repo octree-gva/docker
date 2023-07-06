@@ -134,11 +134,11 @@ Please choose one of the officially supported version of Decidim.
 
 **Stable tags**
 
-[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27)
+[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=develop)
+[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
 
 ## Eject you decidim instance
 You want to publish your instance on a git client? 
