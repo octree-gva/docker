@@ -33,7 +33,7 @@ supported_versions.map do |version|
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
-        -f ./dockerfiles/build/Dockerfile ."
+        -f ./dockerfiles/build/Dockerfile ./bundle"
     puts docker_cmd
     system(docker_cmd)
     docker_cmd = `docker build -t #{source_tag}-dist \
@@ -42,7 +42,7 @@ supported_versions.map do |version|
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
-        -f ./dockerfiles/dist/Dockerfile .`
+        -f ./dockerfiles/dist/Dockerfile ./bundle`
     puts docker_cmd
     system(docker_cmd)
     
@@ -53,8 +53,9 @@ supported_versions.map do |version|
             build_command = "docker tag #{source_tag}-build #{version}-build"
             dist_command = "docker tag #{source_tag}-dist #{version}"
             if push_to_dockerhub?
-                `#{build_command}`
-                `#{dist_command}`
+                system("#{build_command}")
+                system("#{dist_command}")
+
                 `docker push #{version}-build`
                 `docker push #{version}`
     
@@ -68,8 +69,8 @@ supported_versions.map do |version|
         build_command = "docker tag #{source_tag}-build #{version}-build"
         dist_command = "docker tag #{source_tag}-dist #{version}"
         if push_to_dockerhub?
-            `#{build_command}`
-            `#{dist_command}`
+            system("#{build_command}")
+            system("#{dist_command}")
             `docker push #{version}-build`
             `docker push #{version}`
         else

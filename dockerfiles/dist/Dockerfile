@@ -96,9 +96,10 @@ COPY --from=builder $ROOT/config ./config
 COPY --from=builder $ROOT/Gemfile* ./
 COPY --from=builder $ROOT/app ./app
 
-COPY ./bundle/bin /usr/local/bin
-COPY ./bundle/docker-entrypoint.d /usr/local/share/docker-entrypoint.d
-COPY ./bundle/crontab.d /usr/local/share/cronfiles
+COPY ./bin /usr/local/bin
+COPY ./templates /usr/local/share/decidim/templates
+COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+COPY ./crontab.d /usr/local/share/cronfiles
 
 # Backup directories that will be mounted in volumes
 # because several Docker infrastructure will clean the 
@@ -106,7 +107,7 @@ COPY ./bundle/crontab.d /usr/local/share/cronfiles
 RUN mkdir -p ./tmp/pids ./log \
   && tar cfvz ./tmp/public.bak.tar.gz public \
   && tar cfvz ./tmp/config.bak.tar.gz config \
-  && tar cfvz ./tmp/db.bak.tar.gz db 
+  && tar cfvz ./tmp/db.bak.tar.gz db
 
 VOLUME db
 VOLUME public
