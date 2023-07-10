@@ -210,7 +210,7 @@ Almost all the `DECIDIM_` variables are available. [See the documentation on def
 ## Cron configurations
 Cron is configured to run scripts every 15min, 1hour, daily, weekly, monthly. 
 When the times comes, it will execute all scripts present in the `/etc/periodic` directory. 
-[By default](./bundle/docker/crontab.d), the following scripts are executed: 
+[By default](./bundle/crontab.d), the following scripts are executed: 
 
 ```sh
 ├── 15min
@@ -302,6 +302,7 @@ To debug and rebuild the images locally, you can:
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
 <%= decidim_table.map {|row| "| #{row.map{|cell| cell.ljust(18)}.join("| ")} |"}.join("\n") %>
+
 The templates for README, quickstart.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
 
 

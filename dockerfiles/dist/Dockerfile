@@ -3,7 +3,7 @@ ARG FROM_IMAGE
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
-
+ARG RAILS_ENV
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
 
@@ -69,7 +69,7 @@ RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
     git-core tzdata imagemagick pkg-config \
     libxml2-dev libxslt-dev nodejs npm \
-    libpq-dev shared-mime-info \
+    libpq-dev shared-mime-info locales locales-all \
   && npm install -g yarn --force \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
@@ -96,14 +96,20 @@ COPY --from=builder $ROOT/config ./config
 COPY --from=builder $ROOT/Gemfile* ./
 COPY --from=builder $ROOT/app ./app
 
+COPY ./bundle/bin /usr/local/bin
+COPY ./bundle/docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+COPY ./bundle/crontab.d /usr/local/share/cronfiles
+
 # Backup directories that will be mounted in volumes
 # because several Docker infrastructure will clean the 
 # directories on volumes mounts.
 RUN mkdir -p ./tmp/pids ./log \
-  && tar cfvz ./tmp/db.bak.tar.gz db \
   && tar cfvz ./tmp/public.bak.tar.gz public \
-  && tar cfvz ./tmp/config.bak.tar.gz config
+  && tar cfvz ./tmp/config.bak.tar.gz config \
+  && tar cfvz ./tmp/db.bak.tar.gz db 
 
 VOLUME db
 VOLUME public
 VOLUME config
+
+ENTRYPOINT ["docker-entrypoint"]

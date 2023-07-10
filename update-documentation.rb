@@ -80,3 +80,4 @@ File.write("./README.md", template_readme.result_with_hash(
     last_stable:last_stable,
     decidim_table:decidim_table
 ))
+system("doctoc README.md")

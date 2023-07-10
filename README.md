@@ -124,6 +124,21 @@ Before deploying, be sure to read the [good practices](#good-practices).
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [Dockerhub](#dockerhub)
+- [Eject you decidim instance](#eject-you-decidim-instance)
+- [Environments configurations](#environments-configurations)
+- [Unsupported Environments](#unsupported-environments)
+- [Cron configurations](#cron-configurations)
+- [Extend Decidim Images](#extend-decidim-images)
+- [Good Practices](#good-practices)
+  - [Choose a 64chars password for redis](#choose-a-64chars-password-for-redis)
+  - [Use memcached as cache](#use-memcached-as-cache)
+  - [Redis as a persistent store (AOF)](#redis-as-a-persistent-store-aof)
+  - [Don't run decidim with privilegied postgres user](#dont-run-decidim-with-privilegied-postgres-user)
+- [Contribute](#contribute)
+- [Local development](#local-development)
+- [License](#license)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---
