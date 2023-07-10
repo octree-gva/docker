@@ -55,17 +55,23 @@ supported_versions.map do |version|
             if push_to_dockerhub?
                 `#{build_command}`
                 `#{dist_command}`
+                `docker push #{version}-build`
+                `docker push #{version}`
+    
             else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dist_command}"
             end    
         end
     else
-        build_command = "docker tag #{source_tag}-build #{docker.decidim_version.github_branch}-build"
-        dist_command = "docker tag #{source_tag}-dist #{docker.decidim_version.github_branch}"
+        version = docker.decidim_version.github_branch
+        build_command = "docker tag #{source_tag}-build #{version}-build"
+        dist_command = "docker tag #{source_tag}-dist #{version}"
         if push_to_dockerhub?
             `#{build_command}`
             `#{dist_command}`
+            `docker push #{version}-build`
+            `docker push #{version}`
         else
             puts "--dry-run: #{build_command}"
             puts "--dry-run: #{dist_command}"
