@@ -123,7 +123,6 @@ Before deploying, be sure to read the [good practices](#good-practices).
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Dockerhub](#dockerhub)
 - [Eject you decidim instance](#eject-you-decidim-instance)
 - [Environments configurations](#environments-configurations)
@@ -225,7 +224,7 @@ Almost all the `DECIDIM_` variables are available. [See the documentation on def
 ## Cron configurations
 Cron is configured to run scripts every 15min, 1hour, daily, weekly, monthly. 
 When the times comes, it will execute all scripts present in the `/etc/periodic` directory. 
-[By default](./bundle/docker/crontab.d), the following scripts are executed: 
+[By default](./bundle/crontab.d), the following scripts are executed: 
 
 ```sh
 ├── 15min
@@ -318,6 +317,7 @@ To debug and rebuild the images locally, you can:
 | ----------------- | ----------------- | ----------------- | ---------------------- |
 | 0.27.3            | ruby:3.0.6-buster | node_16_x         | docker-compose -f quickstart.0.27.yml up |
 | develop           | ruby:3.1.4-buster | node_16_x         | docker-compose -f quickstart.develop.yml up |
+
 The templates for README, quickstart.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
 
 
