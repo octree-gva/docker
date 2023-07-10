@@ -49,15 +49,14 @@ supported_versions.map do |version|
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker.decidim_version.version) do |version|
-            docker_tag = "#{DOCKERHUB_USERNAME}:#{version}"
-            build_command = "docker tag #{source_tag}-build #{version}-build"
-            dist_command = "docker tag #{source_tag}-dist #{version}"
+            build_command = "docker tag #{source_tag}-build #{DOCKERHUB_USERNAME}/#{version}-build"
+            dist_command = "docker tag #{source_tag}-dist #{DOCKERHUB_USERNAME}/#{version}"
             if push_to_dockerhub?
                 system("#{build_command}")
                 system("#{dist_command}")
 
-                `docker push #{version}-build`
-                `docker push #{version}`
+                `docker push #{DOCKERHUB_USERNAME}/#{version}-build`
+                `docker push #{DOCKERHUB_USERNAME}/#{version}`
     
             else
                 puts "--dry-run: #{build_command}"
@@ -66,13 +65,13 @@ supported_versions.map do |version|
         end
     else
         version = docker.decidim_version.github_branch
-        build_command = "docker tag #{source_tag}-build #{version}-build"
-        dist_command = "docker tag #{source_tag}-dist #{version}"
+        build_command = "docker tag #{source_tag}-build #{DOCKERHUB_USERNAME}/#{version}-build"
+        dist_command = "docker tag #{source_tag}-dist #{DOCKERHUB_USERNAME}/#{version}"
         if push_to_dockerhub?
             system("#{build_command}")
             system("#{dist_command}")
-            `docker push #{version}-build`
-            `docker push #{version}`
+            `docker push #{DOCKERHUB_USERNAME}/#{version}-build`
+            `docker push #{DOCKERHUB_USERNAME}/#{version}`
         else
             puts "--dry-run: #{build_command}"
             puts "--dry-run: #{dist_command}"
