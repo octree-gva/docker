@@ -75,15 +75,16 @@ RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
 
+WORKDIR $ROOT
+
 # Setup bundle global config
 RUN bundle config --global build.nokogiri --use-system-libraries \
   && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
   && bundle config set --global path 'vendor'
 
-WORKDIR $ROOT
-
 # Copy directories that are needed to run decidim
 # We copy one by one to take advantage of docker cache
+COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY --from=builder $ROOT/vendor ./vendor
 COPY --from=builder /usr/share/mime  /usr/share/mime
 COPY --from=builder $ROOT/config.ru $ROOT/Rakefile ./
@@ -96,7 +97,7 @@ COPY --from=builder $ROOT/config ./config
 COPY --from=builder $ROOT/Gemfile* ./
 COPY --from=builder $ROOT/app ./app
 
-COPY ./bin /usr/local/bin
+COPY --chmod=0755 ./bin/* /usr/local/bin/
 COPY ./templates /usr/local/share/decidim/templates
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 COPY ./crontab.d /usr/local/share/cronfiles

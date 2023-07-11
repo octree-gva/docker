@@ -62,6 +62,7 @@ RUN if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else g
 WORKDIR $ROOT
 
 RUN rm -rf /home/app/generator \
+  && rm -rf /usr/local/bundle/**/* \
   && bundle install --jobs "$(nproc)" --retry 3 \
   && bundle clean --force \
   && truncate -s 0 /var/log/*log
