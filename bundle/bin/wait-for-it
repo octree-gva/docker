@@ -1,6 +1,8 @@
 #!/bin/sh
 # Use this script to test if a given TCP host/port are available
-# Source: https://gist.githubusercontent.com/yahyaergun/597d787c6aeffd495e9eaa8b3fdd8e96/raw/a36a04ab21355786f0ce53014fd6c15a2e1c5c68/wait-for-it.sh
+# Author: yahyaergun
+# Source 2019: https://gist.githubusercontent.com/yahyaergun/597d787c6aeffd495e9eaa8b3fdd8e96/raw/a36a04ab21355786f0ce53014fd6c15a2e1c5c68/wait-for-it.sh 
+# License: [APGL-V3](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 TIMEOUT=15
 QUIET=0

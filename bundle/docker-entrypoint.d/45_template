@@ -1,22 +1,24 @@
 #!/usr/bin/env ruby
+require "erb"
 
 puts "Setup templates"
+root_dir = root_dir
 template_directory = "/usr/local/share/decidim/templates"
 template_motd = ERB.new(File.read(File.join(template_directory, "motd.txt.erb")))
 supervisord_motd = ERB.new(File.read(File.join(template_directory, "supervisord.conf.erb")))
 
 File.write("/etc/motd", template_motd.result_with_hash(
-	decidim_version: ENV.fetch("ROOT"),
-	root: ENV.fetch("ROOT"),
+	decidim_version: root_dir,
+	root: root_dir,
 	rails_env: ENV.fetch("RAILS_ENV"),
 	ruby_version: ENV.fetch("RUBY_VERSION")
 ))
 
-File.write(File.join(ENV.fetch("ROOT"), "/config/supervisord.conf"), supervisord_motd.result_with_hash(
-	root: ENV.fetch("ROOT"),
+File.write(File.join(root_dir, "/config/supervisord.conf"), supervisord_motd.result_with_hash(
+	root: root_dir,
 	run_rails: ENV.fetch("DECIDIM_RUN_RAILS", "0") == "1",
 	run_sidekiq: ENV.fetch("DECIDIM_RUN_CRON", "0") == "1",
 	run_cron: ENV.fetch("DECIDIM_RUN_CRON", "0") == "1"
 ))
 puts "    ✅ /etc/motd updated"
-puts "    ✅ $ROOT/config/supervisord.conf updated"
+puts "    ✅ #{$ROOT}/config/supervisord.conf updated"

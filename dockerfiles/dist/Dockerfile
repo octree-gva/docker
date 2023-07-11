@@ -68,7 +68,7 @@ RUN apt-get upgrade -yq \
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
     git-core tzdata imagemagick pkg-config \
-    libxml2-dev libxslt-dev nodejs npm \
+    libxml2-dev libxslt-dev nodejs npm vi \
     libpq-dev shared-mime-info locales locales-all \
   && npm install -g yarn --force \
   && apt-get clean \
@@ -84,7 +84,7 @@ WORKDIR $ROOT
 
 # Copy directories that are needed to run decidim
 # We copy one by one to take advantage of docker cache
-COPY --from=builder $ROOT/vendor/cache ./vendor/cache
+COPY --from=builder $ROOT/vendor ./vendor
 COPY --from=builder /usr/share/mime  /usr/share/mime
 COPY --from=builder $ROOT/config.ru $ROOT/Rakefile ./
 COPY --from=builder $ROOT/public ./public
@@ -108,6 +108,8 @@ RUN mkdir -p ./tmp/pids ./log \
   && tar cfvz ./tmp/public.bak.tar.gz public \
   && tar cfvz ./tmp/config.bak.tar.gz config \
   && tar cfvz ./tmp/db.bak.tar.gz db
+
+RUN bundle install
 
 VOLUME db
 VOLUME public

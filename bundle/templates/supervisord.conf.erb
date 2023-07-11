@@ -1,54 +1,54 @@
 [unix_http_server]
-file=<%= root -%>/tmp/sockets/supervisor
+file=<%= root %>/tmp/sockets/supervisor
 
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [supervisorctl]
-serverurl=unix://<%= root -%>/tmp/sockets/supervisor
+serverurl=unix://<%= root %>/tmp/sockets/supervisor
 
 [supervisord]
 logfile_maxbytes=4MB
 logfile_backups=10
-logfile=<%= root -%>/log/run.supervisord.log
-pidfile=<%= root -%>/tmp/pids/supervisord.pid
+logfile=<%= root %>/log/run.supervisord.log
+pidfile=<%= root %>/tmp/pids/supervisord.pid
 loglevel=info
 nodaemon=true
 user=decidim
 
 [program:cron]
 command=crond -f
-directory=<%= root -%>
-autostart=<%= run_cron.to_s -%>
+directory=<%= root %>
+autostart=<%= run_cron.to_s %>
 autorestart=true
 logfile_maxbytes=4MB
 logfile_backups=10
-stdout_logfile=<%= root -%>/log/run.cron.log
-stderr_logfile=<%= root -%>/log/errors.cron.log
+stdout_logfile=<%= root %>/log/run.cron.log
+stderr_logfile=<%= root %>/log/errors.cron.log
 killasgroup=true
 stopasgroup=true
 
 [program:puma]
 command=bundle exec rails server
-directory=<%= root -%>
-autostart=<%= run_rails.to_s -%>
+directory=<%= root %>
+autostart=<%= run_rails.to_s %>
 autorestart=true
 logfile_maxbytes=4MB
 logfile_backups=10
-stdout_logfile=<%= root -%>/log/run.puma.log
-stderr_logfile=<%= root -%>/log/errors.puma.log
+stdout_logfile=<%= root %>/log/run.puma.log
+stderr_logfile=<%= root %>/log/errors.puma.log
 killasgroup=true
 stopasgroup=true
 
 [program:sidekiq]
 command=bundle exec sidekiq
-directory=<%= root -%>
-autostart=<%= run_sidekiq.to_s -%>
+directory=<%= root %>
+autostart=<%= run_sidekiq.to_s %>
 autorestart=true
 logfile_maxbytes=4MB
 logfile_backups=10
-stdout_logfile=<%= root -%>/log/run.sidekiq.log
-stderr_logfile=<%= root -%>/log/errors.sidekiq.log
+stdout_logfile=<%= root %>/log/run.sidekiq.log
+stderr_logfile=<%= root %>/log/errors.sidekiq.log
 killasgroup=true
 stopasgroup=true
 

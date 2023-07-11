@@ -53,7 +53,7 @@ supported_versions.map do |version|
             )
             File.write("./quickstart.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: true,
-                docker_tag: "#{DOCKERHUB_USERNAME}/#{version}"
+                docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}"
             ))
             break # Write down only one version in the README.
         end
@@ -69,7 +69,7 @@ supported_versions.map do |version|
         ])
         File.write("./quickstart.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
-            docker_tag: "#{DOCKERHUB_USERNAME}/#{docker.decidim_version.github_branch}"
+            docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{docker.decidim_version.github_branch}"
         ))
     end
 end

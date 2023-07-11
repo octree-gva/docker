@@ -65,4 +65,3 @@ RUN rm -rf /home/app/generator \
   && bundle install --jobs "$(nproc)" --retry 3 \
   && bundle clean --force \
   && truncate -s 0 /var/log/*log
-RUN bundle pack --all
