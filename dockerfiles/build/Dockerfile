@@ -63,6 +63,6 @@ WORKDIR $ROOT
 
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
-  && bundle install --jobs "$(nproc)" --retry 3 \
   && bundle clean --force \
+  && bundle install --jobs "$(nproc)" --retry 3 \
   && truncate -s 0 /var/log/*log
