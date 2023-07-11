@@ -97,10 +97,13 @@ COPY --from=builder $ROOT/config ./config
 COPY --from=builder $ROOT/Gemfile* ./
 COPY --from=builder $ROOT/app ./app
 
-COPY --chmod=0755 ./bin/* /usr/local/bin/
+COPY ./bin /usr/local/bin/
 COPY ./templates /usr/local/share/decidim/templates
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 COPY ./crontab.d /usr/local/share/cronfiles
+
+# Ensure binaries can be executed.
+RUN chmod +x /usr/local/bin/*
 
 # Backup directories that will be mounted in volumes
 # because several Docker infrastructure will clean the 

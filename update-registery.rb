@@ -49,15 +49,14 @@ supported_versions.map do |version|
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker.decidim_version.version) do |version|
-            build_command = "docker tag #{source_tag}-build #{DOCKERHUB_USERNAME}/decidim:#{version}-build"
-            dist_command = "docker tag #{source_tag}-dist #{DOCKERHUB_USERNAME}/decidim:#{version}"
+            image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+            build_command = "docker tag #{source_tag}-build #{image}-build"
+            dist_command = "docker tag #{source_tag}-dist #{image}"
             if push_to_dockerhub?
                 system("#{build_command}")
                 system("#{dist_command}")
-
-                `docker push #{DOCKERHUB_USERNAME}/decidim:#{version}-build`
-                `docker push #{DOCKERHUB_USERNAME}/decidim:#{version}`
-    
+                `docker push #{image}-build`
+                `docker push #{image}`
             else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dist_command}"
@@ -65,13 +64,14 @@ supported_versions.map do |version|
         end
     else
         version = docker.decidim_version.github_branch
-        build_command = "docker tag #{source_tag}-build #{DOCKERHUB_USERNAME}/decidim:#{version}-build"
-        dist_command = "docker tag #{source_tag}-dist #{DOCKERHUB_USERNAME}/decidim:#{version}"
+        image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+        build_command = "docker tag #{source_tag}-build #{image}-build"
+        dist_command = "docker tag #{source_tag}-dist #{image}"
         if push_to_dockerhub?
             system("#{build_command}")
             system("#{dist_command}")
-            `docker push #{DOCKERHUB_USERNAME}/decidim:#{version}-build`
-            `docker push #{DOCKERHUB_USERNAME}/decidim:#{version}`
+            `docker push #{image}-build`
+            `docker push #{image}`
         else
             puts "--dry-run: #{build_command}"
             puts "--dry-run: #{dist_command}"
