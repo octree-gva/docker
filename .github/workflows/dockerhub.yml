@@ -27,13 +27,13 @@ jobs:
           export DOCKERHUB_PUSH=true
           ./update-registery.rb
 
-      # - name: Publish edge
-      #   run: |
-      #     npm install -g doctoc
-      #     export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-      #     export DECIDIM_VERSION_BRANCHES=develop
-      #     export DOCKERHUB_PUSH=true
-      #     ./update-registery.rb
+      - name: Publish edge
+        run: |
+          npm install -g doctoc
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DECIDIM_VERSION_BRANCHES=develop
+          export DOCKERHUB_PUSH=true
+          ./update-registery.rb
       
       - name: Update Readme
         run: |

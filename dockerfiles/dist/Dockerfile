@@ -68,7 +68,7 @@ RUN apt-get upgrade -yq \
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
     git-core tzdata imagemagick pkg-config \
-    libxml2-dev libxslt-dev nodejs npm vi \
+    libxml2-dev libxslt-dev nodejs npm vim \
     libpq-dev shared-mime-info locales locales-all \
   && npm install -g yarn --force \
   && apt-get clean \
