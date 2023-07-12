@@ -49,7 +49,7 @@ class DecidimVersion
     
     def read_bundler_version
         gemfile_lock = URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/Gemfile.lock").read.strip
-        version_string = gemfile_lock.match(/^BUNDLED\s+WITH\s+(\d+\.\d+\.\d+)/)
+        version_string = gemfile_lock.match(/^BUNDLED\s+WITH\s+(\d+\.\d+\.\d+)/)[1]
         major, minor, patch = version_string.scan(/\d+/)
     end
 end
