@@ -32,22 +32,25 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
     RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION}
+
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
-  && apt-get install -yq gnupg2 
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  && apt-get install -yq gnupg2 \
+  && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  # Install native deps
   && apt-get install -yq \
     build-essential yarn git-core vim \
     tmux unzip python3 python3-pip python3-setuptools \
     nodejs tzdata \
     imagemagick shared-mime-info file libpq-dev \
+  # Update yarn version
   && npm install -g yarn --force \
+  # Clean installation clutters
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && truncate -s 0 /var/log/*log
-
-# Setup global bundle configurations
-RUN bundle config --global build.nokogiri --use-system-libraries \
+  && truncate -s 0 /var/log/*log \
+  # Setup global bundle configurations
+  && bundle config --global build.nokogiri --use-system-libraries \
   && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
   && bundle config set --global path 'vendor'
 
