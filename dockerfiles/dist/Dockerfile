@@ -1,10 +1,11 @@
-ARG BASE_IMAGE
-ARG FROM_IMAGE
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-ARG RAILS_ENV
-ARG BUNDLER_VERSION
+ARG BASE_IMAGE \
+    FROM_IMAGE \
+    BUILD_DATE \
+    VCS_REF \
+    VERSION \
+    RAILS_ENV \
+    BUNDLER_VERSION \
+    LOCALE
 
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
@@ -30,9 +31,10 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
-ENV LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" \
+ENV LANG=${LOCALE} LANGUAGE=${LOCALE} LC_ALL=${LOCALE} \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
-    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION}
+    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
+    DECIDIM_VERSION=${VERSION}
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -67,13 +69,14 @@ ENV MAPS_PROVIDER="" MAPS_API_KEY="" \
 
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
-  && apt-get install -yq gnupg2 \
+  && apt-get install -y locales \
+  && locale-gen $LANGUAGE \
   && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
     build-essential curl libpq-dev \
     git-core tzdata imagemagick pkg-config \
     libxml2-dev libxslt-dev nodejs npm vim \
-    shared-mime-info locales locales-all \
+    supervisor cron \
   && npm install -g yarn --force \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
@@ -91,7 +94,13 @@ RUN bundle config --global build.nokogiri --use-system-libraries \
 # We copy one by one to take advantage of docker cache
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY --from=builder $ROOT/vendor ./vendor
+# Copy the shared-mime-info database
 COPY --from=builder /usr/share/mime  /usr/share/mime
+# Copy application
+COPY --from=builder $ROOT/Gemfile* ./
+RUN bundle install
+
+# Copy application
 COPY --from=builder $ROOT/config.ru $ROOT/Rakefile ./
 COPY --from=builder $ROOT/public ./public
 COPY --from=builder $ROOT/storage ./storage
@@ -99,13 +108,17 @@ COPY --from=builder $ROOT/lib ./lib
 COPY --from=builder $ROOT/bin ./bin
 COPY --from=builder $ROOT/db ./db
 COPY --from=builder $ROOT/config ./config
-COPY --from=builder $ROOT/Gemfile* ./
 COPY --from=builder $ROOT/app ./app
 
+# Add docker scripts
 COPY ./bin /usr/local/bin/
+# Add erb templates that will be populated at start
 COPY ./templates /usr/local/share/decidim/templates
+# Add scripts to run alphabetically for entrypoints
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+# Prepare crontab.
 COPY ./crontab.d /usr/local/share/cronfiles
+COPY ./crontab /etc/crontab
 
 # Ensure binaries can be executed.
 RUN chmod +x /usr/local/bin/* \
@@ -115,11 +128,11 @@ RUN chmod +x /usr/local/bin/* \
   && mkdir -p ./tmp/pids ./log \
   && tar cfvz ./tmp/public.bak.tar.gz public \
   && tar cfvz ./tmp/config.bak.tar.gz config \
-  && tar cfvz ./tmp/db.bak.tar.gz db \
-  && bundle install
+  && tar cfvz ./tmp/db.bak.tar.gz db
 
 VOLUME db
 VOLUME public
 VOLUME config
 
 ENTRYPOINT ["docker-entrypoint"]
+CMD ["start"]

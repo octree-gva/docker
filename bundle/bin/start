@@ -1,0 +1,4 @@
+#! /bin/sh
+set -e
+supervisord -c "$ROOT"/config/supervisord.conf
+echo "    🚀 supervisord is starting"
