@@ -148,7 +148,7 @@ Please choose one of the officially supported version of Decidim.
 
 **Stable tags**
 
-[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
+[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
 
 **Development tags**
 
@@ -315,6 +315,7 @@ To debug and rebuild the images locally, you can:
 
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
+| 0.26.7            | ruby:2.7.8-buster | node_16_x         | docker-compose -f quickstart.0.26.yml up |
 | 0.27.3            | ruby:3.0.6-buster | node_16_x         | docker-compose -f quickstart.0.27.yml up |
 | develop           | ruby:3.1.4-buster | node_16_x         | docker-compose -f quickstart.develop.yml up |
 
