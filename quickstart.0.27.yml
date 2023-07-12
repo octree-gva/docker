@@ -9,7 +9,7 @@ services:
   decidim:
     container_name: decidim
     
-    image: hfroger/decidim:0.27
+    image: hfroger/decidim:0.27.3
     ports:
       - 3000:3000
     volumes:

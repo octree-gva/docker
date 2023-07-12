@@ -4,6 +4,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 ARG RAILS_ENV
+
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
 
@@ -64,8 +65,8 @@ ENV MAPS_PROVIDER="" MAPS_API_KEY="" \
 
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
-  && apt-get install -yq gnupg2 
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  && apt-get install -yq gnupg2 \
+  && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
     git-core tzdata imagemagick pkg-config \
     libxml2-dev libxslt-dev nodejs npm vim \
@@ -103,17 +104,15 @@ COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 COPY ./crontab.d /usr/local/share/cronfiles
 
 # Ensure binaries can be executed.
-RUN chmod +x /usr/local/bin/*
-
-# Backup directories that will be mounted in volumes
-# because several Docker infrastructure will clean the 
-# directories on volumes mounts.
-RUN mkdir -p ./tmp/pids ./log \
+RUN chmod +x /usr/local/bin/* \
+  # Backup directories that will be mounted in volumes
+  # because several Docker infrastructure will clean the 
+  # directories on volumes mounts.
+  && mkdir -p ./tmp/pids ./log \
   && tar cfvz ./tmp/public.bak.tar.gz public \
   && tar cfvz ./tmp/config.bak.tar.gz config \
-  && tar cfvz ./tmp/db.bak.tar.gz db
-
-RUN bundle install
+  && tar cfvz ./tmp/db.bak.tar.gz db \
+  && bundle install
 
 VOLUME db
 VOLUME public
