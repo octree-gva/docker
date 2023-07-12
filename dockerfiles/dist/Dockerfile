@@ -4,9 +4,11 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 ARG RAILS_ENV
+ARG BUNDLER_VERSION
 
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
+ARG BUNDLER_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -30,7 +32,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
-    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app"
+    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION}
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -74,7 +76,8 @@ RUN apt-get upgrade -yq \
   && npm install -g yarn --force \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && truncate -s 0 /var/log/*log
+  && truncate -s 0 /var/log/*log \
+  && gem install bundler -v $BUNDLER_VERSION
 
 WORKDIR $ROOT
 

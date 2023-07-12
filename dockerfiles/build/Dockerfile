@@ -6,6 +6,7 @@ ARG VERSION
 ARG DECIDIM_VERSION
 ARG NODE_MAJOR_VERSION
 ARG GENERATOR_PARAMS
+ARG BUNDLER_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -31,7 +32,7 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
-    RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION}
+    RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION}
 
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
@@ -45,6 +46,7 @@ RUN apt-get upgrade -yq \
     imagemagick shared-mime-info file libpq-dev \
   # Update yarn version
   && npm install -g yarn --force \
+  && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
@@ -62,7 +64,6 @@ RUN if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else g
   
 # Switch back to ROOT and install deps.
 WORKDIR $ROOT
-
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
   && bundle clean --force \
