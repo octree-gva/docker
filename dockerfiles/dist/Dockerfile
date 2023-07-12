@@ -70,12 +70,13 @@ RUN apt-get upgrade -yq \
   && apt-get install -yq gnupg2 \
   && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends \
+    build-essential curl libpq-dev \
     git-core tzdata imagemagick pkg-config \
     libxml2-dev libxslt-dev nodejs npm vim \
-    libpq-dev shared-mime-info locales locales-all \
+    shared-mime-info locales locales-all \
   && npm install -g yarn --force \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
   && truncate -s 0 /var/log/*log \
   && gem install bundler -v $BUNDLER_VERSION
 
