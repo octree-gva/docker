@@ -18,6 +18,7 @@ ensure
     system("rm -rf decidim-repo")
 end
 
+last_stable = ""
 supported_versions.map do |version| 
     docker = DockerImage.new(version)
     decidim_version_string = docker.decidim_version.version.join(".")
@@ -53,14 +54,15 @@ supported_versions.map do |version|
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker.decidim_version.version) do |version|
             image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+            last_stable = image
             build_command = "docker tag #{source_tag}-build #{image}-build"
             dist_command = "docker tag #{source_tag}-dist #{image}"
             if push_to_dockerhub?
                 system("#{build_command}")
                 system("#{dist_command}")
-                `docker push #{image}-build`
-                `docker push #{image}`
-            else
+                system("docker push #{image}-build")
+                system("docker push #{image}")
+                else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dist_command}"
             end    
@@ -73,11 +75,20 @@ supported_versions.map do |version|
         if push_to_dockerhub?
             system("#{build_command}")
             system("#{dist_command}")
-            `docker push #{image}-build`
-            `docker push #{image}`
+            system("docker push #{image}-build")
+            system("docker push #{image}")
         else
             puts "--dry-run: #{build_command}"
             puts "--dry-run: #{dist_command}"
         end
+    end
+end
+
+if last_stable
+    build_command = "docker tag #{last_stable}-build latest-build"
+    dist_command = "docker tag #{last_stable}-dist latest"
+    if push_to_dockerhub?
+        system("docker push latest-build")
+        system("docker push latest")
     end
 end
