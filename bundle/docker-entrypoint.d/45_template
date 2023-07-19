@@ -2,7 +2,7 @@
 require "erb"
 
 puts "Setup templates"
-root_dir = ENV.fetch("ROOT")
+root_dir = ENV.fetch("ROOT", "/home/decidim/app")
 template_directory = "/usr/local/share/decidim/templates"
 template_motd = ERB.new(File.read(File.join(template_directory, "motd.txt.erb")))
 supervisord_motd = ERB.new(File.read(File.join(template_directory, "supervisord.conf.erb")))
