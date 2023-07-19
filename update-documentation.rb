@@ -44,7 +44,7 @@ supported_versions.map do |version|
         tag_versions(docker.decidim_version.version) do |version|
             decidim_table.push([
                 decidim_version_string,
-                "ruby:#{docker.buster_tag}",
+                "ruby:#{docker.slim_buster_tag}",
                 "node_#{node_major_version}_x",
                 "docker-compose -f quickstart.#{version}.yml up"
             ])
@@ -63,7 +63,7 @@ supported_versions.map do |version|
         )
         decidim_table.push([
             docker.decidim_version.github_branch,
-            "ruby:#{docker.buster_tag}",
+            "ruby:#{docker.slim_buster_tag}",
             "node_#{node_major_version}_x",
             "docker-compose -f quickstart.#{docker.decidim_version.github_branch}.yml up"
         ])

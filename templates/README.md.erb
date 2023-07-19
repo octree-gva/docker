@@ -301,7 +301,7 @@ To debug and rebuild the images locally, you can:
 
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
-<%= decidim_table.map {|row| "| #{row.map{|cell| cell.ljust(18)}.join("| ")} |"}.join("\n") %>
+<%= decidim_table.map {|row| "| #{row.map{|cell| "`#{cell}`".ljust(18)}.join("| ")} |"}.join("\n") %>
 
 The templates for README, quickstart.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
 
