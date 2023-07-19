@@ -37,11 +37,12 @@ jobs:
       - name: Push README
         run: |
           docker run --rm -e DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }} \
+            -v $(pwd):/myvol \
             -e DOCKER_PASS=${{ secrets.DOCKERHUB_TOKEN }} \
             -e PUSHRM_SHORT="Decidim docker images" \
             -e PUSHRM_TARGET="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/decidim" \
             -e PUSHRM_DEBUG=1 \
-            -e PUSHRM_FILE=$PWD/README.md chko/docker-pushrm
+            -e PUSHRM_FILE=/myvol/README.md chko/docker-pushrm:v1
 
       - name: Commit and push changes
         run: |
