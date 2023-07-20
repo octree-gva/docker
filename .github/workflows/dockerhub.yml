@@ -42,7 +42,7 @@ jobs:
             -e PUSHRM_SHORT="Decidim docker images" \
             -e PUSHRM_TARGET="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/decidim" \
             -e PUSHRM_DEBUG=1 \
-            -e PUSHRM_FILE=/myvol/README.md chko/docker-pushrm:v1
+            -e PUSHRM_FILE=/myvol/README.md chko/docker-pushrm
 
       - name: Commit and push changes
         run: |
