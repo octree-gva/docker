@@ -12,8 +12,6 @@ ARG BUILD_DATE \
     BUNDLER_VERSION \
     # Optional paramenters for the generator (ex: --edge)
     GENERATOR_PARAMS \
-    # production, development or test
-    RAILS_ENV \
     # System locale
     LOCALE \
     # Build 
@@ -43,7 +41,7 @@ ENV LANG=${LOCALE} LANGUAGE=${LOCALE} LC_ALL=${LOCALE} \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
-    RAILS_ENV=${RAILS_ENV} NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION} \
+    RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUILD_WITHOUT=${BUILD_WITHOUT}
 
 RUN apt-get upgrade -yq \

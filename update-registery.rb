@@ -54,6 +54,7 @@ supported_versions.map do |version|
             --build-arg BUILD_WITHOUT="" \
             --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
             --build-arg VERSION=#{decidim_version_string} \
+            --build-arg RAILS_ENV=development \
             --build-arg BUNDLER_VERSION=#{bundler_version} \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg BUILD_DATE=#{build_date} \
@@ -66,6 +67,7 @@ supported_versions.map do |version|
             --build-arg BUNDLER_VERSION=#{bundler_version} \
             --build-arg BASE_IMAGE=ruby:#{docker.slim_buster_tag} \
             --build-arg BUILD_DATE=#{build_date} \
+            --build-arg RAILS_ENV=production \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/dist/Dockerfile ./bundle`
