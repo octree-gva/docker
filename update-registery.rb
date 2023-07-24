@@ -59,7 +59,7 @@ supported_versions.map do |version|
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
-        -f ./dockerfiles/build/Dockerfile ./bundle"
+        -f ./dockerfiles/dist/Dockerfile ./bundle"
     puts docker_cmd
     system(docker_cmd)
     docker_cmd = `docker build -t #{source_tag}-dist \
