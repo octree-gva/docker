@@ -73,6 +73,11 @@ supported_versions.map do |version|
         -f ./dockerfiles/dist/Dockerfile ./bundle`
     puts docker_cmd
     system(docker_cmd)
+    docker_cmd = `docker build -t #{source_tag}-selfservice \
+            --build-arg BASE_IMAGE=#{source_tag}-dist \
+        -f ./dockerfiles/selfservice/Dockerfile ./bundle`
+    puts docker_cmd
+    system(docker_cmd)
     
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
@@ -81,17 +86,21 @@ supported_versions.map do |version|
             last_stable = image
             build_command = "docker tag #{source_tag}-build #{image}-build"
             dev_command = "docker tag #{source_tag}-dev #{image}-dev"
+            selfservice_command = "docker tag #{source_tag}-selfservice #{image}-selfservice"
             dist_command = "docker tag #{source_tag}-dist #{image}"
             if push_to_dockerhub?
                 system("#{build_command}")
                 system("#{dev_command}")
                 system("#{dist_command}")
+                system("#{selfservice_command}")
                 system("docker push #{image}-build")
                 system("docker push #{image}-dev")
+                system("docker push #{image}-selfservice")
                 system("docker push #{image}")
                 else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dev_command}"
+                puts "--dry-run: #{selfservice_command}"
                 puts "--dry-run: #{dist_command}"
             end    
         end

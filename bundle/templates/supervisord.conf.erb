@@ -1,6 +1,11 @@
 [unix_http_server]
 file=<%= root %>/tmp/sockets/supervisor
 
+[inet_http_server]
+username=decidim
+password=<%= rand_password %>
+port=*:9001
+
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
@@ -17,7 +22,7 @@ nodaemon=true
 user=decidim
 
 [program:cron]
-command=cron -f
+command=cron start -f
 directory=<%= root %>
 autostart=<%= run_cron.to_s %>
 autorestart=true
@@ -29,7 +34,7 @@ killasgroup=true
 stopasgroup=true
 
 [program:puma]
-command=bundle exec rails server
+command=bundle exec puma --bind unix:///home/decidim/app/tmp/puma.sock
 directory=<%= root %>
 autostart=<%= run_rails.to_s %>
 autorestart=true
@@ -52,5 +57,17 @@ stderr_logfile=<%= root %>/log/errors.sidekiq.log
 killasgroup=true
 stopasgroup=true
 
+[program:nginx]
+command=nginx
+directory=/etc/nginx
+autostart=<%= run_nginx.to_s %>
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.nginx.log
+stderr_logfile=<%= root %>/log/errors.nginx.log
+killasgroup=true
+stopasgroup=true
+
 [group:workers]
-programs=puma,sidekiq,cron
+programs=puma,sidekiq,cron,nginx

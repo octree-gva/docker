@@ -5,7 +5,9 @@ ARG BASE_IMAGE \
     VERSION \
     RAILS_ENV \
     BUNDLER_VERSION \
-    LOCALE
+    LOCALE \
+    USER_ID \
+    GROUP_ID
 
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
@@ -34,7 +36,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 ENV LANG=${LOCALE} LANGUAGE=${LOCALE} LC_ALL=${LOCALE} \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
-    DECIDIM_VERSION=${VERSION}
+    DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID}
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -43,7 +45,8 @@ ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
     SMTP_USERNAME="" DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_MAILER_SENDER="change-me@example.org" SMTP_PORT="587" \
     SMTP_STARTTLS_AUTO="true" SMTP_AUTHENTICATION="plain" \
-    QUEUE_ADAPTER="async" SIDEKIQ_CONCURRENCY="5"
+    QUEUE_ADAPTER="async" SIDEKIQ_CONCURRENCY="5" \
+    DECIDIM_RUN_RAILS="1" DECIDIM_RUN_SIDEKIQ="1" DECIDIM_RUN_CRON="1"
 
 ENV STORAGE_PROVIDER="local" STORAGE_CDN_HOST="" AWS_ACCESS_KEY_ID="" \
     AWS_SECRET_ACCESS_KEY="" AWS_BUCKET="" AWS_REGION="" AWS_ENDPOINT="" \
@@ -84,38 +87,45 @@ RUN apt-get upgrade -yq \
   && gem install bundler -v $BUNDLER_VERSION
 
 WORKDIR $ROOT
+RUN groupadd -g ${GROUP_ID} decidim && \
+    useradd -u ${USER_ID} -g ${GROUP_ID} -ms /bin/sh decidim
 
 # Setup bundle global config
 RUN bundle config --global build.nokogiri --use-system-libraries \
   && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
   && bundle config set --global path 'vendor'
 
-# Copy directories that are needed to run decidim
-# We copy one by one to take advantage of docker cache
-COPY --from=builder /usr/local/bundle /usr/local/bundle
-COPY --from=builder $ROOT/vendor ./vendor
-# Copy the shared-mime-info database
-COPY --from=builder /usr/share/mime  /usr/share/mime
-# Copy application
-COPY --from=builder $ROOT/Gemfile* ./
-RUN bundle install
-
-# Copy application
-COPY --from=builder $ROOT/config.ru $ROOT/Rakefile ./
-COPY --from=builder $ROOT/public ./public
-COPY --from=builder $ROOT/storage ./storage
-COPY --from=builder $ROOT/lib ./lib
-COPY --from=builder $ROOT/bin ./bin
-COPY --from=builder $ROOT/db ./db
-COPY --from=builder $ROOT/config ./config
-COPY --from=builder $ROOT/app ./app
-
 # Add docker scripts
 COPY ./bin /usr/local/bin/
+RUN chmod +x /usr/local/bin/*
+
 # Add erb templates that will be populated at start
 COPY ./templates /usr/local/share/decidim/templates
 # Add scripts to run alphabetically for entrypoints
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+
+
+USER decidim
+# Copy directories that are needed to run decidim
+# We copy one by one to take advantage of docker cache
+COPY --from=builder --chown=decidim /usr/local/bundle /usr/local/bundle
+COPY --from=builder --chown=decidim $ROOT/vendor ./vendor
+# Copy the shared-mime-info database
+COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
+# Copy application
+COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
+RUN bundle install
+
+# Copy application
+COPY --from=builder --chown=decidim $ROOT/config.ru $ROOT/Rakefile ./
+COPY --from=builder --chown=decidim $ROOT/public ./public
+COPY --from=builder --chown=decidim $ROOT/storage ./storage
+COPY --from=builder --chown=decidim $ROOT/lib ./lib
+COPY --from=builder --chown=decidim $ROOT/bin ./bin
+COPY --from=builder --chown=decidim $ROOT/db ./db
+COPY --from=builder --chown=decidim $ROOT/config ./config
+COPY --from=builder --chown=decidim $ROOT/app ./app
+
 # Prepare crontab.
 COPY ./crontab.d /usr/local/share/cronfiles
 COPY ./crontab /etc/crontab
@@ -123,11 +133,10 @@ COPY ./docker-compose.yml docker-compose.yml
 COPY ./Dockerfile Dockerfile
 
 # Ensure binaries can be executed.
-RUN chmod +x /usr/local/bin/* \
-  # Backup directories that will be mounted in volumes
-  # because several Docker infrastructure will clean the 
-  # directories on volumes mounts.
-  && mkdir -p ./tmp/pids ./log \
+# Backup directories that will be mounted in volumes
+# because several Docker infrastructure will clean the 
+# directories on volumes mounts.
+RUN mkdir -p ./tmp/pids ./log \
   && tar cfvz ./tmp/public.bak.tar.gz public \
   && tar cfvz ./tmp/config.bak.tar.gz config \
   && tar cfvz ./tmp/db.bak.tar.gz db
