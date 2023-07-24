@@ -49,13 +49,13 @@ RUN apt-get upgrade -yq \
   && locale-gen $LANGUAGE \
   # Install node and yarn
   && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
-  && npm -g yarn --force \
   # Install native deps
   && apt-get install -yq \
     build-essential yarn git-core vim \
     tmux unzip python3-pip python3-setuptools \
     nodejs yarn tzdata \
     imagemagick libpq-dev \
+  && npm -g yarn --force \
   && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
   && apt-get clean \
