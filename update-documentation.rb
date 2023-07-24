@@ -46,16 +46,21 @@ supported_versions.map do |version|
                 decidim_version_string,
                 "ruby:#{docker.slim_buster_tag}",
                 "node_#{node_major_version}_x",
-                "docker-compose -f quickstart.#{version}.yml up"
+                "docker-compose -f decidim.#{version}.yml up"
             ])
             stable_images.push(
                 "[:#{version}](https://hub.docker.com/r/#{DOCKERHUB_USERNAME}/decidim/tags?page=1&name=#{version})"
             )
-            File.write("./quickstart.#{version}.yml", template_quickstart.result_with_hash(
+            File.write("./decidim.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: true,
                 docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}"
             ))
-            break # Write down only one version in the README.
+            File.write("./development.#{version}.yml", template_quickstart.result_with_hash(
+                is_stable: false,
+                docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}-dev"
+            ))
+            # Write down only one version in the README.
+            break 
         end
     else
         dev_images.push(
@@ -65,11 +70,15 @@ supported_versions.map do |version|
             docker.decidim_version.github_branch,
             "ruby:#{docker.slim_buster_tag}",
             "node_#{node_major_version}_x",
-            "docker-compose -f quickstart.#{docker.decidim_version.github_branch}.yml up"
+            "docker-compose -f decidim.#{docker.decidim_version.github_branch}.yml up"
         ])
-        File.write("./quickstart.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
+        File.write("./decidim.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
             docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{docker.decidim_version.github_branch}"
+        ))
+        File.write("./development.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
+            is_stable: false,
+            docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}-dev"
         ))
     end
 end

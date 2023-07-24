@@ -31,6 +31,20 @@ supported_versions.map do |version|
     docker_cmd = "docker build -t #{source_tag}-build \
             #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
             --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
+            --build-arg BUILD_WITHOUT=development:test \
+            --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
+            --build-arg VERSION=#{decidim_version_string} \
+            --build-arg BUNDLER_VERSION=#{bundler_version} \
+            --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
+            --build-arg BUILD_DATE=#{build_date} \
+            --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
+        -f ./dockerfiles/build/Dockerfile ./bundle"
+    puts docker_cmd
+    system(docker_cmd)
+    docker_cmd = "docker build -t #{source_tag}-dev \
+            #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
+            --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
+            --build-arg BUILD_WITHOUT="" \
             --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
             --build-arg VERSION=#{decidim_version_string} \
             --build-arg BUNDLER_VERSION=#{bundler_version} \
@@ -57,14 +71,18 @@ supported_versions.map do |version|
             image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
             last_stable = image
             build_command = "docker tag #{source_tag}-build #{image}-build"
+            dev_command = "docker tag #{source_tag}-dev #{image}-dev"
             dist_command = "docker tag #{source_tag}-dist #{image}"
             if push_to_dockerhub?
                 system("#{build_command}")
+                system("#{dev_command}")
                 system("#{dist_command}")
                 system("docker push #{image}-build")
+                system("docker push #{image}-dev")
                 system("docker push #{image}")
                 else
                 puts "--dry-run: #{build_command}"
+                puts "--dry-run: #{dev_command}"
                 puts "--dry-run: #{dist_command}"
             end    
         end
@@ -72,14 +90,18 @@ supported_versions.map do |version|
         version = docker.decidim_version.github_branch
         image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
         build_command = "docker tag #{source_tag}-build #{image}-build"
+        dev_command = "docker tag #{source_tag}-dev #{image}-dev"
         dist_command = "docker tag #{source_tag}-dist #{image}"
         if push_to_dockerhub?
             system("#{build_command}")
+            system("#{dev_command}")
             system("#{dist_command}")
             system("docker push #{image}-build")
+            system("docker push #{image}-dev")
             system("docker push #{image}")
         else
             puts "--dry-run: #{build_command}"
+            puts "--dry-run: #{dev_command}"
             puts "--dry-run: #{dist_command}"
         end
     end
@@ -87,9 +109,11 @@ end
 
 if last_stable
     build_command = "docker tag #{last_stable}-build latest-build"
+    dev_command = "docker tag #{last_stable}-dev latest-dev"
     dist_command = "docker tag #{last_stable}-dist latest"
     if push_to_dockerhub?
         system("docker push latest-build")
+        system("docker push latest-dev")
         system("docker push latest")
     end
 end

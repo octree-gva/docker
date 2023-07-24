@@ -15,7 +15,9 @@ ARG BUILD_DATE \
     # production, development or test
     RAILS_ENV \
     # System locale
-    LOCALE
+    LOCALE \
+    # Build 
+    BUILD_WITHOUT
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -41,7 +43,8 @@ ENV LANG=${LOCALE} LANGUAGE=${LOCALE} LC_ALL=${LOCALE} \
     TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
-    RAILS_ENV=${RAILS_ENV} NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION}
+    RAILS_ENV=${RAILS_ENV} NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION} \
+    BUILD_WITHOUT=${BUILD_WITHOUT}
 
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
@@ -55,7 +58,7 @@ RUN apt-get upgrade -yq \
     tmux unzip python3-pip python3-setuptools \
     nodejs yarn tzdata \
     imagemagick libpq-dev \
-  && npm -g yarn --force \
+  && npm -g install yarn --force \
   && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
   && apt-get clean \
@@ -78,5 +81,6 @@ WORKDIR $ROOT
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
   && bundle clean --force \
+  && bundle config --global without $BUILD_WITHOUT \
   && bundle install --jobs "$(nproc)" --retry 3 \
   && truncate -s 0 /var/log/*log

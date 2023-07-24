@@ -2,12 +2,12 @@
 
 # Wait for postgres to be available for connections
 database_address = ENV.fetch("DATABASE_URL").match(/.*@([^\/]+).*/)[1]
-raise "postgres is unavailable, abort" unless system("wait-for-it \"#{database_address}\" -t 60")
+raise "#{database_address} is unavailable, abort" unless system("wait-for-it \"#{database_address}\" -t 60")
 
 queue_adapter = ENV.fetch("QUEUE_ADAPTER", "default")
 if queue_adapter == "sidekiq"
   redis_address = ENV.fetch("REDIS_URL").match(/.*@([^\/]+).*/)[1]
-  raise "redis is unavailable, abort" unless system("wait-for-it \"#{redis_address}\" -t 60")
+  raise "#{redis_address} is unavailable, abort" unless system("wait-for-it \"#{redis_address}\" -t 60")
 end
 
 puts "    ✅ databases are ready"

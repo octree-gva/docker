@@ -4,29 +4,34 @@
 # Don't edit it directly.
 #
 # @see /update-documentation.rb
+# @see /templates/quickstart.yml.erb
 # #################################################
+version: '3.9'
 services:
   decidim:
     container_name: decidim
     
-    image: hfroger/decidim:0.26
+    image: hfroger/decidim:0.27
     ports:
       - 3000:3000
     volumes:
       - storage:/home/decidim/app/storage
       - bundle:/home/decidim/app/vendor
+      - public:/home/decidim/app/public
+      - db:/home/decidim/app/db
+      - config:/home/decidim/app/config
     environment:
-      - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-      - DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
-      - DATABASE_URL=postgres://decidim:youReallyWantToChangeMe@pg:5432/decidim
-      - REDIS_URL=redis://default:youReallyWantToChangeMe@redis:6379/1
-      - RAILS_SERVE_STATIC_FILES=true
-      - RAILS_FORCE_SSL=false
-      - SMTP_ADDRESS=mailer
-      - SMTP_PORT=25
-      - SMTP_AUTHENTICATION=none
-      - RUN_RAILS=1 
-      - RUN_SIDEKIQ=1
+      DECIDIM_SYSTEM_EMAIL: "hello@myorg.com"
+      DECIDIM_SYSTEM_PASSWORD: "youReallyWantToChangeMe"
+      DATABASE_URL: "postgres://decidim:youReallyWantToChangeMe@pg:5432/decidim"
+      REDIS_URL: "redis://default:youReallyWantToChangeMe@redis:6379/1"
+      RAILS_SERVE_STATIC_FILES: "true"
+      RAILS_FORCE_SSL: "false"
+      SMTP_ADDRESS: "mailer"
+      SMTP_PORT: "25"
+      SMTP_AUTHENTICATION: "none"
+      RUN_RAILS: "1"
+      RUN_SIDEKIQ: "1"
     depends_on:
       - pg
       - redis
@@ -44,9 +49,9 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=youReallyWantToChangeMe
-      - POSTGRES_USER=decidim
-      - POSTGRES_DB=decidim
+      POSTGRES_PASSWORD: "youReallyWantToChangeMe"
+      POSTGRES_USER: "decidim"
+      POSTGRES_DB: "decidim"
     networks:
       - private
 
@@ -64,6 +69,7 @@ services:
   mailer:
     image: tophfr/mailcatcher
     ports:
+      # SMTP port is 25, webinterface is on 80
       - 1080:80
     networks:
       - private
@@ -74,6 +80,10 @@ volumes:
   redis-data: {}
   storage: {}
   bundle: {}
+  public: {}
+  db: {}
+  config: {}
+
 networks:
   private:
     internal: true

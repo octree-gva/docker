@@ -130,9 +130,6 @@ RUN chmod +x /usr/local/bin/* \
   && tar cfvz ./tmp/config.bak.tar.gz config \
   && tar cfvz ./tmp/db.bak.tar.gz db
 
-VOLUME db
-VOLUME public
-VOLUME config
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["start"]

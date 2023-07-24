@@ -10,8 +10,8 @@ version: '3.9'
 services:
   decidim:
     container_name: decidim
-    <%= "# DON'T USE THIS IN PRODUCTION, this is an unstable version" unless is_stable %>
-    image: <%= docker_tag %>
+    # DON'T USE THIS IN PRODUCTION, this is an unstable version
+    image: decidim/decidim:0.27-dev
     ports:
       - 3000:3000
     volumes:
