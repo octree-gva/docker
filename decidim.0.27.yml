@@ -6,7 +6,7 @@
 # @see /update-documentation.rb
 # @see /templates/quickstart.yml.erb
 # #################################################
-version: '3.9'
+version: "3.3"
 services:
   decidim:
     container_name: decidim
@@ -32,6 +32,8 @@ services:
       SMTP_AUTHENTICATION: "none"
       RUN_RAILS: "1"
       RUN_SIDEKIQ: "1"
+      RAILS_ENV: production
+      SECRET_KEY_BASE: whatever
     depends_on:
       - pg
       - redis
