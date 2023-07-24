@@ -6,12 +6,12 @@
 # @see /update-documentation.rb
 # @see /templates/quickstart.yml.erb
 # #################################################
-version: '3.9'
+version: '3.3'
 services:
   decidim:
     container_name: decidim
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: hfroger/decidim:#<DecidimVersion:0x000055c523eb9180>-dev
+    image: hfroger/decidim:#<DecidimVersion:0x0000563453ce9248>-dev
     ports:
       - 3000:3000
     volumes:
