@@ -32,8 +32,7 @@ supported_versions.map do |version|
             #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
             --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
             --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
-            --build-arg VERSION=#{docker.decidim_version.version} \
-            --build-arg DECIDIM_VERSION=#{docker.decidim_version.version} \
+            --build-arg VERSION=#{decidim_version_string} \
             --build-arg BUNDLER_VERSION=#{bundler_version} \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg BUILD_DATE=#{build_date} \
