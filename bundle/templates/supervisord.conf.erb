@@ -17,7 +17,7 @@ nodaemon=true
 user=decidim
 
 [program:cron]
-command=crond -f
+command=cron -f
 directory=<%= root %>
 autostart=<%= run_cron.to_s %>
 autorestart=true
