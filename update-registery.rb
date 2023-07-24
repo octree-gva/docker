@@ -68,6 +68,8 @@ supported_versions.map do |version|
             --build-arg BASE_IMAGE=ruby:#{docker.slim_buster_tag} \
             --build-arg BUILD_DATE=#{build_date} \
             --build-arg RAILS_ENV=production \
+            --build-arg GROUP_ID=1001 \
+            --build-arg USER_ID=1001 \
             --build-arg NODE_MAJOR_VERSION=#{node_major_version} \
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/dist/Dockerfile ./bundle`
@@ -95,8 +97,8 @@ supported_versions.map do |version|
                 system("#{selfservice_command}")
                 system("docker push #{image}-build")
                 system("docker push #{image}-dev")
-                system("docker push #{image}-selfservice")
                 system("docker push #{image}")
+                system("docker push #{image}-selfservice")
                 else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dev_command}"
