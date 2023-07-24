@@ -41,12 +41,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ### Get the docker-compose
-In an empty directory, download the [quickstart](https://raw.githubusercontent.com/decidim/docker/master/quickstart.yml) docker-compose.
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.3.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/quickstart.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.3.yml > docker-compose.yml
 ```
 
 ### Run the docker-compose
@@ -113,7 +113,7 @@ That's it, you've got your participatory platform!
 | [http://127.0.0.1:1080](http://127.0.0.1:1080) | ✉️ A Mailcatcher instance, all emails will be sent there |
 | [http://127.0.0.1:3000](http://127.0.0.1:3000) | 🌱 Decidim instance |
 | [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
-| [http://127.0.0.1:3000/sidekiq](http://127.0.0.1:3000/_queuedjobs) | Monitoring Sidekiq jobs (login with your admin account) |
+| [http://127.0.0.1:3000/sidekiq](http://127.0.0.1:3000/sidekiq) | Monitoring Sidekiq jobs (login with your admin account) |
 | [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
 Before deploying, be sure to read the [good practices](#good-practices).
@@ -124,13 +124,13 @@ Before deploying, be sure to read the [good practices](#good-practices).
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Dockerhub](#dockerhub)
 - [Eject you decidim instance](#eject-you-decidim-instance)
 - [Environments configurations](#environments-configurations)
 - [Unsupported Environments](#unsupported-environments)
 - [Cron configurations](#cron-configurations)
 - [Extend Decidim Images](#extend-decidim-images)
+- [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
 - [Good Practices](#good-practices)
   - [Choose a 64chars password for redis](#choose-a-64chars-password-for-redis)
   - [Use memcached as cache](#use-memcached-as-cache)
@@ -138,6 +138,8 @@ Before deploying, be sure to read the [good practices](#good-practices).
   - [Don't run decidim with privilegied postgres user](#dont-run-decidim-with-privilegied-postgres-user)
 - [Contribute](#contribute)
 - [Local development](#local-development)
+  - [Templates](#templates)
+  - [Scripts](#scripts)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -150,38 +152,24 @@ Please choose one of the officially supported version of Decidim.
 
 **Stable tags**
 
-[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27)
+[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=develop)
+[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
 
 ## Eject you decidim instance
-You want to publish your instance on a git client? 
+You want to publish your instance on a git? 
 You can copy all files of your decidim container in your local environment with `docker cp`
 
 ```bash
-docker-compose -f quickstart.yml up -d
+docker-compose up -d
 docker cp decidim:/home/decidim/app ready-to-publish # Wait the command finishes!
 cd ready-to-publish && git init
 # Follow your git client instructions to upload this repo to github
 ```
 
-And if you want to keep this docker-compose from quickstart: 
-```diff
-    container_name: decidim
-    image: ghcr.io/decidim/decidim:latest
-    ports:
-      - 3000:3000
-    volumes:
-+     - ./ready-to-publish:/home/decidim/app
-+   environment:
--     - storage:/home/decidim/app/storage
--     - ./db/migrate:/home/decidim/app/migrate
--   environment:    
-      - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-      - DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
-```
+Once ejected, you will have a Dockerfile and docker-compose ready to use on your ejected application. 
 
 ## Environments configurations
 >  🔐: be sure to read the [good practices](#good-practices) ;)
@@ -226,7 +214,7 @@ Almost all the `DECIDIM_` variables are available. [See the documentation on def
 ## Cron configurations
 Cron is configured to run scripts every 15min, 1hour, daily, weekly, monthly. 
 When the times comes, it will execute all scripts present in the `/etc/periodic` directory. 
-[By default](./bundle/crontab.d), the following scripts are executed: 
+[By default](./bundle/crontab.d), the following scripts are executed:
 
 ```sh
 ├── 15min
@@ -265,19 +253,21 @@ And update your docker-compose:
 -   environment:    
 ```
 
+> The environment variable `DECIDIM_RUN_CRON` (`1` or `0`) define if your container will run cron or not. 
+> Thus, you have a fine-grained control over your containers. `cron` is handled by supervisord and is running in __forground__ when `1`
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
 FROM decidim:0.27.3
-USER root # temporary go back in root to add your executable
 RUN apk --update --no-cache restic
-USER decidim # Go back to non-root user
-# You are done!
+# You are done, restic is now available in your image.
 ```
 
-To improve this you could remove logs, cache and others artifact from `apk` or use a multi-stage build to keep only the restic binary.
+## Run Decidim in development/test mode
+The docker-compose `development.NAME_YOUR_VERSION.yml` allows you to run decidim in `development` or `test` mode. 
+They are larger images, and are not suited for production usage. 
 
 
 ## Good Practices
@@ -317,11 +307,27 @@ To debug and rebuild the images locally, you can:
 
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
+| `0.26.7`          | `ruby:2.7.8-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.26.yml up` |
 | `0.27.3`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
 | `develop`         | `ruby:3.1.4-slim-buster`| `node_16_x`       | `docker-compose -f decidim.develop.yml up` |
 
-The templates for README, quickstart.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
+### Templates
+The templates for README, decidim.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
+```
+├── templates
+│   ├── README.md.erb # This readme
+│   ├── container-Dockerfile.erb # the Dockerfile injected in the image, present if you eject
+│   ├── container-docker-compose.yml.erb # The docker-compose injected in the image, present if you eject
+│   └── quickstart.yml.erb # the decidim.NAME_YOUR_VERSION.yml docker-compose template.
+```
 
+### Scripts
+The scripts are all written in plain ruby. You can find the two generator scripts in this repo: 
+
+1. ./update-registery.rb: that build the Docker image (`-build`, `-dev` and NAME_YOUR_VERSION)
+2. ./update-documentation.rb: that generates the README, and the docker-compose files.
+
+These scripts are configurable, look at the `.env.sample` file for configuration variables. 
 
 [PR are Welcome](./CONTRIBUTING.md) ❤️ 
 
