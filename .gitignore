@@ -2,3 +2,5 @@
 versions.csv
 *versions
 .env
+bundle/Dockerfile
+bundle/docker-compose.yml

@@ -119,6 +119,8 @@ COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 # Prepare crontab.
 COPY ./crontab.d /usr/local/share/cronfiles
 COPY ./crontab /etc/crontab
+COPY ./docker-compose.yml docker-compose.yml
+COPY ./Dockerfile Dockerfile
 
 # Ensure binaries can be executed.
 RUN chmod +x /usr/local/bin/* \

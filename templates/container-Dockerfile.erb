@@ -1,0 +1,4 @@
+FROM <%= docker_tag %>
+USER decidim
+COPY . /home/decidim/app
+RUN bundle install --jobs "$(nproc)" --retry 3

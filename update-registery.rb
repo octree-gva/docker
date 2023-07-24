@@ -4,10 +4,12 @@ require_relative 'lib/decidim_version'
 require_relative 'lib/ruby_buster_repo'
 require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
-
+require "erb"
 DOCKERHUB_USERNAME = ENV.fetch("DOCKERHUB_USERNAME", "decidim")
 DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
 
+template_docker_compose = ERB.new(File.read('templates/container-docker-compose.yml.erb'))
+template_dockerfile = ERB.new(File.read('templates/container-Dockerfile.erb'))
 supported_versions = []
 begin
     system("git clone --bare https://github.com/decidim/decidim.git decidim-repo")
@@ -27,7 +29,12 @@ supported_versions.map do |version|
     is_stable = docker.decidim_version.github_branch.include?("stable")
     node_major_version = docker.decidim_version.node_version[0]
     bundler_version = docker.decidim_version.bundler_version.join(".")
-
+    File.write("./bundle/docker-compose.yml", template_docker_compose.result_with_hash(
+        is_stable: is_stable,
+    ))
+    File.write("./bundle/Dockerfile", template_dockerfile.result_with_hash(
+        docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{docker.decidim_version.version.first(2).join(".")}",
+    ))
     docker_cmd = "docker build -t #{source_tag}-build \
             #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
             --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
