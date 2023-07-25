@@ -2,3 +2,9 @@
 pid_file = ENV.fetch("RAILS_PID_FILE", "tmp/pids/server.pid")
 File.delete(pid_file) if File.exists?(pid_file)
 puts "    ✅ Puma pid is removed"
+
+pid_file = "tmp/pids/supervisord.pid"
+File.delete(pid_file) if File.exists?(pid_file)
+puts "    ✅ Supervisord pid is removed"
+
+Dir.mkdir("tmp/sockets") unless File.exists?("tmp/sockets")

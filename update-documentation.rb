@@ -11,12 +11,12 @@ DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,de
 
 supported_versions = []
 begin
-    system("git clone --bare https://github.com/decidim/decidim.git decidim-repo")
+    system("git", "clone", "--bare", "https://github.com/decidim/decidim.git", "decidim-repo")
     Dir.chdir('decidim-repo') do 
         supported_versions = DECIDIM_VERSIONS.map{|branch| DecidimVersion.new(branch) }
     end
 ensure
-    system("rm -rf decidim-repo README.md quickstart*.yml")
+    system("rm", "-rf", "decidim-repo", "README.md", "decidim*.yml", "development*.yml")
 end
 
 template_quickstart = ERB.new(File.read('templates/quickstart.yml.erb'))
@@ -89,4 +89,4 @@ File.write("./README.md", template_readme.result_with_hash(
     last_stable:last_stable,
     decidim_table:decidim_table
 ))
-system("doctoc README.md")
+system("doctoc", "README.md")
