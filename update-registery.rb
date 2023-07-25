@@ -76,7 +76,6 @@ def build_images(docker_image)
         "--build-arg", "FROM_IMAGE=#{source_tag}-build",
         "--build-arg", "GROUP_ID=1001",
         "--build-arg", "USER_ID=1001",
-        "--build-arg", "BUILD_WITHOUT=",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "RAILS_ENV=development",

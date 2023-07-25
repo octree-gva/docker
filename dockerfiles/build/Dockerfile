@@ -15,7 +15,7 @@ ARG BUILD_DATE \
     # System locale
     LOCALE="en_US.UTF-8" \
     # Build 
-    BUILD_WITHOUT
+    BUILD_WITHOUT=""
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
