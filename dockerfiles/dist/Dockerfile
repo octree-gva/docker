@@ -118,13 +118,7 @@ RUN bundle config --global build.nokogiri --use-system-libraries \
 # Add docker scripts
 COPY ./bin /usr/local/bin/
 RUN chmod +x /usr/local/bin/* \
-  && mkdir -p tmp/pids log \
-# Backup directories that will be mounted in volumes
-# because several Docker infrastructure will clean the 
-# directories on volumes mounts.
-  && tar cfvz ./tmp/public.bak.tar.gz public \
-  && tar cfvz ./tmp/config.bak.tar.gz config \
-  && tar cfvz ./tmp/db.bak.tar.gz db
+  && mkdir -p tmp/pids log
 
 
 # Add erb templates that will be populated at start
