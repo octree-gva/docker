@@ -11,7 +11,27 @@ ARG BASE_IMAGE \
     NODE_MAJOR_VERSION
 
 FROM $FROM_IMAGE as builder
+ENV RAILS_ENV=${RAILS_ENV}
+# If we want to run rails under something else than production, 
+# we need to install first the dependancies
+RUN if [ "$RAILS_ENV" != "production" ]; then \
+    bundle config --global without "" \
+    && bundle install
+;fi
+
 FROM $BASE_IMAGE
+ARG BASE_IMAGE \
+    FROM_IMAGE \
+    BUILD_DATE \
+    VCS_REF \
+    VERSION \
+    RAILS_ENV="production" \
+    BUNDLER_VERSION \
+    LOCALE="en_US.UTF-8" \
+    USER_ID="1001" \
+    GROUP_ID="1001" \
+    NODE_MAJOR_VERSION
+
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
       org.label-schema.description="Docker image for decidim" \

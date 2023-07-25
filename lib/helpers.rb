@@ -1,3 +1,6 @@
+require 'net/http'
+require 'json'
+
 def push_to_registery?
     ["1", "true", "enable"].include?(ENV.fetch("REGISTERY_PUSH", "false"))
 end
@@ -10,3 +13,4 @@ def tag_versions(decidim_versions)
         yield(prev_version)
     end
 end
+

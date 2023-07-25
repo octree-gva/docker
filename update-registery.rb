@@ -52,6 +52,7 @@ def build_images(docker_image)
     node_major_version = docker_image.decidim_version.node_version[0]
     bundler_version = docker_image.decidim_version.bundler_version.join(".")
     generator_params = is_stable ? [] : ["--build-arg", "GENERATOR_PARAMS=--edge"]
+
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-build",
@@ -65,7 +66,7 @@ def build_images(docker_image)
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
         "-f", "./dockerfiles/build/Dockerfile", "./bundle"
-      ]         
+    ]
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string}-build image" unless system(*docker_cmd)
     docker_cmd = [
