@@ -78,7 +78,7 @@ RUN apt-get upgrade -yq \
   && apt-get install -yq --no-install-recommends \
     build-essential curl libpq-dev \
     git-core tzdata imagemagick pkg-config \
-    libxml2-dev libxslt-dev nodejs node-gyp npm vim \
+    libxml2-dev libxslt-dev nodejs node-gyp libnode-dev npm vim \
     supervisor cron \
   && npm install -g yarn --force \
   && apt-get clean \
