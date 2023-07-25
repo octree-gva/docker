@@ -3,11 +3,11 @@ ARG BASE_IMAGE \
     BUILD_DATE \
     VCS_REF \
     VERSION \
-    RAILS_ENV \
+    RAILS_ENV="production" \
     BUNDLER_VERSION \
-    LOCALE \
-    USER_ID \
-    GROUP_ID \
+    LOCALE="en_US.UTF-8" \
+    USER_ID="1001" \
+    GROUP_ID="1001" \
     NODE_MAJOR_VERSION
 
 FROM $FROM_IMAGE as builder
