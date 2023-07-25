@@ -48,7 +48,7 @@ ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
     SMTP_STARTTLS_AUTO="true" SMTP_AUTHENTICATION="plain" \
     QUEUE_ADAPTER="async" SIDEKIQ_CONCURRENCY="5" \
     DECIDIM_RUN_RAILS="1" DECIDIM_RUN_SIDEKIQ="1" DECIDIM_RUN_CRON="1" \
-    NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION}
+    NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION:-"16"}
 
 ENV STORAGE_PROVIDER="local" STORAGE_CDN_HOST="" AWS_ACCESS_KEY_ID="" \
     AWS_SECRET_ACCESS_KEY="" AWS_BUCKET="" AWS_REGION="" AWS_ENDPOINT="" \
@@ -75,8 +75,8 @@ ENV MAPS_PROVIDER="" MAPS_API_KEY="" \
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
   && apt-get install -y locales \
-  && locale-gen $LANGUAGE \
-  && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  && locale-gen ${LANGUAGE} \
+  && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash - \
   && apt-get install -yq --no-install-recommends \
     build-essential curl libpq-dev \
     git-core tzdata imagemagick pkg-config \
@@ -86,7 +86,7 @@ RUN apt-get upgrade -yq \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
   && truncate -s 0 /var/log/*log \
-  && gem install bundler -v $BUNDLER_VERSION
+  && gem install bundler -v ${BUNDLER_VERSION}
 
 WORKDIR $ROOT
 RUN groupadd -g ${GROUP_ID} decidim \
