@@ -84,11 +84,11 @@ RUN apt-get upgrade -yq \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
   && truncate -s 0 /var/log/*log \
-  && gem install bundler -v ${BUNDLER_VERSION}
+  && gem install bundler -v $BUNDLER_VERSION
 
 WORKDIR $ROOT
-RUN groupadd -g ${GROUP_ID} decidim \
-  && useradd -u ${USER_ID} -g ${GROUP_ID} -ms /bin/sh decidim
+RUN groupadd -g $GROUP_ID decidim \
+  && useradd -u $USER_ID -g $GROUP_ID -ms /bin/sh decidim
 
 # Setup bundle global config
 RUN bundle config --global build.nokogiri --use-system-libraries \
