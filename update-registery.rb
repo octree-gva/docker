@@ -51,11 +51,11 @@ def build_images(docker_image)
     is_stable = docker_image.decidim_version.github_branch.include?("stable")
     node_major_version = docker_image.decidim_version.node_version[0]
     bundler_version = docker_image.decidim_version.bundler_version.join(".")
-
+    generator_params = is_stable ? [] : ["--build-arg", "GENERATOR_PARAMS=--edge"]
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-build",
-        is_stable ? "" : "--build-arg", "GENERATOR_PARAMS=--edge",
+        *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
         "--build-arg", "BUILD_WITHOUT=development:test",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
@@ -71,7 +71,7 @@ def build_images(docker_image)
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-dev",
-        is_stable ? "" : "--build-arg", "GENERATOR_PARAMS=--edge",
+        *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
         "--build-arg", "FROM_IMAGE=#{source_tag}-build",
         "--build-arg", "GROUP_ID=1001",
@@ -104,14 +104,16 @@ def build_images(docker_image)
     
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string} image" unless system(*docker_cmd)
-    docker_cmd = [
-        "docker", "build",
-        "-t", "#{source_tag}-selfservice",
-        "--build-arg", "BASE_IMAGE=#{source_tag}-dist",
-        "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
-    ]
-    puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
+    if is_stable
+        docker_cmd = [
+            "docker", "build",
+            "-t", "#{source_tag}-selfservice",
+            "--build-arg", "BASE_IMAGE=#{source_tag}-dist",
+            "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
+        ]
+        puts docker_cmd.join(" ")
+        raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
+    end
 end
 
 # Keep the last stable image found to publish the latest
