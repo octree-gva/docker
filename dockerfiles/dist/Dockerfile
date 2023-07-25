@@ -12,8 +12,6 @@ ARG BASE_IMAGE \
 
 FROM $FROM_IMAGE as builder
 FROM $BASE_IMAGE
-ARG BUNDLER_VERSION
-
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
       org.label-schema.description="Docker image for decidim" \
@@ -80,7 +78,7 @@ RUN apt-get upgrade -yq \
   && apt-get install -yq --no-install-recommends \
     build-essential curl libpq-dev \
     git-core tzdata imagemagick pkg-config \
-    libxml2-dev libxslt-dev nodejs npm vim \
+    libxml2-dev libxslt-dev nodejs node-gyp npm vim \
     supervisor cron \
   && npm install -g yarn --force \
   && apt-get clean \
