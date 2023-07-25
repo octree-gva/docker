@@ -16,7 +16,7 @@ ENV RAILS_ENV=${RAILS_ENV}
 # we need to install first the dependancies
 RUN if [ "$RAILS_ENV" != "production" ]; then \
     bundle config --global without "" \
-    && bundle install
+    && bundle install \
 ;fi
 
 FROM $BASE_IMAGE
