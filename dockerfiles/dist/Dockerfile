@@ -76,9 +76,9 @@ RUN apt-get upgrade -yq \
   && locale-gen ${LANGUAGE} \
   && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash - \
   && apt-get install -yq --no-install-recommends \
-    build-essential curl libpq-dev \
-    git-core tzdata imagemagick pkg-config \
-    libxml2-dev libxslt-dev nodejs yarn vim \
+    build-essential libpq-dev \
+    tzdata imagemagick \
+    nodejs yarn vim \
     supervisor cron \
   && npm install -g yarn --force \
   && apt-get clean \
