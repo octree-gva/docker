@@ -47,10 +47,13 @@ supported_versions.map do |version|
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/build/Dockerfile ./bundle"
     puts docker_cmd
-    system(docker_cmd)
+    raise "docker failed to build #{decidim_version_string}-build image" unless system(docker_cmd)
     docker_cmd = "docker build -t #{source_tag}-dev \
             #{is_stable ? "" : '--build-arg GENERATOR_PARAMS=--edge'} \
             --build-arg DECIDIM_VERSION=#{is_stable ? decidim_version_string : ""} \
+            --build-arg FROM_IMAGE=#{source_tag}-build \
+            --build-arg GROUP_ID=1001 \
+            --build-arg USER_ID=1001 \
             --build-arg BUILD_WITHOUT="" \
             --build-arg BASE_IMAGE=ruby:#{docker.buster_tag} \
             --build-arg VERSION=#{decidim_version_string} \
@@ -61,7 +64,7 @@ supported_versions.map do |version|
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/dist/Dockerfile ./bundle"
     puts docker_cmd
-    system(docker_cmd)
+    raise "docker failed to build #{decidim_version_string}-dev image" unless system(docker_cmd)
     docker_cmd = `docker build -t #{source_tag}-dist \
             --build-arg FROM_IMAGE=#{source_tag}-build \
             --build-arg BUNDLER_VERSION=#{bundler_version} \
@@ -74,12 +77,12 @@ supported_versions.map do |version|
             --build-arg VCS_REF=#{docker.decidim_version.commit_rev} \
         -f ./dockerfiles/dist/Dockerfile ./bundle`
     puts docker_cmd
-    system(docker_cmd)
+    raise "docker failed to build #{decidim_version_string} image" unless system(docker_cmd)
     docker_cmd = `docker build -t #{source_tag}-selfservice \
             --build-arg BASE_IMAGE=#{source_tag}-dist \
         -f ./dockerfiles/selfservice/Dockerfile ./bundle`
     puts docker_cmd
-    system(docker_cmd)
+    raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(docker_cmd)
     
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
