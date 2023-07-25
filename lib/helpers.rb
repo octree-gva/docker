@@ -1,6 +1,7 @@
-def push_to_dockerhub?
-    ["1", "true", "enable"].include?(ENV.fetch("DOCKERHUB_PUSH", "false"))
+def push_to_registery?
+    ["1", "true", "enable"].include?(ENV.fetch("REGISTERY_PUSH", "false"))
 end
+
 
 def tag_versions(decidim_versions)
     prev_version = decidim_versions.first

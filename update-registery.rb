@@ -5,7 +5,7 @@ require_relative 'lib/ruby_buster_repo'
 require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
 require "erb"
-DOCKERHUB_USERNAME = ENV.fetch("DOCKERHUB_USERNAME", "decidim")
+REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
 DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
 
 template_docker_compose = ERB.new(File.read('templates/container-docker-compose.yml.erb'))
@@ -24,7 +24,7 @@ end
 # Docker tag an image name to a new image name
 def tag_image(source, destination)
     tag_command = ["docker", "tag", "#{source}", "#{destination}"]
-    if push_to_dockerhub?
+    if push_to_registery?
         raise "docker failed to tag #{destination}" unless system(*tag_command)
     else
         puts "--dry-run: #{tag_command.join(" ")}"
@@ -35,7 +35,7 @@ end
 def push_image(source, destination)
     tag_image(source, destination)
     push_command = ["docker", "push", "#{destination}"]
-    if push_to_dockerhub?
+    if push_to_registery?
         raise "docker failed to push #{destination}" unless system(*push_command)
     else
         puts "--dry-run: #{push_command.join(" ")}"
@@ -127,13 +127,13 @@ supported_versions.map do |version|
         is_stable: is_stable,
     ))
     File.write("./bundle/Dockerfile", template_dockerfile.result_with_hash(
-        docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{docker_image.decidim_version.version.first(2).join(".")}",
+        docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker_image.decidim_version.version.first(2).join(".")}",
     ))
     build_images(docker_image)
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker_image.decidim_version.version) do |version|
-            image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+            image = "#{REGISTERY_USERNAME}/decidim:#{version}"
             last_stable = image
             push_image("#{source_tag}-build", "#{image}-build")
             push_image("#{source_tag}-dev", "#{image}-dev")
@@ -142,7 +142,7 @@ supported_versions.map do |version|
         end
     else
         version = docker_image.decidim_version.github_branch
-        image = "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+        image = "#{REGISTERY_USERNAME}/decidim:#{version}"
         push_image("#{source_tag}-build", "#{image}-build")
         push_image("#{source_tag}-dev", "#{image}-dev")
         push_image("#{source_tag}-dist", "#{image}")

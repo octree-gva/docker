@@ -6,7 +6,7 @@ require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
 require "erb"
 
-DOCKERHUB_USERNAME = ENV.fetch("DOCKERHUB_USERNAME", "decidim")
+REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
 DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
 
 supported_versions = []
@@ -49,22 +49,22 @@ supported_versions.map do |version|
                 "docker-compose -f decidim.#{version}.yml up"
             ])
             stable_images.push(
-                "[:#{version}](https://hub.docker.com/r/#{DOCKERHUB_USERNAME}/decidim/tags?page=1&name=#{version})"
+                "[:#{version}](https://hub.docker.com/r/#{REGISTERY_USERNAME}/decidim/tags?page=1&name=#{version})"
             )
             File.write("./decidim.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: true,
-                docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}"
+                docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}"
             ))
             File.write("./development.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: false,
-                docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}-dev"
+                docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}-dev"
             ))
             # Write down only one version in the README.
             break 
         end
     else
         dev_images.push(
-            "[:#{docker.decidim_version.github_branch}](https://hub.docker.com/r/#{DOCKERHUB_USERNAME}/decidim/tags?page=1&name=#{docker.decidim_version.github_branch})"
+            "[:#{docker.decidim_version.github_branch}](https://hub.docker.com/r/#{REGISTERY_USERNAME}/decidim/tags?page=1&name=#{docker.decidim_version.github_branch})"
         )
         decidim_table.push([
             docker.decidim_version.github_branch,
@@ -74,11 +74,11 @@ supported_versions.map do |version|
         ])
         File.write("./decidim.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
-            docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{docker.decidim_version.github_branch}"
+            docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker.decidim_version.github_branch}"
         ))
         File.write("./development.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
-            docker_tag: "#{DOCKERHUB_USERNAME}/decidim:#{version}-dev"
+            docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}-dev"
         ))
     end
 end
