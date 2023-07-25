@@ -13,7 +13,7 @@ ARG BUILD_DATE \
     # Optional paramenters for the generator (ex: --edge)
     GENERATOR_PARAMS \
     # System locale
-    LOCALE \
+    LOCALE="en_US.UTF-8" \
     # Build 
     BUILD_WITHOUT
 
@@ -79,6 +79,6 @@ WORKDIR $ROOT
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
   && bundle clean --force \
-  && bundle config --global without $BUILD_WITHOUT \
+  &&  if [ -z "$BUILD_WITHOUT" ]; then bundle config --global without "$BUILD_WITHOUT"; fi\
   && bundle install --jobs "$(nproc)" --retry 3 \
   && truncate -s 0 /var/log/*log
