@@ -94,15 +94,15 @@ supported_versions.map do |version|
             selfservice_command = "docker tag #{source_tag}-selfservice #{image}-selfservice"
             dist_command = "docker tag #{source_tag}-dist #{image}"
             if push_to_dockerhub?
-                system("#{build_command}")
-                system("#{dev_command}")
-                system("#{dist_command}")
-                system("#{selfservice_command}")
-                system("docker push #{image}-build")
-                system("docker push #{image}-dev")
-                system("docker push #{image}")
-                system("docker push #{image}-selfservice")
-                else
+                raise "docker failed to tag #{decidim_version_string}-build" unless system("#{build_command}")
+                raise "docker failed to tag #{decidim_version_string}-dev" unless system("#{dev_command}")
+                raise "docker failed to tag #{decidim_version_string}" unless system("#{dist_command}")
+                raise "docker failed to tag #{decidim_version_string}-selfservice" unless system("#{selfservice_command}")
+                raise "docker failed to push #{decidim_version_string}-build" unless system("docker push #{image}-build")
+                raise "docker failed to push #{decidim_version_string}-dev" unless system("docker push #{image}-dev")
+                raise "docker failed to push #{decidim_version_string}" unless system("docker push #{image}")
+                raise "docker failed to push #{decidim_version_string}-selfservice" unless system("docker push #{image}-selfservice")
+            else
                 puts "--dry-run: #{build_command}"
                 puts "--dry-run: #{dev_command}"
                 puts "--dry-run: #{selfservice_command}"
@@ -116,12 +116,12 @@ supported_versions.map do |version|
         dev_command = "docker tag #{source_tag}-dev #{image}-dev"
         dist_command = "docker tag #{source_tag}-dist #{image}"
         if push_to_dockerhub?
-            system("#{build_command}")
-            system("#{dev_command}")
-            system("#{dist_command}")
-            system("docker push #{image}-build")
-            system("docker push #{image}-dev")
-            system("docker push #{image}")
+            raise "docker failed to tag #{decidim_version_string}-build" unless system("#{build_command}")
+            raise "docker failed to tag #{decidim_version_string}-dev" unless system("#{dev_command}")
+            raise "docker failed to tag #{decidim_version_string}" unless system("#{dist_command}")
+            raise "docker failed to push #{decidim_version_string}-build" unless system("docker push #{image}-build")
+            raise "docker failed to push #{decidim_version_string}-dev" unless system("docker push #{image}-dev")
+            raise "docker failed to push #{decidim_version_string}" unless system("docker push #{image}")
         else
             puts "--dry-run: #{build_command}"
             puts "--dry-run: #{dev_command}"
@@ -135,8 +135,8 @@ if last_stable
     dev_command = "docker tag #{last_stable}-dev latest-dev"
     dist_command = "docker tag #{last_stable}-dist latest"
     if push_to_dockerhub?
-        system("docker push latest-build")
-        system("docker push latest-dev")
-        system("docker push latest")
+        raise "docker failed to push latest-build" unless system("docker push latest-build")
+        raise "docker failed to push latest-dev" unless system("docker push latest-dev")
+        raise "docker failed to push latest" unless system("docker push latest")
     end
 end
