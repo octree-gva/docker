@@ -74,14 +74,14 @@ def build_images(docker_image)
         "-t", "#{source_tag}-dev",
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
+        "--build-arg", "BUILD_WITHOUT=development:test",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
-        "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
         "-f", "./dockerfiles/build/Dockerfile", "./bundle"
-      ]
+    ]
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
     docker_cmd = [
