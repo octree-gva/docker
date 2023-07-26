@@ -80,7 +80,7 @@ def build_images(docker_image)
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
+        "-f", "./dockerfiles/build/Dockerfile", "./bundle"
       ]
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
