@@ -52,7 +52,7 @@ RUN apt-get upgrade -yq \
   && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   # Install native deps
   && apt-get install -yq \
-    build-essential yarn vim \
+    build-essential vim \
     tmux python3-pip python3-setuptools \
     nodejs yarn tzdata \
     imagemagick libpq-dev \

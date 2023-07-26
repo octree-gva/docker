@@ -3,6 +3,7 @@
 require 'json'
 require 'open3'
 require 'open-uri'
+require 'rubygems'
 
 class DecidimVersion
     attr_accessor :github_branch, :node_version, :ruby_version, :version, :commit_rev, :version, :bundler_version
@@ -45,6 +46,20 @@ class DecidimVersion
     def read_decidim_version
         version_string = URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/lib/decidim/version.rb").read.strip
         major, minor, patch = version_string.scan(/\d+/)
+        # Check last match over rubygem
+        # If we have a major.minor, then we take the last patch available
+        # on rubygem, and not the one present in the source. 
+        # FIXME: having a publishing flow should let all this too much
+        url = "https://rubygems.org/api/v1/versions/decidim.json"
+        gem_versions = JSON.parse(URI.open(url).read)
+        gem_versions.each do |version_data|
+          version = version_data['number']
+          segments = Gem::Version.new(version).segments
+          if segments[0..1].join(".") == "#{major}.#{minor}"
+            return segments
+          end
+        end
+        return [major, minor, patch]
     end
     
     def read_bundler_version
