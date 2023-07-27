@@ -129,7 +129,7 @@ COPY ./templates /usr/local/share/decidim/templates
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 
 
-USER decidim
+
 # Copy directories that are needed to run decidim
 # We copy one by one to take advantage of docker cache
 COPY --from=builder --chown=decidim /usr/local/bundle /usr/local/bundle
@@ -140,6 +140,7 @@ COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
 RUN bundle install
 
+USER decidim
 # Copy application
 COPY --from=builder --chown=decidim $ROOT/config.ru $ROOT/Rakefile ./
 COPY --from=builder --chown=decidim $ROOT/public ./public
