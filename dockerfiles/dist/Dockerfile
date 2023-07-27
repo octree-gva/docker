@@ -127,8 +127,6 @@ COPY ./templates /usr/local/share/decidim/templates
 # Add scripts to run alphabetically for entrypoints
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 
-
-
 # Copy directories that are needed to run decidim
 # We copy one by one to take advantage of docker cache
 COPY --from=builder --chown=decidim /usr/local/bundle /usr/local/bundle
@@ -139,9 +137,8 @@ COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
 RUN bundle install
 
-RUN mkdir -p $ROOT/tmp \ 
-  && chown -R decidim:decidim /etc/motd \
-  && $ROOT/tmp /var/run/crond.pid
+RUN chown -R decidim:decidim /etc/motd \
+  $ROOT/tmp /var/run/crond.pid
 
 USER decidim
 # Copy application
