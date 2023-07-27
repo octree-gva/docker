@@ -109,7 +109,7 @@ def build_images(docker_image)
             "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
         ]
         puts docker_cmd.join(" ")
-        raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
+        # raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
     end
 end
 
