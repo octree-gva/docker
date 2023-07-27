@@ -137,7 +137,7 @@ COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
 RUN bundle install
 
-RUN chown -R decidim:decidim /etc/motd \
+RUN touch /etc/motd /var/run/crond.pid && chown -R decidim:decidim /etc/motd \
   $ROOT/tmp /var/run/crond.pid
 
 USER decidim
