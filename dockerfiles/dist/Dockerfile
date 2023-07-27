@@ -139,6 +139,10 @@ COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
 RUN bundle install
 
+RUN mkdir -p $ROOT/tmp \ 
+  && chown -R decidim:decidim /etc/motd \
+  && $ROOT/tmp /var/run/crond.pid
+
 USER decidim
 # Copy application
 COPY --from=builder --chown=decidim $ROOT/config.ru $ROOT/Rakefile ./
@@ -155,8 +159,7 @@ COPY ./crontab.d /usr/local/share/cronfiles
 COPY ./crontab /etc/crontab
 COPY ./docker-compose.yml docker-compose.yml
 COPY ./Dockerfile Dockerfile
-RUN chown -R decidim:decidim /etc/motd \
-  $ROOT/tmp 
+
 
 
 ENTRYPOINT ["docker-entrypoint"]
