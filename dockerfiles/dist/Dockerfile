@@ -100,8 +100,7 @@ RUN apt-get upgrade -yq \
     tzdata imagemagick \
     nodejs yarn vim \
     supervisor cron \
-    libicu-dev \
-    npm \
+    libicu-dev npm \
   && npm install -g yarn --force \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
@@ -156,6 +155,8 @@ COPY ./crontab.d /usr/local/share/cronfiles
 COPY ./crontab /etc/crontab
 COPY ./docker-compose.yml docker-compose.yml
 COPY ./Dockerfile Dockerfile
+RUN chown -R decidim:decidim /etc/motd \
+  $ROOT/tmp 
 
 
 ENTRYPOINT ["docker-entrypoint"]
