@@ -113,6 +113,7 @@ def build_images(docker_image)
     end
 end
 
+image = "#{REGISTERY_USERNAME}/decidim"
 # Keep the last stable image found to publish the latest
 last_stable = ""
 supported_versions.map do |version| 
@@ -130,24 +131,22 @@ supported_versions.map do |version|
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker_image.decidim_version.version) do |version|
-            image = "#{REGISTERY_USERNAME}/decidim:#{version}"
-            last_stable = image
-            push_image("#{source_tag}-build", "#{image}-build")
-            push_image("#{source_tag}-dev", "#{image}-dev")
-            push_image("#{source_tag}-dist", "#{image}")
+            last_stable = "#{image}:#{version}"
+            push_image("#{source_tag}-build", "#{image}:#{version}-build")
+            push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
+            push_image("#{source_tag}-dist", "#{image}:#{version}")
             #push_image("#{source_tag}-selfservice", "#{image}-selfservice")
         end
     else
         version = docker_image.decidim_version.github_branch
-        image = "#{REGISTERY_USERNAME}/decidim:#{version}"
-        push_image("#{source_tag}-build", "#{image}-build")
-        push_image("#{source_tag}-dev", "#{image}-dev")
-        push_image("#{source_tag}-dist", "#{image}")
+        push_image("#{source_tag}-build", "#{image}:#{version}-build")
+        push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
+        push_image("#{source_tag}-dist", "#{image}:#{version}")
     end
 end
 
 if last_stable
-    push_image("#{last_stable}-build", "latest-build")
-    push_image("#{last_stable}-dev", "latest-dev")
-    push_image("#{last_stable}-dist", "latest")
+    push_image("#{last_stable}-build", "#{image}:latest-build")
+    push_image("#{last_stable}-dev", "#{image}:latest-dev")
+    push_image("#{last_stable}-dist", "#{image}:latest")
 end
