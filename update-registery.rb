@@ -109,7 +109,7 @@ def build_images(docker_image)
             "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
         ]
         puts docker_cmd.join(" ")
-        # raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
+        raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
     end
 end
 
@@ -134,8 +134,8 @@ supported_versions.map do |version|
             last_stable = image
             push_image("#{source_tag}-build", "#{image}-build")
             push_image("#{source_tag}-dev", "#{image}-dev")
-            push_image("#{source_tag}-selfservice", "#{image}-selfservice")
             push_image("#{source_tag}-dist", "#{image}")
+            push_image("#{source_tag}-selfservice", "#{image}-selfservice")
         end
     else
         version = docker_image.decidim_version.github_branch
