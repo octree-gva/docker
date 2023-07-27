@@ -100,6 +100,7 @@ RUN apt-get upgrade -yq \
     tzdata imagemagick \
     nodejs yarn vim \
     supervisor cron \
+    libicu-dev \
     npm \
   && npm install -g yarn --force \
   && apt-get clean \
