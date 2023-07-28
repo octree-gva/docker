@@ -131,7 +131,7 @@ supported_versions.map do |version|
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker_image.decidim_version.version) do |version|
-            last_stable = "#{image}:#{version}"
+            last_stable = "#{source_tag}"
             push_image("#{source_tag}-build", "#{image}:#{version}-build")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
