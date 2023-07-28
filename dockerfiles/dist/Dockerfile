@@ -142,14 +142,7 @@ RUN touch /etc/motd /var/run/crond.pid && chown -R decidim:decidim /etc/motd \
 
 USER decidim
 # Copy application
-COPY --from=builder --chown=decidim $ROOT/config.ru $ROOT/Rakefile ./
-COPY --from=builder --chown=decidim $ROOT/public ./public
-COPY --from=builder --chown=decidim $ROOT/storage ./storage
-COPY --from=builder --chown=decidim $ROOT/lib ./lib
-COPY --from=builder --chown=decidim $ROOT/bin ./bin
-COPY --from=builder --chown=decidim $ROOT/db ./db
-COPY --from=builder --chown=decidim $ROOT/config ./config
-COPY --from=builder --chown=decidim $ROOT/app ./app
+COPY --from=builder --chown=decidim $ROOT ./
 
 # Prepare crontab.
 COPY ./crontab.d /usr/local/share/cronfiles
@@ -157,6 +150,12 @@ COPY ./crontab /etc/crontab
 COPY ./docker-compose.yml docker-compose.yml
 COPY ./Dockerfile Dockerfile
 
+# Backup directories that can be in volumes
+# As some infrastructures will erase volumes on mount
+RUN tar cfvz public.bak.tar.gz public \ 
+  tar cfvz storage.bak.tar.gz storage \
+  tar cfvz db.bak.tar.gz db \
+  tar cfvz config.bak.tar.gz config
 
 
 ENTRYPOINT ["docker-entrypoint"]
