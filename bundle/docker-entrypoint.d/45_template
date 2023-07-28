@@ -21,7 +21,8 @@ File.write(File.join(root_dir, "/config/supervisord.conf"), supervisord_motd.res
 	run_sidekiq: ENV.fetch("DECIDIM_RUN_SIDEKIQ", "0") == "1",
 	run_cron: ENV.fetch("DECIDIM_RUN_CRON", "0") == "1",
 	run_nginx: ENV.fetch("DECIDIM_RUN_NGINX", "0") == "1",
-	rand_password: SecureRandom.hex(32)
+	unix_http_server_password: SecureRandom.hex(32),
+	inet_http_server_password: SecureRandom.hex(32)
 ))
 puts "    ✅ /etc/motd updated"
 puts "    ✅ #{$ROOT}/config/supervisord.conf updated"

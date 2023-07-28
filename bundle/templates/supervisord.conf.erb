@@ -1,9 +1,11 @@
 [unix_http_server]
 file=<%= root %>/tmp/sockets/supervisor
+username=decidim
+password=<%= unix_http_server_password %>
 
 [inet_http_server]
 username=decidim
-password=<%= rand_password %>
+password=<%= inet_http_server_password %>
 port=*:9001
 
 [rpcinterface:supervisor]
