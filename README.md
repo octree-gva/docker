@@ -41,12 +41,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ### Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.3.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.3.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml > docker-compose.yml
 ```
 
 ### Run the docker-compose
@@ -147,12 +147,13 @@ Before deploying, be sure to read the [good practices](#good-practices).
 ---
 
 ## Dockerhub
-Don't use the `latest` tag, it is used for `develop` branch and is not suited for production.
-Please choose one of the officially supported version of Decidim. 
+
+`latest` image is the last stable image. Use it with caution.
 
 **Stable tags**
 
-[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
+[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
+
 
 **Development tags**
 
@@ -260,7 +261,7 @@ And update your docker-compose:
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
-FROM decidim:0.27.3
+FROM decidim:0.27.4
 RUN apk --update --no-cache restic
 # You are done, restic is now available in your image.
 ```
@@ -297,6 +298,7 @@ A common way to put this in practice is to have CI/CD deployment script (through
 
 **NB** running `rails db:migrate` while a rails application is running is most of the time a bad idea (connection to postgres can hangs). Always check `rails db:migrate:status` after a migration, to be sure all migration passed.
 
+
 ## Contribute
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more informations.
 
@@ -307,8 +309,7 @@ To debug and rebuild the images locally, you can:
 
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
-| `0.26.7`          | `ruby:2.7.8-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.26.yml up` |
-| `0.27.3`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
+| `0.27.4`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
 | `develop`         | `ruby:3.1.4-slim-buster`| `node_16_x`       | `docker-compose -f decidim.develop.yml up` |
 
 ### Templates
