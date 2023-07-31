@@ -36,7 +36,7 @@ killasgroup=true
 stopasgroup=true
 
 [program:puma]
-command=bundle exec puma --bind unix:///home/decidim/app/tmp/puma.sock
+command=bundle exec puma --bind 0.0.0.0
 directory=<%= root %>
 autostart=<%= run_rails.to_s %>
 autorestart=true

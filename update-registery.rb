@@ -6,7 +6,7 @@ require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
 require "erb"
 REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
-DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
+DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable").split(",")
 
 template_docker_compose = ERB.new(File.read('templates/container-docker-compose.yml.erb'))
 template_dockerfile = ERB.new(File.read('templates/container-Dockerfile.erb'))
@@ -30,6 +30,7 @@ def tag_image(source, destination)
         puts "--dry-run: #{tag_command.join(" ")}"
     end
 end
+
 ##
 # Docker tag an image name to a destination image name, and push the latter.
 def push_image(source, destination)
@@ -58,13 +59,13 @@ def build_images(docker_image)
         "-t", "#{source_tag}-build",
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
-        "--build-arg", "BUILD_WITHOUT=development:test",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
+        "--no-cache", "--network=host",
         "-f", "./dockerfiles/build/Dockerfile", "./bundle"
     ]
     puts docker_cmd.join(" ")
@@ -80,6 +81,7 @@ def build_images(docker_image)
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
+        "--no-cache", "--network=host",
         "-f", "./dockerfiles/build/Dockerfile", "./bundle"
     ]
     puts docker_cmd.join(" ")
@@ -96,6 +98,7 @@ def build_images(docker_image)
         "--build-arg", "USER_ID=1001",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
+        "--no-cache", "--network=host",
         "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
       ]
     
@@ -106,6 +109,7 @@ def build_images(docker_image)
             "docker", "build",
             "-t", "#{source_tag}-selfservice",
             "--build-arg", "BASE_IMAGE=#{source_tag}-dist",
+            "--no-cache", "--network=host",
             "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
         ]
         puts docker_cmd.join(" ")
