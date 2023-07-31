@@ -139,7 +139,7 @@ supported_versions.map do |version|
             push_image("#{source_tag}-build", "#{image}:#{version}-build")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
-            push_image("#{source_tag}-selfservice", "#{image}-selfservice")
+            push_image("#{source_tag}-selfservice", "#{image}:#{version}-selfservice")
         end
     else
         version = docker_image.decidim_version.github_branch
