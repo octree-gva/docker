@@ -121,7 +121,7 @@ RUN apt-get upgrade -yq \
   && truncate -s 0 /var/log/*log \
   # Add User
   && groupadd -g $GROUP_ID decidim \
-  && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim \
+  && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim 
 
 # Add docker scripts
 COPY ./bin /usr/local/bin/
