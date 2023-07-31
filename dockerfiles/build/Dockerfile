@@ -56,10 +56,10 @@ RUN apt-get upgrade -yq \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
   && truncate -s 0 /var/log/*log \
-  # Setup global bundle configurations
-  && bundle config --global build.nokogiri --use-system-libraries \
-  && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-  && bundle config set --global path 'vendor' \
+  # Setup local bundle configurations
+  && bundle config --local build.nokogiri --use-system-libraries \
+  && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
+  && bundle config set --local path 'vendor' \
   # Generates the application to $ROOT
   && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
   && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
@@ -71,6 +71,6 @@ WORKDIR $ROOT
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
   && bundle clean --force \
-  && bundle config --global without "test:development" \
+  && bundle config --local without "test:development" \
   && bundle install --jobs "$(nproc)" --retry 3 \
   && truncate -s 0 /var/log/*log
