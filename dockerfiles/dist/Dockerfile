@@ -140,7 +140,7 @@ RUN chmod +x /usr/local/bin/* \
   && mkdir -p tmp/pids log \
   && touch /etc/motd /var/run/crond.pid \
   && chown -R decidim:decidim /etc/motd $ROOT/tmp /var/run/crond.pid
-USER decidim
+
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
 COPY ./crontab.d /usr/local/share/cronfiles
@@ -152,7 +152,8 @@ COPY ./Dockerfile Dockerfile
 
 RUN bundle config --local build.nokogiri --use-system-libraries \
   && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
-  && bundle config set --local path 'vendor'
+  && bundle config set --local path 'vendor' \
+  && crontab -u decidim /etc/crontab
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["start"]

@@ -21,7 +21,7 @@ logfile=<%= root %>/log/run.supervisord.log
 pidfile=<%= root %>/tmp/pids/supervisord.pid
 loglevel=info
 nodaemon=true
-user=decidim
+user=root
 
 [program:cron]
 command=cron start -f
@@ -46,6 +46,7 @@ stdout_logfile=<%= root %>/log/run.puma.log
 stderr_logfile=<%= root %>/log/errors.puma.log
 killasgroup=true
 stopasgroup=true
+user=decidim
 
 [program:sidekiq]
 command=bundle exec sidekiq
@@ -58,6 +59,7 @@ stdout_logfile=<%= root %>/log/run.sidekiq.log
 stderr_logfile=<%= root %>/log/errors.sidekiq.log
 killasgroup=true
 stopasgroup=true
+user=decidim
 
 [program:nginx]
 command=nginx
@@ -70,6 +72,7 @@ stdout_logfile=<%= root %>/log/run.nginx.log
 stderr_logfile=<%= root %>/log/errors.nginx.log
 killasgroup=true
 stopasgroup=true
+user=decidim
 
 [group:workers]
 programs=puma,sidekiq,cron,nginx
