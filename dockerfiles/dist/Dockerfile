@@ -20,10 +20,11 @@ RUN if [ "$RAILS_ENV" != "production" ]; then \
 
 # Backup directories that can be in volumes
 # As some infrastructures will erase volumes on mount
-RUN tar cfvz tmp/public.bak.tar.gz public \ 
-  tar cfvz tmp/storage.bak.tar.gz storage \
-  tar cfvz tmp/db.bak.tar.gz db \
-  tar cfvz tmp/config.bak.tar.gz config
+RUN mkdir -p $ROOT/tmp \
+  && tar cfvz tmp/public.bak.tar.gz public \ 
+  && tar cfvz tmp/storage.bak.tar.gz storage \
+  && tar cfvz tmp/db.bak.tar.gz db \
+  && tar cfvz tmp/config.bak.tar.gz config
 
 FROM $BASE_IMAGE
 ARG BASE_IMAGE \
@@ -98,8 +99,8 @@ WORKDIR $ROOT
 
 RUN apt-get upgrade -yq \
   && apt-get update -yq \
-
-  && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash - \
+  && apt-get install -yq --no-install-recommends curl \
+  && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | sh - \
   && apt-get install -yq --no-install-recommends \
     build-essential libpq-dev \
     tzdata imagemagick \

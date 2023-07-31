@@ -65,27 +65,11 @@ def build_images(docker_image)
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "--no-cache", "--network=host",
+        "--network=host",
         "-f", "./dockerfiles/build/Dockerfile", "./bundle"
     ]
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string}-build image" unless system(*docker_cmd)
-    docker_cmd = [
-        "docker", "build",
-        "-t", "#{source_tag}-dev",
-        *generator_params,
-        "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
-        "--build-arg", "BUILD_WITHOUT=development:test",
-        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
-        "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
-        "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
-        "--build-arg", "BUILD_DATE=#{build_date}",
-        "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "--no-cache", "--network=host",
-        "-f", "./dockerfiles/build/Dockerfile", "./bundle"
-    ]
-    puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-dist",
@@ -98,12 +82,28 @@ def build_images(docker_image)
         "--build-arg", "USER_ID=1001",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "--no-cache", "--network=host",
+        "--network=host",
         "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
       ]
-    
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string} image" unless system(*docker_cmd)
+    docker_cmd = [
+        "docker", "build",
+        "-t", "#{source_tag}-dev",
+        "--build-arg", "FROM_IMAGE=#{source_tag}-build",
+        "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
+        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
+        "--build-arg", "BUILD_DATE=#{build_date}",
+        "--build-arg", "RAILS_ENV=development",
+        "--build-arg", "GROUP_ID=1001",
+        "--build-arg", "USER_ID=1001",
+        "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
+        "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
+        "--network=host",
+        "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
+    ]
+    puts docker_cmd.join(" ")
+    raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
     if is_stable
         docker_cmd = [
             "docker", "build",
