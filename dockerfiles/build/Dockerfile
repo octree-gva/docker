@@ -36,7 +36,9 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
-    RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} BUNDLER_VERSION=${BUNDLER_VERSION}
+    RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
+    BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle"\
+    BUNDLE_PATH="vendor"
 
 WORKDIR /home/app/generator
 
@@ -57,9 +59,8 @@ RUN apt-get upgrade -yq \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
   && truncate -s 0 /var/log/*log \
   # Setup local bundle configurations
-  && bundle config --local build.nokogiri --use-system-libraries \
-  && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
-  && bundle config set --local path 'vendor' \
+  && bundle config --global build.nokogiri --use-system-libraries \
+  && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
   # Generates the application to $ROOT
   && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
   && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \

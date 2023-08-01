@@ -59,7 +59,8 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
-    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
+    DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" HOME="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
+    BUNDLE_PATH="vendor" BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID}
 
 # Decidim specifics environments variables
@@ -143,6 +144,7 @@ RUN chmod +x /usr/local/bin/* \
 
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
+# Copy cron files
 COPY ./crontab.d /usr/local/share/cronfiles
 COPY ./crontab /etc/crontab
 # Copy docker-compose and dockerfile that got
@@ -152,7 +154,6 @@ COPY ./Dockerfile Dockerfile
 
 RUN bundle config --local build.nokogiri --use-system-libraries \
   && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
-  && bundle config set --local path 'vendor' \
   && crontab -u decidim /etc/crontab \
   && ln -s $ROOT/log /var/log/decidim
 
