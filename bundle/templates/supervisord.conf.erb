@@ -21,7 +21,6 @@ logfile=<%= root %>/log/run.supervisord.log
 pidfile=<%= root %>/tmp/pids/supervisord.pid
 loglevel=info
 nodaemon=true
-user=root
 
 [program:cron]
 command=cron start -f

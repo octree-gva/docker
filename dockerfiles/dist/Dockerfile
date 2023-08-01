@@ -153,7 +153,8 @@ COPY ./Dockerfile Dockerfile
 RUN bundle config --local build.nokogiri --use-system-libraries \
   && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
   && bundle config set --local path 'vendor' \
-  && crontab -u decidim /etc/crontab
+  && crontab -u decidim /etc/crontab \
+  && ln -s $ROOT/log /var/log/decidim
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["start"]
