@@ -8,5 +8,9 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
     File.delete(pid_file) if File.exists?(pid_file)
     puts "    ✅ Supervisord pid is removed"
 
+    pid_file = "tmp/pids/nginx.pid"
+    File.delete(pid_file) if File.exists?(pid_file)
+    puts "    ✅ Nginx pid is removed"
+
     Dir.mkdir("tmp/sockets") unless File.exists?("tmp/sockets")
 end
