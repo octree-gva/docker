@@ -139,9 +139,7 @@ COPY --from=builder --chown=decidim $ROOT/Gemfile* ./
 RUN chmod +x /usr/local/bin/* \
   && mkdir -p tmp/pids log \
   && touch /etc/motd /var/run/crond.pid \
-  && chown -R decidim:decidim /etc/motd $ROOT/tmp $ROOT/log /var/run/crond.pid \
-  # Don't start cron in background
-  && systemctl disable cron 
+  && chown -R decidim:decidim /etc/motd $ROOT/tmp $ROOT/log /var/run/crond.pid 
 
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
