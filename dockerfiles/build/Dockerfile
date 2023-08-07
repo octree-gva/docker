@@ -71,6 +71,7 @@ WORKDIR $ROOT
 
 RUN rm -rf /home/app/generator \
   && rm -rf /usr/local/bundle/**/* \
+  && rm -rf vendor Gemfile.lock \
   && bundle clean --force \
   && bundle config --local without "test:development" \
   && bundle install --jobs "$(nproc)" --retry 3 \
