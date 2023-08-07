@@ -22,6 +22,7 @@ Dir.chdir(root_dir) do
 		run_sidekiq: ENV.fetch("DECIDIM_RUN_SIDEKIQ", "0") == "1",
 		run_cron: ENV.fetch("DECIDIM_RUN_CRON", "0") == "1",
 		run_nginx: ENV.fetch("DECIDIM_RUN_NGINX", "0") == "1",
+		run_dev: ENV.fetch("RAILS_ENV", "production") == "development",
 		unix_http_server_password: SecureRandom.hex(32),
 		inet_http_server_password: SecureRandom.hex(32)
 	))

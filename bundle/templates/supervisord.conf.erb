@@ -73,5 +73,18 @@ killasgroup=true
 stopasgroup=true
 user=decidim
 
+[program:webpacker]
+command=bin/webpack-dev-server
+directory=<%= root %>
+autostart=<%= run_dev.to_s %>
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.webpacker.log
+stderr_logfile=<%= root %>/log/errors.webpacker.log
+killasgroup=true
+stopasgroup=true
+user=decidim
+
 [group:workers]
-programs=puma,sidekiq,cron,nginx
+programs=puma,sidekiq,cron,nginx,webpacker
