@@ -42,7 +42,8 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
 
 WORKDIR /home/app/generator
 
-RUN apt-get upgrade -yq \
+RUN mkdir -p $ROOT \
+  && apt-get upgrade -yq \
   && apt-get update -yq \
   # Install node and yarn
   && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
@@ -52,7 +53,9 @@ RUN apt-get upgrade -yq \
     python3-pip python3-setuptools \
     nodejs tzdata \
     imagemagick libpq-dev \
+  # Force yarn update from recently updated node
   && npm -g install yarn --force \
+  # Install bundler at the same decidim's version
   && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
   && apt-get clean \
@@ -70,7 +73,6 @@ RUN apt-get upgrade -yq \
 WORKDIR $ROOT
 
 RUN rm -rf /home/app/generator \
-  && rm -rf /usr/local/bundle/**/* \
   && rm -rf vendor Gemfile.lock \
   && bundle clean --force \
   && bundle config --local without "test:development" \
