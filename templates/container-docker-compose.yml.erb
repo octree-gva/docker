@@ -18,9 +18,9 @@ services:
       SMTP_ADDRESS: "mailer"
       SMTP_PORT: "25"
       SMTP_AUTHENTICATION: "none"
-      DECIDIM_RUN_RAILS: "1"
-      DECIDIM_RUN_SIDEKIQ: "1"
-      DECIDIM_RUN_CRON: "1"
+      RUN_PUMA: "1"
+      RUN_SIDEKIQ: "1"
+      RUN_CRON: "1"
     depends_on:
       - pg
       - redis

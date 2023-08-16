@@ -162,9 +162,9 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
 | DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `youReallyWantToChangeMe` |
-| DECIDIM_RUN_RAILS | If the container should run rails | `1` |
-| DECIDIM_RUN_SIDEKIQ | If the container should run sidekiq | `1` |
-| DECIDIM_RUN_CRON | If the container should run cron | `1` |
+| RUN_PUMA | If the container should run rails | `1` |
+| RUN_SIDEKIQ | If the container should run sidekiq | `1` |
+| RUN_CRON | If the container should run cron | `1` |
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `youReallyWantToChangeMe` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `youReallyWantToChangeMe` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |

@@ -21,26 +21,12 @@ logfile=<%= root %>/log/run.supervisord.log
 pidfile=<%= root %>/tmp/pids/supervisord.pid
 loglevel=info
 nodaemon=true
-user=root
+user=<%= ENV.fetch("USER", "root") %>
 
-<% supervisord_includes.each do |program|
-# Program
+<% supervisord_includes.each do |program_name, program|
+# Program <%= program_name %>
 <%= program %>
-
 <% end %>
 
-[program:webpacker]
-command=bin/webpack-dev-server
-directory=<%= root %>
-autostart=<%= run_dev.to_s %>
-autorestart=true
-logfile_maxbytes=4MB
-logfile_backups=10
-stdout_logfile=<%= root %>/log/run.webpacker.log
-stderr_logfile=<%= root %>/log/errors.webpacker.log
-killasgroup=true
-stopasgroup=true
-user=decidim
-
 [group:workers]
-programs=puma,sidekiq,cron,nginx,webpacker
+programs=<%= supervisord_includes.map {|name| name}.join(",") %>

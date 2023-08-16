@@ -1,4 +1,5 @@
 FROM <%= docker_tag %>
+ENV RUN_CRON="0" # cron can't run under non-root user.
 USER decidim
 COPY . /home/decidim/app
 RUN bundle install --jobs "$(nproc)" --retry 3

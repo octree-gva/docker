@@ -7,19 +7,23 @@ Dir.chdir(root_dir) do
 	template_directory = "/usr/local/share/decidim/templates"
 	template_motd = ERB.new(File.read(File.join(template_directory, "motd.txt.erb")))
 	supervisord_config = ERB.new(File.read(File.join(template_directory, "supervisord.conf.erb")))
+	##
 	# Supervisord config will add programs to run
-	# looking at environment variables: RUN_<program>
-	supervisord_workers = []
-	supervisord_includes = Dir[File.join(template_directory, "supervisord.includes/*.erb")].map do |file_path|
+	# looking at environment variables: RUN_<program>	
+	supervisord_includes = Dir[File.join(template_directory, "supervisord.programs/*.erb")].map do |file_path|
 		script_name = File.basename(file_path, ".erb")
 		next unless ["1", "enabled", "true"].include?(
 			ENV.fetch("RUN_#{script_name.underscore.upcase}", "")
 		)
-		supervisord_workers.push(script_name)
-		ERB.new(File.read(file_path)).result_with_hash(
-			name: script_name,
-			root: root_dir
-		)
+
+		[
+			script_name, 
+			ERB.new(File.read(file_path)).result_with_hash(
+				name: script_name,
+				root: root_dir,
+				rails_env: ENV.fetch("RAILS_ENV", "production")
+			)
+		]
 	end
 	  
 	File.write("/etc/motd", template_motd.result_with_hash(
@@ -32,7 +36,6 @@ Dir.chdir(root_dir) do
 	File.write(File.join(root_dir, "/config/supervisord.conf"), supervisord_config.result_with_hash(
 		root: root_dir,
 		supervisord_includes: supervisord_includes,
-		supervisord_workers: supervisord_workers,
 		unix_http_server_password: SecureRandom.hex(32),
 		inet_http_server_password: SecureRandom.hex(32)
 	))

@@ -1,0 +1,14 @@
+<% if rails_env == "development" %>
+[program:<%= name %>]
+command=bin/webpack-dev-server
+directory=<%= root %>
+autostart=true  # env RUN_WEBPACKER is active
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.<%= name %>.log
+stderr_logfile=<%= root %>/log/errors.<%= name %>.log
+killasgroup=true
+stopasgroup=true
+user=decidim
+<% end %>
