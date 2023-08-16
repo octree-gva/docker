@@ -1,0 +1,12 @@
+[program:nginx]
+command=nginx
+directory=/etc/nginx
+autostart=true # env RUN_NGINX is active
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.nginx.log
+stderr_logfile=<%= root %>/log/errors.nginx.log
+killasgroup=true
+stopasgroup=true
+user=decidim

@@ -4,11 +4,24 @@ require 'securerandom'
 puts "Setup templates"
 root_dir = ENV.fetch("ROOT", "/home/decidim/app")
 Dir.chdir(root_dir) do 
-
 	template_directory = "/usr/local/share/decidim/templates"
 	template_motd = ERB.new(File.read(File.join(template_directory, "motd.txt.erb")))
-	supervisord_motd = ERB.new(File.read(File.join(template_directory, "supervisord.conf.erb")))
-
+	supervisord_config = ERB.new(File.read(File.join(template_directory, "supervisord.conf.erb")))
+	# Supervisord config will add programs to run
+	# looking at environment variables: RUN_<program>
+	supervisord_workers = []
+	supervisord_includes = Dir[File.join(template_directory, "supervisord.includes/*.erb")].map do |file_path|
+		script_name = File.basename(file_path, ".erb")
+		next unless ["1", "enabled", "true"].include?(
+			ENV.fetch("RUN_#{script_name.underscore.upcase}", "")
+		)
+		supervisord_workers.push(script_name)
+		ERB.new(File.read(file_path)).result_with_hash(
+			name: script_name,
+			root: root_dir
+		)
+	end
+	  
 	File.write("/etc/motd", template_motd.result_with_hash(
 		decidim_version: ENV.fetch("DECIDIM_VERSION", "?"),
 		root: root_dir,
@@ -16,13 +29,10 @@ Dir.chdir(root_dir) do
 		ruby_version: ENV.fetch("RUBY_VERSION")
 	))
 
-	File.write(File.join(root_dir, "/config/supervisord.conf"), supervisord_motd.result_with_hash(
+	File.write(File.join(root_dir, "/config/supervisord.conf"), supervisord_config.result_with_hash(
 		root: root_dir,
-		run_rails: ENV.fetch("DECIDIM_RUN_RAILS", "0") == "1",
-		run_sidekiq: ENV.fetch("DECIDIM_RUN_SIDEKIQ", "0") == "1",
-		run_cron: ENV.fetch("DECIDIM_RUN_CRON", "0") == "1",
-		run_nginx: ENV.fetch("DECIDIM_RUN_NGINX", "0") == "1",
-		run_dev: ENV.fetch("RAILS_ENV", "production") == "development",
+		supervisord_includes: supervisord_includes,
+		supervisord_workers: supervisord_workers,
 		unix_http_server_password: SecureRandom.hex(32),
 		inet_http_server_password: SecureRandom.hex(32)
 	))

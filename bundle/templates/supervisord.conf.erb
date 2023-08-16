@@ -21,57 +21,13 @@ logfile=<%= root %>/log/run.supervisord.log
 pidfile=<%= root %>/tmp/pids/supervisord.pid
 loglevel=info
 nodaemon=true
+user=root
 
-[program:cron]
-command=cron start -f
-directory=<%= root %>
-autostart=<%= run_cron.to_s %>
-autorestart=true
-logfile_maxbytes=4MB
-logfile_backups=10
-stdout_logfile=<%= root %>/log/run.cron.log
-stderr_logfile=<%= root %>/log/errors.cron.log
-killasgroup=true
-stopasgroup=true
+<% supervisord_includes.each do |program|
+# Program
+<%= program %>
 
-[program:puma]
-command=bundle exec puma
-directory=<%= root %>
-autostart=<%= run_rails.to_s %>
-autorestart=true
-logfile_maxbytes=4MB
-logfile_backups=10
-stdout_logfile=<%= root %>/log/run.puma.log
-stderr_logfile=<%= root %>/log/errors.puma.log
-killasgroup=true
-stopasgroup=true
-user=decidim
-
-[program:sidekiq]
-command=bundle exec sidekiq
-directory=<%= root %>
-autostart=<%= run_sidekiq.to_s %>
-autorestart=true
-logfile_maxbytes=4MB
-logfile_backups=10
-stdout_logfile=<%= root %>/log/run.sidekiq.log
-stderr_logfile=<%= root %>/log/errors.sidekiq.log
-killasgroup=true
-stopasgroup=true
-user=decidim
-
-[program:nginx]
-command=nginx
-directory=/etc/nginx
-autostart=<%= run_nginx.to_s %>
-autorestart=true
-logfile_maxbytes=4MB
-logfile_backups=10
-stdout_logfile=<%= root %>/log/run.nginx.log
-stderr_logfile=<%= root %>/log/errors.nginx.log
-killasgroup=true
-stopasgroup=true
-user=decidim
+<% end %>
 
 [program:webpacker]
 command=bin/webpack-dev-server

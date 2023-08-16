@@ -1,0 +1,12 @@
+[program:puma]
+command=bundle exec puma
+directory=<%= root %>
+autostart=true # env RUN_PUMA is active
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.puma.log
+stderr_logfile=<%= root %>/log/errors.puma.log
+killasgroup=true
+stopasgroup=true
+user=decidim

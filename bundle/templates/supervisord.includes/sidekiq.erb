@@ -1,0 +1,12 @@
+[program:sidekiq]
+command=bundle exec sidekiq
+directory=<%= root %>
+autostart=true  # env RUN_SIDEKIQ is active
+autorestart=true
+logfile_maxbytes=4MB
+logfile_backups=10
+stdout_logfile=<%= root %>/log/run.sidekiq.log
+stderr_logfile=<%= root %>/log/errors.sidekiq.log
+killasgroup=true
+stopasgroup=true
+user=decidim

@@ -124,8 +124,9 @@ RUN apt-get upgrade -yq \
   && groupadd -g $GROUP_ID decidim \
   && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim 
 
-# Add docker scripts
+# Add run scripts
 COPY ./bin /usr/local/bin/
+COPY ./Dockerfile ./docker-compose.yml $ROOT/
 # Add erb templates that will be populated at start
 COPY ./templates /usr/local/share/decidim/templates
 # Add scripts to run alphabetically for entrypoints
