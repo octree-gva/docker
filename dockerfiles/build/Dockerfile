@@ -76,5 +76,6 @@ RUN rm -rf /home/app/generator \
   && rm -rf vendor Gemfile.lock \
   && bundle clean --force \
   && bundle config --local without "test:development" \
-  && bundle install --jobs "$(nproc)" --retry 3 \
+  && bundle config --local path "$BUNDLE_PATH" \
+  && bundle install \
   && truncate -s 0 /var/log/*log
