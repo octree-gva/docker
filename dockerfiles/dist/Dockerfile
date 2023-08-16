@@ -153,10 +153,7 @@ COPY ./crontab /etc/crontab
 COPY ./docker-compose.yml docker-compose.yml
 COPY ./Dockerfile Dockerfile
 
-RUN bundle config --local path "$BUNDLE_PATH" \
-  && bundle config --local build.nokogiri --use-system-libraries \
-  && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
-  && crontab -u decidim /etc/crontab \
+RUN crontab /etc/crontab \
   && ln -s $ROOT/log /var/log/decidim
 
 ENTRYPOINT ["docker-entrypoint"]
