@@ -74,9 +74,7 @@ WORKDIR $ROOT
 
 RUN rm -rf /home/app/generator \
   && rm -rf vendor Gemfile.lock \
-  && bundle clean --force \
   && bundle config --local without "test:development" \
   && bundle config --local path "$BUNDLE_PATH" \
-  && cat Gemfile \
   && bundle install \
   && truncate -s 0 /var/log/*log
