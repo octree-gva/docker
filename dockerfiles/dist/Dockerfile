@@ -137,7 +137,7 @@ RUN mkdir -p tmp/pids log \
   && touch /etc/motd /var/run/crond.pid \
   && chown -R decidim:decidim /etc/motd /var/run/crond.pid \
   && crontab /etc/crontab.d/crontab \
-  && chown -R $ROOT/tmp $ROOT/log
+  && chown -R $ROOT/tmp $ROOT/log \
   && ln -s $ROOT/log /var/log/decidim \
   && truncate -s 0 /var/log/*log
 
