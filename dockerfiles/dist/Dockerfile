@@ -8,25 +8,25 @@ ARG BASE_IMAGE \
     USER_ID="1001" \
     GROUP_ID="1001" \
     NODE_MAJOR_VERSION
-    
+
 FROM $FROM_IMAGE as builder
 ENV RAILS_ENV=${RAILS_ENV:-"production"}
 
-# If we want to run rails under something else than production, 
-# we need to install first the dependancies
-RUN if [ "$RAILS_ENV" != "production" ]; then \
-    rm -rf $ROOT/vendor \
-    && bundle config --local without "" \
-    && bundle install \
-;fi
-
-# Backup directories that can be in volumes
-# As some infrastructures will erase volumes on mount
-RUN mkdir -p $ROOT/tmp \
-  && tar cfvz tmp/public.bak.tar.gz public \ 
-  && tar cfvz tmp/storage.bak.tar.gz storage \
-  && tar cfvz tmp/db.bak.tar.gz db \
-  && tar cfvz tmp/config.bak.tar.gz config
+RUN \
+  # If we want to run rails under something else than production, 
+  # we need to install first the dependancies
+    && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
+        rm -rf $ROOT/vendor \
+        && bundle config --local without "" \
+        && bundle install \
+    ;fi \
+  # Backup directories that can be in volumes
+  # As some infrastructures will erase volumes on mount
+    && mkdir -p $ROOT/tmp \
+    && tar cfvz tmp/public.bak.tar.gz public \ 
+    && tar cfvz tmp/storage.bak.tar.gz storage \
+    && tar cfvz tmp/db.bak.tar.gz db \
+    && tar cfvz tmp/config.bak.tar.gz config
 
 # Add run scripts
 COPY ./bin $ROOT/bin/
@@ -35,17 +35,6 @@ COPY ./bin $ROOT/bin/
 COPY ./Dockerfile ./docker-compose.yml $ROOT/
 
 FROM $BASE_IMAGE
-ARG BASE_IMAGE \
-    FROM_IMAGE \
-    BUILD_DATE \
-    VCS_REF \
-    VERSION \
-    RAILS_ENV="production" \
-    BUNDLER_VERSION \
-    USER_ID="1001" \
-    GROUP_ID="1001" \
-    NODE_MAJOR_VERSION
-
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
       org.label-schema.description="Docker image for decidim" \

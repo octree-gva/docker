@@ -73,9 +73,14 @@ RUN mkdir -p $ROOT \
 # Switch back to ROOT and install deps.
 WORKDIR $ROOT
 
-RUN rm -rf /home/app/generator \
-  && rm -rf vendor Gemfile.lock \
-  && bundle config --local without "test:development" \
-  && bundle config --local path "$BUNDLE_PATH" \
-  && bundle install \
-  && truncate -s 0 /var/log/*log
+RUN \
+  # Remove old saved stuff
+    rm -rf /home/app/generator \
+  # Prepare to install Gemfile in the ARG env.
+    && rm -rf vendor Gemfile.lock \
+    && bundle config --local without "test:development" \
+    && bundle config --local path "$BUNDLE_PATH" \
+    && bundle install \
+  # Cleanup
+    && rm -rf .bundle/cache \ 
+    && truncate -s 0 /var/log/*log
