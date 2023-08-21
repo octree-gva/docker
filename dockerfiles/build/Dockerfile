@@ -59,6 +59,7 @@ RUN mkdir -p $ROOT \
   && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
   && apt-get clean \
+  && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
   && truncate -s 0 /var/log/*log \
   # Setup local bundle configurations

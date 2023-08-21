@@ -14,8 +14,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 # *  *  *  *  * user-name command to be executed
-* * * * * decidim cd $ROOT && run-parts --report /usr/local/share/cronfiles/15min
-0 0 * * * decidim cd $ROOT && run-parts --report /usr/local/share/cronfiles/daily
-0 * * * * decidim cd $ROOT && run-parts --report /usr/local/share/cronfiles/hourly
-0 0 * * 0 decidim cd $ROOT && run-parts --report /usr/local/share/cronfiles/weekly
-0 0 1 * * decidim cd $ROOT && run-parts --report /usr/local/share/cronfiles/monthly
+* * * * * decidim cd $ROOT && run-parts --report /etc/crontab.d/15min
+0 0 * * * decidim cd $ROOT && run-parts --report /etc/crontab.d/daily
+0 * * * * decidim cd $ROOT && run-parts --report /etc/crontab.d/hourly
+0 0 * * 0 decidim cd $ROOT && run-parts --report /etc/crontab.d/weekly
+0 0 1 * * decidim cd $ROOT && run-parts --report /etc/crontab.d/monthly
