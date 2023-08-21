@@ -19,11 +19,27 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Publish Decidim Images
+      - name: Publish Decidim 026
         run: |
           npm install -g doctoc
           export REGISTERY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DECIDIM_VERSION_BRANCHES=release/0.27-stable,develop
+          export DECIDIM_VERSION_BRANCHES=release/0.26-stable
+          export REGISTERY_PUSH=true
+          ./update-registery.rb
+
+      - name: Publish Decidim 027
+        run: |
+          npm install -g doctoc
+          export REGISTERY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DECIDIM_VERSION_BRANCHES=release/0.27-stable
+          export REGISTERY_PUSH=true
+          ./update-registery.rb
+
+      - name: Publish Decidim Develop
+        run: |
+          npm install -g doctoc
+          export REGISTERY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DECIDIM_VERSION_BRANCHES=develop
           export REGISTERY_PUSH=true
           ./update-registery.rb
       
