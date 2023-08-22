@@ -159,7 +159,7 @@ ONBUILD RUN \
   # Cleanup
     && bundle clean --force  \
     && rm -rf ./.bundle/cache ./vendor/cache /usr/local/bundle/* \
-    && truncate -s 0 /var/log/*log
+    && truncate -s 0 /var/log/*log \
   # Precompile the application with bootsnap.
   # Check tmp/cache/bootsnap*
     && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
