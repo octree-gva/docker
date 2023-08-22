@@ -54,7 +54,7 @@ RUN \
       build-essential vim \
       python3-pip python3-setuptools \
       nodejs tzdata \
-      vips-dev libpq-dev \
+      imagemagick libpq-dev \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
   # Install bundler

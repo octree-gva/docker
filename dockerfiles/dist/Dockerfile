@@ -131,7 +131,7 @@ RUN \
       build-essential \
       libpq-dev \
       tzdata \
-      vips-dev \
+      imagemagick \
       nodejs \
       # Vim the editor
       vim \
@@ -166,6 +166,8 @@ COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
 COPY ./crontab.d /etc/crontab.d
+# Copy ImageMagick policy
+COPY ./imagetragick.xml /var/imagetragick.xml
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
 
@@ -174,6 +176,12 @@ RUN \
     mkdir -p tmp/pids log \
     && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
     && touch /etc/motd /var/run/crond.pid \
+  # Add imagemagick's policy to avoid 
+  #   CVE-2016-3714
+  #   CVE-2016-3718 - SSRF
+  #   CVE-2016-3716
+  #   CVE-2016-3717
+    && IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && cat /var/imagetragick.xml > $IMAGEMAGIC_POLICY
   # Allow motd to be written by our docker-entrypoint script
     && chown -R decidim:decidim /etc/motd \
   # Setup crontab (need to run image as root)
