@@ -47,7 +47,7 @@ jobs:
         run: |
           npm install -g doctoc
           export REGISTERY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DECIDIM_VERSION_BRANCHES=release/0.27-stable,develop
+          export DECIDIM_VERSION_BRANCHES=release/0.26-stable,release/0.27-stable,develop
           ./update-documentation.rb
 
       - name: Push README

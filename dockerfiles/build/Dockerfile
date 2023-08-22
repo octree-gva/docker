@@ -42,33 +42,38 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
 
 WORKDIR /home/app/generator
 
-RUN mkdir -p $ROOT \
-  && apt-get upgrade -yq \
-  && apt-get update -yq \
-  # Install node and yarn
-  && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+RUN \
+  # Update apt-get
+    mkdir -p $ROOT \
+    && apt-get upgrade -yq \
+    && apt-get update -yq \
+  # Prepare node installation
+    && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   # Install native deps
-  && apt-get install -yq \
-    build-essential vim \
-    python3-pip python3-setuptools \
-    nodejs tzdata \
-    imagemagick libpq-dev \
-  # Force yarn update from recently updated node
-  && npm -g install yarn --force \
-  # Install bundler at the same decidim's version
-  && gem install bundler -v $BUNDLER_VERSION \
+    && apt-get install -yq \
+      build-essential vim \
+      python3-pip python3-setuptools \
+      nodejs tzdata \
+      imagemagick libpq-dev \
+  # Update yarn to a more recent version
+    && npm -g install yarn --force \
+  # Install bundler
+    && gem install bundler -v $BUNDLER_VERSION \
   # Clean installation clutters
-  && apt-get clean \
-  && apt-get autoremove -y \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
-  && truncate -s 0 /var/log/*log \
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
+    && truncate -s 0 /var/log/*log \
   # Setup local bundle configurations
-  && bundle config --global build.nokogiri --use-system-libraries \
-  && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-  # Generates the application to $ROOT
-  && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
-  && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
-  && gem uninstall decidim -a -x -I
+    && bundle config --global build.nokogiri --use-system-libraries \
+    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
+  # Install the decidim generator
+    && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
+  # Generates the rails application at /home/decidim/app ($ROOT)
+  # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
+    && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
+  # Done, remove the decidim generator.
+    && gem uninstall decidim -a -x -I
 
 # Switch back to ROOT and install deps.
 WORKDIR $ROOT
@@ -76,7 +81,8 @@ WORKDIR $ROOT
 RUN \
   # Remove old saved stuff
     rm -rf /home/app/generator \
-  # Prepare to install Gemfile in the ARG env.
+  # Remove old vendors and lock files, to 
+  # keep only production gems.
     && rm -rf vendor Gemfile.lock \
     && bundle config --local without "test:development" \
     && bundle config --local path "$BUNDLE_PATH" \

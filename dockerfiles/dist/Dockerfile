@@ -15,13 +15,14 @@ ENV RAILS_ENV=${RAILS_ENV:-"production"}
 RUN \
   # If we want to run rails under something else than production, 
   # we need to install first the dependancies
-    && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
+    if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
         rm -rf $ROOT/vendor \
         && bundle config --local without "" \
         && bundle install \
     ;fi \
-  # Backup directories that can be in volumes
-  # As some infrastructures will erase volumes on mount
+  # In many infrastructures, volumes might empty
+  # the directories. Keep a copy of essentials 
+  # files in tmp directory
     && mkdir -p $ROOT/tmp \
     && tar cfvz tmp/public.bak.tar.gz public \ 
     && tar cfvz tmp/storage.bak.tar.gz storage \
@@ -59,7 +60,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" HOME="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUNDLE_PATH="vendor" BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} \
-    PATH="${PATH}:${ROOT}/bin"
+    PATH="${PATH}:${ROOT}/bin" EDITOR="vim"
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -96,36 +97,48 @@ ENV MAPS_PROVIDER="" MAPS_API_KEY="" \
 
 WORKDIR $ROOT
 
-RUN apt-get upgrade -yq \
-  && apt-get update -yq \
-  && apt-get install -yq --no-install-recommends curl \
-  && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | sh - \
-  && apt-get install -yq --no-install-recommends \
-    build-essential libpq-dev \
-    tzdata imagemagick \
-    nodejs \
-    # Vim the editor
-    # Supervisor the program manager
-    # Cron... to run cron
-    # Git to fetch gemfile from git.
-    vim supervisor cron git-core \
-  # Re-install yarn on the newer version
+RUN \
+  # Prepare apt-get 
+    apt-get upgrade -yq \
+    && apt-get update -yq \
+    && apt-get install -yq --no-install-recommends curl \
+  # Prepare node installation
+    && curl -sL "https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | sh - \
+  # Install native dependancies
+    && apt-get install -yq --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      tzdata \
+      imagemagick \
+      nodejs \
+      # Vim the editor
+      vim \
+      # Supervisor the program manager
+      supervisor \
+      # Cron... to run cron
+      cron \
+      # Git to fetch gemfile from git.
+      git-core \
+  # Re-install yarn on the newer version.
   # needed to pre-compile assets
-  && npm install -g yarn --force \
+    && npm install -g yarn --force \
   # Clean installation files
-  && apt-get clean \
-  && apt-get autoremove -y \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
-  && for x in `gem list --no-versions`; do gem uninstall $x -a -x -I; done \
-  && gem install bundler -v $BUNDLER_VERSION \
-  # Add User
-  && groupadd -g $GROUP_ID decidim \
-  && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim 
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
+    && for x in `gem list --no-versions`; do gem uninstall $x -a -x -I; done \
+  # Install bundler
+    && gem install bundler -v $BUNDLER_VERSION \
+  # Add a non-root user
+    && groupadd -g $GROUP_ID decidim \
+    && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim 
 
-# Add erb templates that will be populated at start
+# Templates used by our `45_template` docker-entrypoint script. 
 COPY ./templates /usr/local/share/decidim/templates
-# Add scripts to run alphabetically for entrypoints
+
+# Add all the docker-entrypoints scripts (docker-entrypoint is a run-part).
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+
 # Copy the shared-mime-info database
 COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
@@ -133,11 +146,16 @@ COPY ./crontab.d /etc/crontab.d
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
 
-RUN mkdir -p tmp/pids log \
+RUN \
+  # Enforce directory structure
+  mkdir -p tmp/pids log \
+  && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
   && touch /etc/motd /var/run/crond.pid \
-  && chown -R decidim:decidim /etc/motd /var/run/crond.pid \
+  # Allow motd to be written by our docker-entrypoint script
+  && chown -R decidim:decidim /etc/motd \
+  # Setup crontab (need to run image as root)
   && crontab /etc/crontab.d/crontab \
-  && chown -R $ROOT/tmp $ROOT/log \
+  # Symlink logs to a common linux place
   && ln -s $ROOT/log /var/log/decidim \
   && truncate -s 0 /var/log/*log
 
