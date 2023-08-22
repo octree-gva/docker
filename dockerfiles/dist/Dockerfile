@@ -25,9 +25,9 @@ RUN \
         && npm install \
         && rm -rf ./.bundle/cache ./vendor/cache \
     ;fi \
-  # Execute bootsnap and ignore error
+  # Precompile the application with bootsnap.
+  # Check tmp/cache/bootsnap*
     && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
-
   # In many infrastructures, volumes might empty
   # the directories. Keep a copy of essentials 
   # files in tmp directory

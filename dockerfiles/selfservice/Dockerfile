@@ -18,3 +18,6 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx/nginx.supervisord.erb /usr/local/share/decidim/templates/supervisord.programs/nginx.erb
 # Prepare to run nginx as non-root
 RUN chown -R decidim:decidim /etc/nginx /var/log/nginx /var/nginx/tmp /var/lib/nginx /home/decidim/app/tmp
+
+# Expose nginx port, see nginx.conf for more info.
+EXPOSE 8080
