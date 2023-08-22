@@ -148,13 +148,9 @@ ONBUILD RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
     && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config --local without "" \
-        && bundle install \
-        && NODE_ENV=development npm install \
-    else \
-      bundle config --local without "test:development" \
-      && bundle install \
-      && NODE_ENV=production npm install --production \
+        echo "salut"
+    ;else \
+        echo "polu"
     ;fi \
   # Cleanup
     && bundle clean --force  \

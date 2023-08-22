@@ -60,7 +60,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" HOME="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUNDLE_PATH="vendor" BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} \
-    PATH="$PATH:$ROOT/bin" EDITOR="vim" \
+    PATH="$PATH:/home/decidim/app/bin" EDITOR="vim" \
     LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
     # Enable Just In Time compiler, if Ruby > 3.2.0
     RUBY_YJIT_ENABLE="1"
