@@ -22,9 +22,9 @@ services:
       - config:/home/decidim/app/config
     environment:
       DECIDIM_SYSTEM_EMAIL: "hello@myorg.com"
-      DECIDIM_SYSTEM_PASSWORD: "youReallyWantToChangeMe"
-      DATABASE_URL: "postgres://decidim:youReallyWantToChangeMe@pg:5432/decidim"
-      REDIS_URL: "redis://default:youReallyWantToChangeMe@redis:6379/1"
+      DECIDIM_SYSTEM_PASSWORD: "my_insecure_password"
+      DATABASE_URL: "postgres://decidim:my_insecure_password@pg:5432/decidim"
+      REDIS_URL: "redis://default:my_insecure_password@redis:6379/1"
       RAILS_SERVE_STATIC_FILES: "true"
       RAILS_FORCE_SSL: "false"
       SMTP_ADDRESS: "mailer"
@@ -50,7 +50,7 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: "youReallyWantToChangeMe"
+      POSTGRES_PASSWORD: "my_insecure_password"
       POSTGRES_USER: "decidim"
       POSTGRES_DB: "decidim"
     networks:

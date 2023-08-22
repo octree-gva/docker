@@ -57,7 +57,7 @@ Now you can access [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system).
 
 ```
 DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
+DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
 Once connected, you can go in [/system](http://127.0.0.1:3000/system/organizations) and create a new organization. 
@@ -98,7 +98,7 @@ And add these lines in your docker-compose.yml file:
 +   environment:
 -   environment:    
       - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-      - DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
+      - DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
 You can now `docker-compose up` again and have a safer place to tweak decidim.

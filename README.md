@@ -74,12 +74,12 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | Env Name | Description | Default |
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
-| DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `youReallyWantToChangeMe` |
+| DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `my_insecure_password` |
 | RUN_PUMA | If the container should run rails | `1` |
 | RUN_SIDEKIQ | If the container should run sidekiq | `1` |
 | RUN_CRON | If the container should run cron | `1` |
-| SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `youReallyWantToChangeMe` |
-| RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `youReallyWantToChangeMe` |
+| SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `my_insecure_password` |
+| RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `my_insecure_password` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
 | RAILS_MAX_THREADS | How many threads rails can use | `5` |
 | RAILS_SERVE_STATIC_FILES | If rails should be accountable to serve assets | `false` |
@@ -91,7 +91,7 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | REDIS_UR | Redis url for sidekiq | `redis` |
 | SMTP_AUTHENTICATION | How rails should authenticate to SMTP | `plain`, `none` |
 | SMTP_USERNAME | Username for SMTP | `my-participatory-plateform@iredmail.org` |
-| SMTP_PASSWORD | 🔐 Password for SMTP | `youReallyWantToChangeMe` |
+| SMTP_PASSWORD | 🔐 Password for SMTP | `my_insecure_password` |
 | SMTP_ADDRESS | SMTP address | smtp.iredmail.org |
 | SMTP_DOMAIN | SMTP [HELO Domain](https://www.ibm.com/docs/en/zos/2.2.0?topic=sc-helo-command-identify-domain-name-sending-host-smtp) | `iredmail` |
 | SMTP_PORT | SMTP address port | `587` |
