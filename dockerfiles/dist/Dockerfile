@@ -68,7 +68,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
     DATABASE_USERNAME="" DATABASE_URL="" RAILS_ENV=${RAILS_ENV} \
-    SECRET_KEY_BASE="" SMTP_ADDRESS="" SMTP_DOMAIN="" SMTP_PASSWORD="" \
+    SECRET_KEY_BASE="my_insecure_password" SMTP_ADDRESS="" SMTP_DOMAIN="" SMTP_PASSWORD="" \
     SMTP_USERNAME="" DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_MAILER_SENDER="change-me@example.org" SMTP_PORT="587" \
     SMTP_STARTTLS_AUTO="true" SMTP_AUTHENTICATION="plain" \

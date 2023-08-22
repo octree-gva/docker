@@ -13,7 +13,7 @@ Dir.chdir(root_dir) do
 	supervisord_includes = Dir[File.join(template_directory, "supervisord.programs/*.erb")].map do |file_path|
 		script_name = File.basename(file_path, ".erb")
 		next unless ["1", "enabled", "true"].include?(
-			ENV.fetch("RUN_#{script_name.underscore.upcase}", "")
+			ENV.fetch("RUN_#{script_name.upcase}", "")
 		)
 
 		[
