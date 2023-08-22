@@ -84,10 +84,10 @@ We do these following steps while building the images:
 
         From these steps are build the following images:
 
-- `decidim/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
-- `decidim/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
-- `decidim/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
-- `decidim/decidim:0.27-selfservice` is the result of the `self-service` file
+- `hfroger/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
+- `hfroger/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
+- `hfroger/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
+- `hfroger/decidim:0.27-selfservice` is the result of the `self-service` file
 
 ## Supervisord
 > Supervisor is a client/server system that allows its users to control a number of processes on UNIX-like operating systems. It was inspired by the following:
