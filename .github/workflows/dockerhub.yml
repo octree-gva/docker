@@ -61,7 +61,7 @@ jobs:
           ./update-registery.rb
   update-and-publish:
     runs-on: ubuntu-latest
-    needs: [decidim-026, decidim-027, decidim-latest]
+    needs: [decidim-026, decidim-027, decidim-develop]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
