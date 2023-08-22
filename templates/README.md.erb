@@ -91,7 +91,7 @@ docker cp decidim:/home/decidim/app/db/migrate db/migrate
 And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
-    image: ghcr.io/decidim/decidim:latest
+    image: decidim/decidim:latest
     ports:
       - 3000:3000
     volumes:
@@ -130,8 +130,6 @@ Before deploying, be sure to read the [good practices](#good-practices).
 ---
 
 ## Dockerhub
-
-`latest` image is the last stable image. Use it with caution.
 
 **Stable tags**
 
@@ -227,7 +225,7 @@ docker cp decidim:/etc/periodic crontab.d
 And update your docker-compose: 
 ```diff
     container_name: decidim
-    image: ghcr.io/decidim/decidim:latest
+    image: decidim/decidim:latest
     ports:
       - 3000:3000
     volumes:

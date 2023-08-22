@@ -120,9 +120,8 @@ def build_images(docker_image)
 end
 
 image = "#{REGISTERY_USERNAME}/decidim"
-# Keep the last stable image found to publish the latest
-last_stable = ""
-last_stable_image = ""
+
+
 supported_versions.map do |version| 
     docker_image = DockerImage.new(version)
     decidim_version_string = docker_image.decidim_version.version.join(".")
@@ -138,8 +137,6 @@ supported_versions.map do |version|
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker_image.decidim_version.version) do |version|
-            last_stable = "#{image}:#{version}"
-            last_stable_image = "#{image}"
             push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
@@ -151,10 +148,4 @@ supported_versions.map do |version|
         push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
         push_image("#{source_tag}-dist", "#{image}:#{version}")
     end
-end
-
-if last_stable
-    push_image("#{last_stable}-onbuild", "#{last_stable_image}:latest-onbuild")
-    push_image("#{last_stable}-dev", "#{last_stable_image}:latest-dev")
-    push_image("#{last_stable}", "#{last_stable_image}:latest")
 end

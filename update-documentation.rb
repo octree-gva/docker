@@ -60,7 +60,7 @@ supported_versions.map do |version|
                 docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}-dev"
             ))
             # Write down only one version in the README.
-            break 
+            break
         end
     else
         dev_images.push(
