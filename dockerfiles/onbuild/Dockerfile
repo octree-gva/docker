@@ -52,7 +52,7 @@ RUN \
   # Setup local bundle configurations
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --local path "$BUNDLE_PATH" \
+    && bundle config --global path "$BUNDLE_PATH" \
   # Install the decidim generator
     && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
   # Generates the rails application at /home/decidim/app ($ROOT)
@@ -138,9 +138,9 @@ COPY --from=generator /home/decidim/app /home/decidim/app/
 
 RUN \
   # Setup local bundle configurations
-    bundle config --local build.nokogiri --use-system-libraries \
-    && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --local path "$BUNDLE_PATH" 
+    bundle config --global build.nokogiri --use-system-libraries \
+    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
+    && bundle config --global path "$BUNDLE_PATH" 
 
 ONBUILD RUN \
   # Be sure we are on the current workdir
@@ -148,17 +148,17 @@ ONBUILD RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
     && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config --local without "" \
-        && bundle install \
+        bundle config --global without "" \
+        && bundle install --jobs "$(nproc)" --no-cache --quiet \
         && NODE_ENV=development npm install \
     ;else \
-      bundle config --local without "test:development" \
-      && bundle install \
+      bundle config --global without "test:development" \
+      && bundle install --jobs "$(nproc)" --no-cache --quiet \
       && NODE_ENV=production npm install --production \
     ;fi \
   # Cleanup
     && bundle clean --force  \
-    && rm -rf ./.bundle/cache ./vendor/cache /usr/local/bundle/* \
+    && rm -rf  /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log \
   # Precompile the application with bootsnap.
   # Check tmp/cache/bootsnap*
