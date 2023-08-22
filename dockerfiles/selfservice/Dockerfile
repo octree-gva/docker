@@ -7,10 +7,12 @@ RUN \
   # Install nginx
     && apt-get install -yq --no-install-recommends nginx \
   # Enforce essential directory structure
-    && mkdir -p /var/nginx/tmp  /var/lib/nginx/body /var/log/nginx\
+    && mkdir -p /var/nginx/tmp  /var/lib/nginx/body /var/log/nginx \
   # Remove clutter
     && apt-get clean \
-    && apt-get autoremove -y 
+    && apt-get autoremove -y  \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
 
 # Copy our basic nginx configuration
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
@@ -18,6 +20,5 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx/nginx.supervisord.erb /usr/local/share/decidim/templates/supervisord.programs/nginx.erb
 # Prepare to run nginx as non-root
 RUN chown -R decidim:decidim /etc/nginx /var/log/nginx /var/nginx/tmp /var/lib/nginx /home/decidim/app/tmp
-
 # Expose nginx port, see nginx.conf for more info.
 EXPOSE 8080

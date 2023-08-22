@@ -51,10 +51,14 @@ RUN \
     && curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   # Install native deps
     && apt-get install -yq \
-      build-essential vim \
-      python3-pip python3-setuptools \
-      nodejs tzdata \
-      imagemagick libpq-dev \
+      build-essential \
+      vim \
+      python3-pip \
+      python3-setuptools \
+      nodejs \
+      tzdata \
+      imagemagick \
+      libpq-dev \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
   # Install bundler
@@ -63,7 +67,6 @@ RUN \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
-    && truncate -s 0 /var/log/*log \
   # Setup local bundle configurations
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
@@ -75,7 +78,8 @@ RUN \
     && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
   # Done, remove the decidim generator.
     && gem uninstall decidim -a -x -I \
-    && rm -rf /usr/local/bundle/cache
+    && rm -rf /usr/local/bundle/* \
+    && truncate -s 0 /var/log/*log
 
 # Switch back to ROOT and install deps.
 WORKDIR $ROOT
