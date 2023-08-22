@@ -42,7 +42,7 @@ jobs:
           export DECIDIM_VERSION_BRANCHES=release/0.27-stable
           export REGISTERY_PUSH=true
           ./update-registery.rb
-  decidim-latest:
+  decidim-develop:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
