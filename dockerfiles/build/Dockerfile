@@ -38,7 +38,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
     RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
     BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle"\
-    BUNDLE_PATH="vendor"
+    BUNDLE_PATH="vendor" NODE_ENV="development"
 
 WORKDIR /home/app/generator
 
@@ -54,7 +54,7 @@ RUN \
       build-essential vim \
       python3-pip python3-setuptools \
       nodejs tzdata \
-      imagemagick libpq-dev \
+      vips-dev libpq-dev \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
   # Install bundler
@@ -67,6 +67,7 @@ RUN \
   # Setup local bundle configurations
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
+    && bundle config --local path "$BUNDLE_PATH" \
   # Install the decidim generator
     && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
   # Generates the rails application at /home/decidim/app ($ROOT)
@@ -83,11 +84,13 @@ RUN \
   # Remove old saved stuff
     rm -rf /home/app/generator \
   # Remove old vendors and lock files, to 
-  # keep only production gems.
-    && rm -rf vendor Gemfile.lock \
+  # keep only production gems and node packages.
+    && rm -rf vendor Gemfile.lock package-lock.json node_modules \
     && bundle config --local without "test:development" \
     && bundle config --local path "$BUNDLE_PATH" \
     && bundle install \
+    && npm install --production \
   # Cleanup
-    && rm -rf ./.bundle/cache ./vendor/cache \
+    bundle clean --force 
+    && rm -rf ./.bundle/cache ./vendor/cache /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log

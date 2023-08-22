@@ -12,17 +12,22 @@ ARG BASE_IMAGE \
 # STEP 1: BUILDER
 ##########################################################################
 FROM $FROM_IMAGE as builder
-ENV RAILS_ENV=${RAILS_ENV:-"production"}
+ENV RAILS_ENV=${RAILS_ENV:-"production"} \
+    NODE_ENV=${RAILS_ENV:-"production"}
 
 RUN \
   # If we want to run rails under something else than production, 
   # we need to install first the dependancies
     if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        rm -rf $ROOT/vendor \
+        rm -rf $ROOT/vendor $ROOT/package-lock.json node_modules \
         && bundle config --local without "" \
         && bundle install \
-        && rm -rf ./.bundle/cache ./vendor/cache
+        && npm install \
+        && rm -rf ./.bundle/cache ./vendor/cache \
     ;fi \
+  # Execute bootsnap and ignore error
+    && bundle exec bootsnap precompile --gemfile || true \
+
   # In many infrastructures, volumes might empty
   # the directories. Keep a copy of essentials 
   # files in tmp directory
@@ -126,7 +131,7 @@ RUN \
       build-essential \
       libpq-dev \
       tzdata \
-      imagemagick \
+      vips-dev \
       nodejs \
       # Vim the editor
       vim \
