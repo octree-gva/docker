@@ -1,4 +1,7 @@
-<!-- https://imagetragick.com/#policy -->
+<!-- 
+  Restrict policy for imagemagick in order to have less exposure. 
+  https://imagetragick.com/#policy 
+-->
 <policymap>
   <policy domain="coder" rights="none" pattern="EPHEMERAL" />
   <policy domain="coder" rights="none" pattern="URL" />

@@ -158,10 +158,8 @@ RUN \
 
 # Templates used by our `45_template` docker-entrypoint script. 
 COPY ./templates /usr/local/share/decidim/templates
-
 # Add all the docker-entrypoints scripts (docker-entrypoint is a run-part).
 COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
-
 # Copy the shared-mime-info database
 COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
@@ -181,7 +179,8 @@ RUN \
   #   CVE-2016-3718 - SSRF
   #   CVE-2016-3716
   #   CVE-2016-3717
-    && IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && cat /var/imagetragick.xml > $IMAGEMAGIC_POLICY
+  # There is no simple way to get the policy.xml path, so we need some magics:
+    && IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && cat /var/imagetragick.xml > $IMAGEMAGIC_POLICY \
   # Allow motd to be written by our docker-entrypoint script
     && chown -R decidim:decidim /etc/motd \
   # Setup crontab (need to run image as root)
