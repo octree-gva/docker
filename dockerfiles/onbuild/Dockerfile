@@ -91,8 +91,8 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.version=${VERSION} \
       org.label-schema.schema-version="1.0.0-rc.1" \
       org.opencontainers.image.created=${BUILD_DATE} \
-      org.opencontainers.image.title="decidim-build" \
-      org.opencontainers.image.description="Build image for decidim" \
+      org.opencontainers.image.title="decidim-onbuild" \
+      org.opencontainers.image.description="Onbuild image for decidim, use it at base for building your images." \
       org.opencontainers.image.url="https://github.com/decidim/decidim" \
       org.opencontainers.image.revision=${VCS_REF} \
       org.opencontainers.image.source="https://github.com/decidim/decidim" \
@@ -101,12 +101,11 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
-
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} \
     RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
-    BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle"\
+    BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     BUNDLE_PATH="vendor" NODE_ENV="production"
 
 RUN \
@@ -130,7 +129,7 @@ RUN \
   # Clean installation clutters
     && apt-get clean \
     && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache
 
 WORKDIR $ROOT
 
@@ -144,11 +143,12 @@ RUN \
     && bundle config --local path "$BUNDLE_PATH" 
 
 ONBUILD RUN \
+  # Be sure we are on the current workdir
+    cd $ROOT \
   # Check the current environment, if we are in dev or test, 
   # install everything
-    if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        rm -rf $ROOT/vendor $ROOT/package-lock.json node_modules \
-        && bundle config --local without "" \
+    && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
+        bundle config --local without "" \
         && bundle install \
         && NODE_ENV=development npm install \
     else \
