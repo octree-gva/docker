@@ -60,7 +60,10 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" HOME="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUNDLE_PATH="vendor" BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} \
-    PATH="${PATH}:${ROOT}/bin" EDITOR="vim"
+    PATH="${PATH}:${ROOT}/bin" EDITOR="vim" \
+    LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
+    # Enable Just In Time compiler, if Ruby > 3.2.0
+    RUBY_YJIT_ENABLE="1"
 
 # Decidim specifics environments variables
 ENV DATABASE_HOST="localhost" DATABASE_PASSWORD="" DATABASE_PORT="5432" \
@@ -107,7 +110,6 @@ RUN \
   # Install native dependancies
     && apt-get install -yq --no-install-recommends \
       build-essential \
-      libpq-dev \
       tzdata \
       imagemagick \
       nodejs \
@@ -119,6 +121,8 @@ RUN \
       cron \
       # Git to fetch gemfile from git.
       git-core \
+      # Alternative malloc implementation
+      libjemalloc2 \
   # Re-install yarn on the newer version.
   # needed to pre-compile assets
     && npm install -g yarn --force \
@@ -146,6 +150,7 @@ COPY ./crontab.d /etc/crontab.d
 COPY ./imagetragick.xml /var/imagetragick.xml
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
+COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
   # Enforce directory structure
@@ -158,7 +163,7 @@ RUN \
   #   CVE-2016-3716
   #   CVE-2016-3717
   # There is no simple way to get the policy.xml path, so we need some magics:
-    && IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && cat /var/imagetragick.xml > $IMAGEMAGIC_POLICY \
+    && IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && mv /var/imagetragick.xml $IMAGEMAGIC_POLICY \
   # Allow motd to be written by our docker-entrypoint script
     && chown -R decidim:decidim /etc/motd \
   # Setup crontab (need to run image as root)
