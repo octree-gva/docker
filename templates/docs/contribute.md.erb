@@ -6,6 +6,9 @@ Don't edit it directly.
 @see /update-documentation.rb
 @see /templates/docs/contribute.md.erb
 -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Contribution
 
@@ -19,19 +22,64 @@ To debug and rebuild the images locally, you can:
 <%= decidim_table.map {|row| "| #{row.map{|cell| "`#{cell}`".ljust(18)}.join("| ")} |"}.join("\n") %>
 
 ## Templates
-The templates for README, decidim.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
+
+### Documentation
+To keep documentation and guides up to date, we write documentation in `erb` templates.
+As soon as Decidim supports new version, the documentation should updates itself. 
+
+Documentation files are in [templates](../templates) directory. You will find there: 
+
+- `README.md.erb` # The main README
+- `docs/*.md.erb` # Documentation files to put in the [docs](../docs) folder. 
+
+Documentation is generated with the script [update-documentation.rb](../update-documentation.rb).
+
+### 5min tutorial docker-composes
+The docker-compose files for the 5min tutorials are generated with the [update-documentation.rb](../update-documentation.rb) script. 
+
+We have two different docker-compose.yml: 
+1. The one present in the git source, that will be used for the 5min tutorial
+2. The one present inside the docker image, usable when "ejecting".
+
+Theses 2 differents templates are available int the [templates directory](../templates)
 ```
 ├── templates
-│   ├── README.md.erb # This readme
 │   ├── container-Dockerfile.erb # the Dockerfile injected in the image, present if you eject
 │   ├── container-docker-compose.yml.erb # The docker-compose injected in the image, present if you eject
 │   └── quickstart.yml.erb # the decidim.NAME_YOUR_VERSION.yml docker-compose template.
 ```
 
-## Ruby Scripts
-The scripts are all written in plain ruby. You can find the two generator scripts in this repo: 
+## Decidim Image
+### Build process
+We build everyday three images for all the supported decidim versions: 
 
-1. ./update-registery.rb: that build the Docker image (`-build`, `-dev` and NAME_YOUR_VERSION)
-2. ./update-documentation.rb: that generates the README, and the docker-compose files.
+- `<version>-onbuild`: is an ONBUILD image, used to be a base for other images. 
+- `<version>-dev`: is a decidim with all the dependancies to run in development. 
+- `<version>`: is a decidim installation with production environment. 
 
-These scripts are configurable, look at the `.env.sample` file for configuration variables. 
+We do these following steps while building the images: 
+
+    1. onbuild
+        1. Install the `decidim` gem globally and generates an new Rails app for decidim. 
+        2. Take back the generated app and install native dependancies (C compilation)
+    2. dist
+        1. Take back the onbuild image, and insert Dockerfile, docker-compose.yml files 
+        2. Take back all previous fiels, and configure a process-manager (`supervisord`)
+    3. self-service
+        1. Add a nginx and its configuration to the dist image to be able to run decidim with a SERVE_STATIC_FILES=false.
+
+
+        From these steps are build the following images:
+
+- `<%= registery_username %>/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
+- `<%= registery_username %>/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
+- `<%= registery_username %>/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
+- `<%= registery_username %>/decidim:0.27-selfservice` is the result of the `self-service` file
+
+## Supervisord
+> Supervisor is a client/server system that allows its users to control a number of processes on UNIX-like operating systems. It was inspired by the following:
+> [Introduction — Supervisord Documentation](http://supervisord.org/introduction.html)
+
+Supervisord work with one config file, that will describe all the running processes. 
+We use a `docker-entrypoint` to generate this config file from environment. By exemple: `RUN_NGINX` will add the programm `workers:nginx` as specified in [the program template](../bundle/templates/supervisord.conf.erb)
+

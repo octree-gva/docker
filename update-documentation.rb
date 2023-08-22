@@ -88,7 +88,8 @@ readme_locals = {
     stable_images: stable_images,
     dev_images:dev_images,
     last_stable:last_stable,
-    decidim_table:decidim_table
+    decidim_table:decidim_table,
+    registery_username: REGISTERY_USERNAME
 }
 File.write("./README.md", template_readme.result_with_hash(readme_locals))
 Dir["templates/docs/*.erb"].map do |file_path|
