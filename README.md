@@ -22,142 +22,39 @@ Don't edit it directly.
     <a href="https://github.com/decidim/decidim">Decidim main repository</a></p>
 </p>
 
-
-## Getting started
-Let's run an empty Decidim instance locally in 5min ⏱
-
-### Local dependencies
-In order to run this tutorial, you'll need the following local installations:
-
-* unix-like bash or shell
-* [docker](https://docs.docker.com/get-docker/)
-  * If you haven't the desktop version of docker, you need to install [docker-compose](https://docs.docker.com/compose/install/) as well.
-* curl
-
-And now, check you have all of this in your terminal:
-```
-docker --version # should be 20.*
-docker-compose --version # 1.29.* is fine
-```
-
-### Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml).
-
-```bash
-mkdir my-participatory-platform
-cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml > docker-compose.yml
-```
-
-### Run the docker-compose
-```bash
-docker-compose up
-```
-
-### Create your first organization
-Now you can access [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system). And use the credentials presents in the docker-compose: 
-
-```
-DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
-```
-
-Once connected, you can go in [/system](http://127.0.0.1:3000/system/organizations) and create a new organization. 
-Then you can define your new organization:
-
-- **Name**: Your application name
-- **Reference prefix**: A small prefix for the uploaded files and documents.
-- **Host**: `127.0.0.1`
-- **Secondary host**: Leave empty
-- **Organization admin name**: Your name
-- **Organization admin email**: Your email
-- **Locale**: Choose your own
-- **Force authentication**: don't select
-- **Users registration mode**: `Allow participants to register and login`
-- **Available Authorizations**: Leave empty
-
-And click on `Create organization & invite admin`.
-You will then receive an email on this link: [http://127.0.0.1:1080](http://127.0.0.1:1080). You can there accept the invite.
-
-### Safeguard your migrations files
-Your instance now completly rely on the docker image you build. But it is sensible to changes. 
-In order to be a bit more resilient, keep a copy of your migrations files and bind them as volume: 
-
-```
-# Copy files from the decidim container in a local `db/migrate` directory
-docker cp decidim:/home/decidim/app/db/migrate db/migrate
-```
-
-And add these lines in your docker-compose.yml file:
-```diff
-    container_name: decidim
-    image: ghcr.io/decidim/decidim:latest
-    ports:
-      - 3000:3000
-    volumes:
-      - storage:/home/decidim/app/storage
-+     - ./db/migrate:/home/decidim/app/migrate
-+   environment:
--   environment:    
-      - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
-      - DECIDIM_SYSTEM_PASSWORD=youReallyWantToChangeMe
-```
-
-You can now `docker-compose up` again and have a safer place to tweak decidim.
-
-### 🎉
-That's it, you've got your participatory platform!
-
-| URL | Description |
-|---|---|
-| [http://127.0.0.1:1080](http://127.0.0.1:1080) | ✉️ A Mailcatcher instance, all emails will be sent there |
-| [http://127.0.0.1:3000](http://127.0.0.1:3000) | 🌱 Decidim instance |
-| [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
-| [http://127.0.0.1:3000/sidekiq](http://127.0.0.1:3000/sidekiq) | Monitoring Sidekiq jobs (login with your admin account) |
-| [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
-
-Before deploying, be sure to read the [good practices](#good-practices).
-
----
-## Read more about Decidim on docker
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Dockerhub](#dockerhub)
-- [Eject you decidim instance](#eject-you-decidim-instance)
-- [Environments configurations](#environments-configurations)
-- [Unsupported Environments](#unsupported-environments)
-- [Cron configurations](#cron-configurations)
-- [Extend Decidim Images](#extend-decidim-images)
-- [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
-- [Good Practices](#good-practices)
-  - [Choose a 64chars password for redis](#choose-a-64chars-password-for-redis)
-  - [Use memcached as cache](#use-memcached-as-cache)
-  - [Redis as a persistent store (AOF)](#redis-as-a-persistent-store-aof)
-  - [Don't run decidim with privilegied postgres user](#dont-run-decidim-with-privilegied-postgres-user)
-- [Contribute](#contribute)
-- [Local development](#local-development)
-  - [Templates](#templates)
-  - [Scripts](#scripts)
-- [License](#license)
+- [▶️ 5min tutorial](#-5min-tutorial)
+  - [Eject you decidim instance](#eject-you-decidim-instance)
+  - [Environments configurations](#environments-configurations)
+  - [Unsupported Environments](#unsupported-environments)
+  - [Cron configurations](#cron-configurations)
+  - [Extend Decidim Images](#extend-decidim-images)
+  - [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---
 
-## Dockerhub
-
-`latest` image is the last stable image. Use it with caution.
+# Dockerhub
 
 **Stable tags**
 
-[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
+[:0.26](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27)
 
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
+[:develop](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=develop)
+
+# [▶️ 5min tutorial](./docs/5min-tutorial.md)
+Ready to mount a Decidim installation locally in 5min?
+[Follow our 5min tutorial](./docs/5min-tutorial.md) to setup Decidim with Docker locally.
 
 ## Eject you decidim instance
 You want to publish your instance on a git? 
@@ -179,9 +76,9 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
 | DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `youReallyWantToChangeMe` |
-| DECIDIM_RUN_RAILS | If the container should run rails | `1` |
-| DECIDIM_RUN_SIDEKIQ | If the container should run sidekiq | `1` |
-| DECIDIM_RUN_CRON | If the container should run cron | `1` |
+| RUN_PUMA | If the container should run rails | `1` |
+| RUN_SIDEKIQ | If the container should run sidekiq | `1` |
+| RUN_CRON | If the container should run cron | `1` |
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `youReallyWantToChangeMe` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `youReallyWantToChangeMe` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
@@ -244,7 +141,7 @@ docker cp decidim:/etc/periodic crontab.d
 And update your docker-compose: 
 ```diff
     container_name: decidim
-    image: ghcr.io/decidim/decidim:latest
+    image: decidim/decidim:latest
     ports:
       - 3000:3000
     volumes:
@@ -271,65 +168,8 @@ The docker-compose `development.NAME_YOUR_VERSION.yml` allows you to run decidim
 They are larger images, and are not suited for production usage. 
 
 
-## Good Practices
-
-### Choose a 64chars password for redis
-> Redis internally stores passwords hashed with SHA256. If you set a password and check the output of ACL LIST or ACL GETUSER, you'll see a long hex string that looks pseudo random. […]
-> Using SHA256 provides the ability to avoid storing the password in clear text while still allowing for a very fast AUTH command, which is a very important feature of Redis and is coherent with what clients expect from Redis.
-> **However ACL passwords are not really passwords**. They are shared secrets between the server and the client, because the password is not an authentication token used by a human being. […]
-> For this reason, slowing down the password authentication, in order to use an algorithm that uses time and space to make password cracking hard, is a very poor choice. What we suggest instead is to **generate strong passwords**, so that nobody will be able to crack it using a dictionary or a brute force attack even if they have the hash […]
-> […] 64-byte alphanumerical string […] is long enough to avoid attacks and short enough to be easy to manage[…]
-> Source: [_Redis Documentation_. ACL, Redis Access Control List, Key permissions. (visited 08/11/2022)](https://redis.io/docs/management/security/acl/)
-
-### Use memcached as cache
-**Avoid using redis as cache**. Redis should be configured in persistent mode (AOF) for sidekiq running. It is not a well suited configuration for caching, and you shouldn't use the same redis instance to do cache and queuing.
-Read more on this particular issue in [the sidekiq wiki:](https://github.com/mperham/sidekiq/wiki/Using-Redis#multiple-redis-instances)
-
-### Redis as a persistent store (AOF)
-Sidekiq is used to send emails and do remote tasks. It should be configured as a persistent store (AOF).
-Read more on configuring redis persistence on the [Redis Documentation](https://redis.io/docs/management/persistence/).
-
-### Don't run decidim with privilegied postgres user
-A good practice is to run decidim with unpriviligied user (can not create table, truncate it or alter it). 
-A common way to put this in practice is to have CI/CD deployment script (through github actions for example), where: 
-
-- While deploying, deploy a temporary instance (sidecars) with priviliged database access. Migrate the database.
-- Once `rails db:migrate:status` gives only `up` migrations, redeploy an instance without priviliged accesses.
-
-**NB** running `rails db:migrate` while a rails application is running is most of the time a bad idea (connection to postgres can hangs). Always check `rails db:migrate:status` after a migration, to be sure all migration passed.
-
-
 ## Contribute
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more informations.
-
-## Local development
-To debug and rebuild the images locally, you can: 
-1. Clone this repository (`git clone git@github.com:decidim/docker.git decidim-docker`)
-2. Run one of the docker-compose command with the version you want to build. 
-
-| Decidim Version   | Ruby image        | Node version      | Docker-compose command |
-| ----------------- | ----------------- | ----------------- | ---------------------- |
-| `0.27.4`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
-| `develop`         | `ruby:3.1.4-slim-buster`| `node_16_x`       | `docker-compose -f decidim.develop.yml up` |
-
-### Templates
-The templates for README, decidim.NAME_YOUR_VERSION.yml are available in the [template directory](./templates)
-```
-├── templates
-│   ├── README.md.erb # This readme
-│   ├── container-Dockerfile.erb # the Dockerfile injected in the image, present if you eject
-│   ├── container-docker-compose.yml.erb # The docker-compose injected in the image, present if you eject
-│   └── quickstart.yml.erb # the decidim.NAME_YOUR_VERSION.yml docker-compose template.
-```
-
-### Scripts
-The scripts are all written in plain ruby. You can find the two generator scripts in this repo: 
-
-1. ./update-registery.rb: that build the Docker image (`-build`, `-dev` and NAME_YOUR_VERSION)
-2. ./update-documentation.rb: that generates the README, and the docker-compose files.
-
-These scripts are configurable, look at the `.env.sample` file for configuration variables. 
-
 [PR are Welcome](./CONTRIBUTING.md) ❤️ 
 
 ## License

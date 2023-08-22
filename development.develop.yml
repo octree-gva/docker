@@ -11,7 +11,7 @@ services:
   decidim:
     container_name: decidim
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: hfroger/decidim:#<DecidimVersion:0x000055a432c98840>-dev
+    image: decidim/decidim:#<DecidimVersion:0x00007f917e9b0160>-dev
     ports:
       - 3000:3000
     volumes:
@@ -30,9 +30,9 @@ services:
       SMTP_ADDRESS: "mailer"
       SMTP_PORT: "25"
       SMTP_AUTHENTICATION: "none"
-      DECIDIM_RUN_RAILS: "1"
-      DECIDIM_RUN_SIDEKIQ: "1"
-      DECIDIM_RUN_CRON: "1"
+      RUN_PUMA: "1"
+      RUN_SIDEKIQ: "1"
+      RUN_CRON: "1"
     depends_on:
       - pg
       - redis

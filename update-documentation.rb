@@ -7,7 +7,7 @@ require_relative 'lib/helpers'
 require "erb"
 
 REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
-DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable,develop").split(",")
+DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.26-stable,release/0.27-stable,develop").split(",")
 
 supported_versions = []
 begin
@@ -21,6 +21,7 @@ end
 
 template_quickstart = ERB.new(File.read('templates/quickstart.yml.erb'))
 template_readme = ERB.new(File.read('templates/README.md.erb'))
+
 
 # README variables
 stable_images=[]
@@ -83,11 +84,16 @@ supported_versions.map do |version|
     end
 end
 
-File.write("./README.md", template_readme.result_with_hash(
+readme_locals = {
     stable_images: stable_images,
     dev_images:dev_images,
     last_stable:last_stable,
     decidim_table:decidim_table
-))
+}
+File.write("./README.md", template_readme.result_with_hash(readme_locals))
+Dir["templates/docs/*.erb"].map do |file_path|
+    file_name = File.basename(file_path, ".erb")
+    File.write("./docs/#{file_name}", ERB.new(File.read(file_path)).result_with_hash(readme_locals))
+end
 
-system("doctoc", "README.md")
+`doctoc README.md ./docs/*.md`
