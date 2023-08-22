@@ -91,6 +91,6 @@ RUN \
     && bundle install \
     && npm install --production \
   # Cleanup
-    bundle clean --force 
+    && bundle clean --force 
     && rm -rf ./.bundle/cache ./vendor/cache /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log
