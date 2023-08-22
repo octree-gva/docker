@@ -26,7 +26,7 @@ RUN \
         && rm -rf ./.bundle/cache ./vendor/cache \
     ;fi \
   # Execute bootsnap and ignore error
-    && bundle exec bootsnap precompile --gemfile || true \
+    && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
 
   # In many infrastructures, volumes might empty
   # the directories. Keep a copy of essentials 
