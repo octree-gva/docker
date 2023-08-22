@@ -59,7 +59,7 @@ jobs:
           export DECIDIM_VERSION_BRANCHES=develop
           export REGISTERY_PUSH=true
           ./update-registery.rb
-  finalize:
+  update-and-publish:
     runs-on: ubuntu-latest
     needs: [decidim-026, decidim-027, decidim-latest]
     steps:
