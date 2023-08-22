@@ -149,7 +149,7 @@ RUN \
   # Clean installation files
     && apt-get clean \
     && apt-get autoremove -y \
-    && rm -rf /usr/local/bundle/cache
+    && rm -rf /usr/local/bundle/cache \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc /usr/share/man \
     && for x in `gem list --no-versions`; do gem uninstall $x -a -x -I; done \
   # Add a non-root user
