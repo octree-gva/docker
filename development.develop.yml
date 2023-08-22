@@ -11,7 +11,7 @@ services:
   decidim:
     container_name: decidim
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: hfroger/decidim:#<DecidimVersion:0x000055d4dbadb050>-dev
+    image: hfroger/decidim:#<DecidimVersion:0x0000555698406908>-dev
     ports:
       - 3000:3000
     volumes:
@@ -46,7 +46,7 @@ services:
       - default
 
   pg:
-    image: postgres:14-alpine
+    image: postgres:15-alpine
     volumes:
       - pg-data:/var/lib/postgresql/data
     environment:
@@ -62,6 +62,7 @@ services:
       - 'redis-server'
       - '--loglevel warning'
       - '--appendonly yes' # AOF mode
+      - '--requirepass my_insecure_password' # Choose a > 64chars password
     volumes:
       - redis-data:/data
     networks:

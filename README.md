@@ -164,7 +164,7 @@ RUN apk --update --no-cache restic
 
 ## Run Decidim in development/test mode
 The docker-compose `development.NAME_YOUR_VERSION.yml` allows you to run decidim in `development` or `test` mode. 
-They are larger images, and are not suited for production usage. 
+They are larger images, and are not suited for production usage.
 
 
 ## Contribute
