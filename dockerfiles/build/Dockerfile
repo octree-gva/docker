@@ -73,7 +73,8 @@ RUN \
   # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
     && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
   # Done, remove the decidim generator.
-    && gem uninstall decidim -a -x -I
+    && gem uninstall decidim -a -x -I \
+    && rm -rf /usr/local/bundle/cache
 
 # Switch back to ROOT and install deps.
 WORKDIR $ROOT
@@ -88,5 +89,5 @@ RUN \
     && bundle config --local path "$BUNDLE_PATH" \
     && bundle install \
   # Cleanup
-    && rm -rf .bundle/cache \ 
+    && rm -rf ./.bundle/cache ./vendor/cache
     && truncate -s 0 /var/log/*log
