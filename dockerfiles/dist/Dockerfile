@@ -15,28 +15,6 @@ FROM $FROM_IMAGE as builder
 ENV RAILS_ENV=${RAILS_ENV:-"production"} \
     NODE_ENV=${RAILS_ENV:-"production"}
 
-RUN \
-  # If we want to run rails under something else than production, 
-  # we need to install first the dependancies
-    if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        rm -rf $ROOT/vendor $ROOT/package-lock.json node_modules \
-        && bundle config --local without "" \
-        && bundle install \
-        && npm install \
-        && rm -rf ./.bundle/cache ./vendor/cache \
-    ;fi \
-  # Precompile the application with bootsnap.
-  # Check tmp/cache/bootsnap*
-    && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
-  # In many infrastructures, volumes might empty
-  # the directories. Keep a copy of essentials 
-  # files in tmp directory
-    && mkdir -p $ROOT/tmp \
-    && tar cfvz tmp/public.bak.tar.gz public \ 
-    && tar cfvz tmp/storage.bak.tar.gz storage \
-    && tar cfvz tmp/db.bak.tar.gz db \
-    && tar cfvz tmp/config.bak.tar.gz config
-
 # Add run scripts
 COPY ./bin $ROOT/bin/
 # Copy docker-compose and dockerfile that got

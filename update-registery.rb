@@ -56,7 +56,7 @@ def build_images(docker_image)
 
     docker_cmd = [
         "docker", "build",
-        "-t", "#{source_tag}-build",
+        "-t", "#{source_tag}-onbuild",
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
@@ -66,14 +66,14 @@ def build_images(docker_image)
         "--build-arg", "BUILD_DATE=#{build_date}",
         "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
         "--network=host",
-        "-f", "./dockerfiles/build/Dockerfile", "./bundle"
+        "-f", "./dockerfiles/onbuild/Dockerfile", "./bundle"
     ]
     puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string}-build image" unless system(*docker_cmd)
+    raise "docker failed to build #{decidim_version_string}-onbuild image" unless system(*docker_cmd)
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-dist",
-        "--build-arg", "FROM_IMAGE=#{source_tag}-build",
+        "--build-arg", "FROM_IMAGE=#{source_tag}-onbuild",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
         "--build-arg", "BUILD_DATE=#{build_date}",
@@ -91,7 +91,7 @@ def build_images(docker_image)
     docker_cmd = [
         "docker", "build",
         "-t", "#{source_tag}-dev",
-        "--build-arg", "FROM_IMAGE=#{source_tag}-build",
+        "--build-arg", "FROM_IMAGE=#{source_tag}-onbuild",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
         "--build-arg", "BUILD_DATE=#{build_date}",
@@ -138,21 +138,21 @@ supported_versions.map do |version|
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
         tag_versions(docker_image.decidim_version.version) do |version|
             last_stable = "#{image}:#{version}"
-            push_image("#{source_tag}-build", "#{image}:#{version}-build")
+            push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
             push_image("#{source_tag}-selfservice", "#{image}:#{version}-selfservice")
         end
     else
         version = docker_image.decidim_version.github_branch
-        push_image("#{source_tag}-build", "#{image}:#{version}-build")
+        push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
         push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
         push_image("#{source_tag}-dist", "#{image}:#{version}")
     end
 end
 
 if last_stable
-    push_image("#{last_stable}-build", "#{image}:latest-build")
+    push_image("#{last_stable}-onbuild", "#{image}:latest-onbuild")
     push_image("#{last_stable}-dev", "#{image}:latest-dev")
     push_image("#{last_stable}", "#{image}:latest")
 end
