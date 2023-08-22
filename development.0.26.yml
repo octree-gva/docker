@@ -11,7 +11,7 @@ services:
   decidim:
     container_name: decidim
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: decidim/decidim:0.26-dev
+    image: hfroger/decidim:0.26-dev
     ports:
       - 3000:3000
     volumes:
