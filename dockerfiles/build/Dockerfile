@@ -89,5 +89,5 @@ RUN \
     && bundle config --local path "$BUNDLE_PATH" \
     && bundle install \
   # Cleanup
-    && rm -rf ./.bundle/cache ./vendor/cache
+    && rm -rf ./.bundle/cache ./vendor/cache \
     && truncate -s 0 /var/log/*log

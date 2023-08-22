@@ -166,16 +166,16 @@ COPY --from=builder --chown=decidim $ROOT ./
 
 RUN \
   # Enforce directory structure
-  mkdir -p tmp/pids log \
-  && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
-  && touch /etc/motd /var/run/crond.pid \
+    mkdir -p tmp/pids log \
+    && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
+    && touch /etc/motd /var/run/crond.pid \
   # Allow motd to be written by our docker-entrypoint script
-  && chown -R decidim:decidim /etc/motd \
+    && chown -R decidim:decidim /etc/motd \
   # Setup crontab (need to run image as root)
-  && crontab /etc/crontab.d/crontab \
+    && crontab /etc/crontab.d/crontab \
   # Symlink logs to a common linux place
-  && ln -s $ROOT/log /var/log/decidim \
-  && truncate -s 0 /var/log/*log
+    && ln -s $ROOT/log /var/log/decidim \
+    && truncate -s 0 /var/log/*log
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["start"]
