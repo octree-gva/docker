@@ -141,7 +141,7 @@ RUN \
 # Templates used by our `45_template` docker-entrypoint script. 
 COPY ./templates /usr/local/share/decidim/templates
 # Add all the docker-entrypoints scripts (docker-entrypoint is a run-part).
-COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+COPY --chown=decidim ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 # Copy the shared-mime-info database
 COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
@@ -151,7 +151,7 @@ COPY ./imagetragick.xml /var/imagetragick.xml
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
 # Add binaries
-COPY ./bin $ROOT/bin/
+COPY --chown=decidim ./bin $ROOT/bin/
 # Add libpq-dev files to connect to postgres
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
