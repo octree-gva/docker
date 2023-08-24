@@ -31,8 +31,8 @@ nodaemon=true
 user=<%= ENV.fetch("USER", "root") %>
 
 <% supervisord_includes.each do |program_name, program| %>
-<%= program unless program_name.empty? %>
+<%= program unless program_name.nil? || program_name.empty? %>
 <% end %>
 
 [group:workers]
-programs=<%= supervisord_includes.select{|name, _ | !name.empty? }.map {|name, _| name}.join(",") %>
+programs=<%= supervisord_includes.select{|name, _ | !name.nil? && !name.empty? }.map {|name, _| name}.join(",") %>
