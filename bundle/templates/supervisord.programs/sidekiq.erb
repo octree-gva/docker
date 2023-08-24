@@ -1,7 +1,7 @@
 [program:<%= name %>]
 command=bundle exec sidekiq
 directory=<%= root %>
-autostart=true  # env RUN_SIDEKIQ is active
+autostart=true
 autorestart=true
 logfile_maxbytes=4MB
 logfile_backups=10
