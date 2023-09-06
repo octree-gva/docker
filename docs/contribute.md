@@ -32,7 +32,7 @@ To debug and rebuild the images locally, you can:
 | ----------------- | ----------------- | ----------------- | ---------------------- |
 | `0.26.8`          | `ruby:2.7.8-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.26.yml up` |
 | `0.27.4`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
-| `develop`         | `ruby:3.1.4-slim-buster`| `node_16_x`       | `docker-compose -f decidim.develop.yml up` |
+| `develop`         | `ruby:3.1.4-slim-buster`| `node_18_x`       | `docker-compose -f decidim.develop.yml up` |
 
 ## Templates
 
