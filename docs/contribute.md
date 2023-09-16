@@ -17,7 +17,6 @@ Don't edit it directly.
     - [5min tutorial docker-composes](#5min-tutorial-docker-composes)
   - [Decidim Image](#decidim-image)
     - [Build process](#build-process)
-  - [Supervisord](#supervisord)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -79,7 +78,8 @@ We do these following steps while building the images:
         1. Take back the onbuild image, and insert Dockerfile, docker-compose.yml files 
 
 From these steps are build the following images:
-
 - `hfroger/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
 - `hfroger/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
 - `hfroger/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
+
+

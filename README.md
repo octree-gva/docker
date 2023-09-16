@@ -29,7 +29,6 @@ Don't edit it directly.
 - [▶️ 5min tutorial](#-5min-tutorial)
   - [Eject you decidim instance](#eject-you-decidim-instance)
   - [Environments configurations](#environments-configurations)
-  - [Unsupported Environments](#unsupported-environments)
   - [Cron configurations](#cron-configurations)
   - [Extend Decidim Images](#extend-decidim-images)
   - [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
@@ -98,13 +97,6 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 Almost all the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.27.0/docs/modules/configure/pages/environment_variables.adoc).
 
 
-## Unsupported Environments
-
-| Env name | Why it is NOT supported |
-|---|---|
-| RAILS_LOG_TO_STDOUT | We use `supervisord` process manager that will create/rotates logfiles for you. `RAILS_LOG_TO_STDOUT` will have no effect. |
-
-
 ## Cron configurations
 Cron is configured to run scripts every 15min, 1hour, daily, weekly, monthly. 
 When the times comes, it will execute all scripts present in the `/etc/periodic` directory. 
@@ -146,6 +138,7 @@ And update your docker-compose:
 +   environment:
 -   environment:    
 ```
+
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
