@@ -18,9 +18,6 @@ services:
       SMTP_ADDRESS: "mailer"
       SMTP_PORT: "25"
       SMTP_AUTHENTICATION: "none"
-      RUN_PUMA: "1"
-      RUN_SIDEKIQ: "1"
-      RUN_CRON: "1"
     depends_on:
       - pg
       - redis

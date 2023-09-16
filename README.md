@@ -75,9 +75,6 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
 | DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `my_insecure_password` |
-| RUN_PUMA | If the container should run rails | `1` |
-| RUN_SIDEKIQ | If the container should run sidekiq | `1` |
-| RUN_CRON | If the container should run cron | `1` |
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `my_insecure_password` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `my_insecure_password` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
@@ -149,9 +146,6 @@ And update your docker-compose:
 +   environment:
 -   environment:    
 ```
-
-> The environment variable `DECIDIM_RUN_CRON` (`1` or `0`) define if your container will run cron or not. 
-> Thus, you have a fine-grained control over your containers. `cron` is handled by supervisord and is running in __forground__ when `1`
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 

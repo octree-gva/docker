@@ -1,0 +1,4 @@
+#! /bin/sh
+set -e
+echo "    🚀 puma starting"
+cron start -f

@@ -77,22 +77,9 @@ We do these following steps while building the images:
         2. Take back the generated app and install native dependancies (C compilation)
     2. dist
         1. Take back the onbuild image, and insert Dockerfile, docker-compose.yml files 
-        2. Take back all previous fiels, and configure a process-manager (`supervisord`)
-    3. self-service
-        1. Add a nginx and its configuration to the dist image to be able to run decidim with a SERVE_STATIC_FILES=false.
 
-
-        From these steps are build the following images:
+From these steps are build the following images:
 
 - `hfroger/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
 - `hfroger/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
 - `hfroger/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
-- `hfroger/decidim:0.27-selfservice` is the result of the `self-service` file
-
-## Supervisord
-> Supervisor is a client/server system that allows its users to control a number of processes on UNIX-like operating systems. It was inspired by the following:
-> [Introduction — Supervisord Documentation](http://supervisord.org/introduction.html)
-
-Supervisord work with one config file, that will describe all the running processes. 
-We use a `docker-entrypoint` to generate this config file from environment. By exemple: `RUN_NGINX` will add the programm `workers:nginx` as specified in [the program template](../bundle/templates/supervisord.conf.erb)
-

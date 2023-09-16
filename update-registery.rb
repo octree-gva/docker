@@ -106,17 +106,6 @@ def build_images(docker_image)
     ]
     puts docker_cmd.join(" ")
     raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
-    if is_stable
-        docker_cmd = [
-            "docker", "build",
-            "-t", "#{source_tag}-selfservice",
-            "--build-arg", "BASE_IMAGE=#{source_tag}-dist",
-            "--no-cache", "--network=host",
-            "-f", "./dockerfiles/selfservice/Dockerfile", "./bundle"
-        ]
-        puts docker_cmd.join(" ")
-        raise "docker failed to build #{decidim_version_string}-selfservice image" unless system(*docker_cmd)
-    end
 end
 
 image = "#{REGISTERY_USERNAME}/decidim"
@@ -140,7 +129,6 @@ supported_versions.map do |version|
             push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
-            push_image("#{source_tag}-selfservice", "#{image}:#{version}-selfservice")
         end
     else
         version = docker_image.decidim_version.github_branch
