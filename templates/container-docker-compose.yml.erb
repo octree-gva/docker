@@ -12,19 +12,17 @@ services:
       DECIDIM_SYSTEM_EMAIL: "hello@myorg.com"
       DECIDIM_SYSTEM_PASSWORD: "my_insecure_password"
       DATABASE_URL: "postgres://decidim:my_insecure_password@pg:5432/decidim"
-      REDIS_URL: "redis://default:my_insecure_password@redis:6379/1"
       RAILS_SERVE_STATIC_FILES: "true"
       RAILS_FORCE_SSL: "false"
       SMTP_ADDRESS: "mailer"
       SMTP_PORT: "25"
       SMTP_AUTHENTICATION: "none"
+      QUEUE_ADAPTER: "async"
     depends_on:
       - pg
-      - redis
       - mailer
     links:
       - pg
-      - redis
       - mailer
     networks:
       - private
@@ -41,17 +39,6 @@ services:
     networks:
       - private
 
-  redis:
-    image: redis:alpine3.16
-    command:
-      - 'redis-server'
-      - '--loglevel warning'
-      - '--appendonly yes' # AOF mode
-    volumes:
-      - redis-data:/data
-    networks:
-      - private
-
   mailer:
     image: tophfr/mailcatcher
     ports:
@@ -63,7 +50,6 @@ services:
 
 volumes:
   pg-data: {}
-  redis-data: {}
   bundle: {}
 
 networks:

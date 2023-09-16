@@ -175,4 +175,4 @@ RUN \
     && truncate -s 0 /var/log/*log
 
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["start"]
+CMD ["start-puma"]
