@@ -145,25 +145,6 @@ RUN \
 ONBUILD RUN \
   # Be sure we are on the current workdir
     cd $ROOT \
-    bundle config set --global path "vendor" \
-  # Check the current environment, if we are in dev or test, 
-  # install everything
-    && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config --global without "" \
-        && bundle install --jobs "$(nproc)" --no-cache --quiet \
-        && NODE_ENV=development npm install \
-    ;else \
-      bundle config --global without "test:development" \
-      && bundle install --jobs "$(nproc)" --no-cache --quiet \
-      && NODE_ENV=production npm install --production \
-    ;fi \
-  # Cleanup
-    && bundle clean --force  \
-    && rm -rf  /usr/local/bundle/* \
-    && truncate -s 0 /var/log/*log \
-  # Precompile the application with bootsnap.
-  # Check tmp/cache/bootsnap*
-    && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
   # In many infrastructures, volumes might remove
   # bounded directories. Keep a copy of essentials 
   # files in tmp/ directory can save some lifes
