@@ -145,6 +145,7 @@ RUN \
 ONBUILD RUN \
   # Be sure we are on the current workdir
     cd $ROOT \
+    bundle config set --global path "vendor" \
   # Check the current environment, if we are in dev or test, 
   # install everything
     && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
