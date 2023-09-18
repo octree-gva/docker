@@ -144,15 +144,13 @@ WORKDIR $ROOT
 # COPY files from generator
 COPY --from=generator /home/decidim/app /home/decidim/app/
 
-RUN \
-  # Setup local bundle configurations
-    bundle config --global build.nokogiri --use-system-libraries \
-    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --global path "$BUNDLE_PATH" 
-
 ONBUILD RUN \
   # Be sure we are on the current workdir
     cd $ROOT \
+  # Setup local bundle configurations
+    && bundle config --global build.nokogiri --use-system-libraries \
+    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
+    && bundle config --global path "$BUNDLE_PATH" \ 
   # In many infrastructures, volumes might remove
   # bounded directories. Keep a copy of essentials 
   # files in tmp/ directory can save some lifes
