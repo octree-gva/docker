@@ -54,10 +54,12 @@ supported_versions.map do |version|
             )
             File.write("./decidim.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: true,
+                registery_username: REGISTERY_USERNAME,
                 docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}"
             ))
             File.write("./development.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: false,
+                registery_username: REGISTERY_USERNAME,
                 docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}-dev"
             ))
             # Write down only one version in the README.
