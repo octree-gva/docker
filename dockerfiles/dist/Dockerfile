@@ -114,8 +114,6 @@ RUN \
       nodejs \
       # Vim the editor
       vim \
-      # Supervisor the program manager
-      supervisor \
       # Cron... to run cron
       cron \
       # Git to fetch gemfile from git.
