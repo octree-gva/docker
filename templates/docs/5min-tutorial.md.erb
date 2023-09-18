@@ -16,7 +16,7 @@ Let's run an empty Decidim instance locally in 5min ⏱
 ### Local dependencies
 In order to run this tutorial, you'll need the following local installations:
 
-* unix-like bash or shell
+* a bash or shell
 * [docker](https://docs.docker.com/get-docker/)
   * If you haven't the desktop version of docker, you need to install [docker-compose](https://docs.docker.com/compose/install/) as well.
 * curl
@@ -100,7 +100,6 @@ That's it, you've got your participatory platform!
 | [http://127.0.0.1:1080](http://127.0.0.1:1080) | ✉️ A Mailcatcher instance, all emails will be sent there |
 | [http://127.0.0.1:3000](http://127.0.0.1:3000) | 🌱 Decidim instance |
 | [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
-| [http://127.0.0.1:3000/sidekiq](http://127.0.0.1:3000/sidekiq) | Monitoring Sidekiq jobs (login with your admin account) |
 | [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
 Before deploying, be sure to read the [good practices](./good-practices).
