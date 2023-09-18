@@ -153,6 +153,25 @@ COPY --chown=decidim ./bin $ROOT/bin/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
+    bundle config set --global path "vendor" \
+  # Check the current environment, if we are in dev or test, 
+  # install everything
+    && if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
+        bundle config --global without "" \
+        && bundle install --jobs "$(nproc)" --no-cache --quiet \
+        && NODE_ENV=development npm install \
+    ;else \
+      bundle config --global without "test:development" \
+      && bundle install --jobs "$(nproc)" --no-cache --quiet \
+      && NODE_ENV=production npm install --production \
+    ;fi \
+  # Cleanup
+    && bundle clean --force  \
+    && rm -rf  /usr/local/bundle/* \
+    && truncate -s 0 /var/log/*log \
+  # Precompile the application with bootsnap.
+  # Check tmp/cache/bootsnap*
+    && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
   # Enforce directory structure
     mkdir -p tmp/pids log \
     && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
