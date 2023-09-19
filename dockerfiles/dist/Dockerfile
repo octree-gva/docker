@@ -174,9 +174,9 @@ RUN \
     && truncate -s 0 /var/log/*log \
   # Precompile the application with bootsnap.
   # Check tmp/cache/bootsnap*
-    && bundle exec bootsnap precompile --gemfile app/ lib/ || true \
+    && bundle exec bootsnap precompile --gemfile app/ lib/ \
   # Enforce directory structure
-    mkdir -p tmp/pids log \
+    && mkdir -p tmp/pids log \
     && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
     && touch /etc/motd /var/run/crond.pid \
   # Add imagemagick's policy to avoid 
