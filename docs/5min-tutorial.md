@@ -10,23 +10,13 @@ Don't edit it directly.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-- [5min tutorial](#5min-tutorial)
-    - [Local dependencies](#local-dependencies)
-  - [Get the docker-compose](#get-the-docker-compose)
-  - [Run the docker-compose](#run-the-docker-compose)
-  - [Create your first organization](#create-your-first-organization)
-    - [Safeguard your migrations files](#safeguard-your-migrations-files)
-- [Welcome to Decidim 🎉](#welcome-to-decidim-)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # 5min tutorial
 Let's run an empty Decidim instance locally in 5min ⏱
 
 ### Local dependencies
 In order to run this tutorial, you'll need the following local installations:
 
-* unix-like bash or shell
+* a bash or shell
 * [docker](https://docs.docker.com/get-docker/)
   * If you haven't the desktop version of docker, you need to install [docker-compose](https://docs.docker.com/compose/install/) as well.
 * curl
@@ -52,14 +42,14 @@ docker-compose up
 ```
 
 ## Create your first organization
-Now you can access [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system). And use the credentials presents in the docker-compose: 
+Now you can access [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system). And use the credentials presents in the docker-compose: 
 
 ```
 DECIDIM_SYSTEM_EMAIL=hello@myorg.com
 DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
-Once connected, you can go in [/system](http://127.0.0.1:3000/system/organizations) and create a new organization. 
+Once connected, you can go in [/system](http://127.0.0.1:8080/system/organizations) and create a new organization. 
 Then you can define your new organization:
 
 - **Name**: Your application name
@@ -89,8 +79,6 @@ And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
     image: decidim/decidim:0.27.4
-    ports:
-      - 3000:3000
     volumes:
       - storage:/home/decidim/app/storage
 +     - ./db/migrate:/home/decidim/app/migrate
@@ -108,9 +96,8 @@ That's it, you've got your participatory platform!
 | URL | Description |
 |---|---|
 | [http://127.0.0.1:1080](http://127.0.0.1:1080) | ✉️ A Mailcatcher instance, all emails will be sent there |
-| [http://127.0.0.1:3000](http://127.0.0.1:3000) | 🌱 Decidim instance |
-| [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
-| [http://127.0.0.1:3000/sidekiq](http://127.0.0.1:3000/sidekiq) | Monitoring Sidekiq jobs (login with your admin account) |
-| [http://127.0.0.1:3000/system](http://127.0.0.1:3000/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
+| [http://127.0.0.1:8080](http://127.0.0.1:8080) | 🌱 Decidim instance |
+| [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
+| [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
 Before deploying, be sure to read the [good practices](./good-practices).

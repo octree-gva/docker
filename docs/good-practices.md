@@ -10,14 +10,6 @@ Don't edit it directly.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-- [Good Practices](#good-practices)
-  - [Choose a 64chars password for redis](#choose-a-64chars-password-for-redis)
-  - [Use memcached as cache](#use-memcached-as-cache)
-  - [Redis as a persistent store (AOF)](#redis-as-a-persistent-store-aof)
-  - [Don't run decidim with privilegied postgres user](#dont-run-decidim-with-privilegied-postgres-user)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # Good Practices
 
 ## Choose a 64chars password for redis
