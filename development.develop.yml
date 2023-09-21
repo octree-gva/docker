@@ -28,7 +28,7 @@ services:
     container_name: decidim
     command: start-puma
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: decidim/decidim:#<DecidimVersion:0x00005581216a4b48>-dev
+    image: decidim/decidim:#<DecidimVersion:0x0000562dc187d288>-dev
     volumes:
       - storage:/home/decidim/app/storage
       - bundle:/home/decidim/app/vendor

@@ -78,12 +78,12 @@ supported_versions.map do |version|
         File.write("./decidim.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
             docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker.decidim_version.github_branch}",
-            registery_username: REGISTERY_USERNAME,
+            registery_username: REGISTERY_USERNAME
         ))
         File.write("./development.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
             is_stable: false,
             docker_tag: "#{REGISTERY_USERNAME}/decidim:#{version}-dev",
-            registery_username: REGISTERY_USERNAME,
+            registery_username: REGISTERY_USERNAME
         ))
     end
 end
@@ -93,7 +93,7 @@ readme_locals = {
     dev_images: dev_images,
     last_stable: last_stable,
     decidim_table: decidim_table,
-    registery_username:  REGISTERY_USERNAME}
+    registery_username:  REGISTERY_USERNAME
 }
 File.write("./README.md", template_readme.result_with_hash(readme_locals))
 Dir["templates/docs/*.erb"].map do |file_path|
