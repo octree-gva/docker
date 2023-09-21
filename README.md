@@ -25,6 +25,15 @@ Don't edit it directly.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+- [Dockerhub](#dockerhub)
+- [▶️ 5min tutorial](#-5min-tutorial)
+  - [Eject you decidim instance](#eject-you-decidim-instance)
+  - [Environments configurations](#environments-configurations)
+  - [Cron configurations](#cron-configurations)
+  - [Extend Decidim Images](#extend-decidim-images)
+  - [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -34,12 +43,12 @@ Don't edit it directly.
 
 **Stable tags**
 
-[:0.26](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27)
+[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
 
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=develop)
+[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
 
 # [▶️ 5min tutorial](./docs/5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?

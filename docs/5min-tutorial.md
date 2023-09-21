@@ -10,6 +10,16 @@ Don't edit it directly.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+- [5min tutorial](#5min-tutorial)
+    - [Local dependencies](#local-dependencies)
+  - [Get the docker-compose](#get-the-docker-compose)
+  - [Run the docker-compose](#run-the-docker-compose)
+  - [Create your first organization](#create-your-first-organization)
+    - [Safeguard your migrations files](#safeguard-your-migrations-files)
+- [Welcome to Decidim 🎉](#welcome-to-decidim-)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 5min tutorial
 Let's run an empty Decidim instance locally in 5min ⏱
 
