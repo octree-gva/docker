@@ -84,7 +84,7 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | DATABASE_MAX_POOL_SIZE | Max pool size for the database. | `RAILS_MAX_THREADS` |
 | DATABASE_URL | Host for the postgres database. | `pg` |
 | TZ | Timezone used | `Europe/Madrid` |
-| REDIS_UR | Redis url for sidekiq | `redis` |
+| REDIS_URL | Redis url for sidekiq | `redis` |
 | SMTP_AUTHENTICATION | How rails should authenticate to SMTP | `plain`, `none` |
 | SMTP_USERNAME | Username for SMTP | `my-participatory-plateform@iredmail.org` |
 | SMTP_PASSWORD | 🔐 Password for SMTP | `my_insecure_password` |
