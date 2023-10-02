@@ -150,12 +150,4 @@ ONBUILD RUN \
   # Setup local bundle configurations
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --global path "$BUNDLE_PATH" \ 
-  # In many infrastructures, volumes might remove
-  # bounded directories. Keep a copy of essentials 
-  # files in tmp/ directory can save some lifes
-    && mkdir -p $ROOT/tmp \
-    && tar cfvz tmp/public.bak.tar.gz public \ 
-    && tar cfvz tmp/storage.bak.tar.gz storage \
-    && tar cfvz tmp/db.bak.tar.gz db \
-    && tar cfvz tmp/config.bak.tar.gz config
+    && bundle config --global path "$BUNDLE_PATH" 
