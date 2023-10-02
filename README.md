@@ -30,6 +30,8 @@ Don't edit it directly.
   - [Eject you decidim instance](#eject-you-decidim-instance)
   - [Environments configurations](#environments-configurations)
   - [Cron configurations](#cron-configurations)
+  - [Entrypoints](#entrypoints)
+    - [Command](#command)
   - [Extend Decidim Images](#extend-decidim-images)
   - [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
   - [Contribute](#contribute)
@@ -94,7 +96,7 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-Almost all the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.27.0/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.27.0/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
@@ -139,6 +141,24 @@ And update your docker-compose:
 -   environment:    
 ```
 
+If you don't use docker image to run your cron and prefer using a schedulder, 
+you can get the commands in the [crontab file](./bundle/crontab.d/crontab)
+
+## Entrypoints
+Before running the docker command, we go through [entrypoints scripts](./bundle/docker-entrypoint.d).
+
+* **10_remove_pids**: Remove old puma pids if exists
+* **15_wait_for_it**: Run a [wait-for-it](./bundle/bin/wait-for-it) for dependancies: `REDIS_URL`, `DATABASE_URL` and `MEMCACHE_SERVERS` are supported.
+* **35_bundle_check**: Check if all your gems are installed, and your migrations are up.
+* **45_template**: Set the motd file to have a nice welcome message.
+* **50_upsert-sysadmin**: Check your `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD` and update the first /system administrator
+
+### Command
+You can set as command whatever you want. We pre-defined these binaries:
+
+* **start-puma**: start a puma server.
+* **start-sidekiq**: start a sidekiq worker.
+* **start-cron**: start cron in forground.
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
