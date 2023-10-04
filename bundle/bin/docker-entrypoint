@@ -9,5 +9,6 @@ echo "Container initializing."
 # > the Debian cron script namespace (^[a-zA-Z0-9_-]+$).
 # > source: https://manpages.debian.org/jessie/debianutils/run-parts.8.en.html
 run-parts /usr/local/share/docker-entrypoint.d
+cd $ROOT
 echo "🚀 $@"
 exec "$@"
