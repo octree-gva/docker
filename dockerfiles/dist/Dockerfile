@@ -24,7 +24,6 @@ COPY ./Dockerfile ./docker-compose.yml $ROOT/
 RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
-    bundle config set --local path "vendor" \
     if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
         bundle config set --local without "" \
         && NODE_ENV=development npm install \
@@ -33,6 +32,7 @@ RUN \
       && NODE_ENV=production npm install --production \
       && bundle install --jobs "$(nproc)" --no-cache --quiet \
     ;fi \
+    && bundle config set --local path "vendor" \
     && bundle lock \ 
     && bundle config set --local deployment true \
     && bundle install --jobs "$(nproc)" --no-cache --quiet \
