@@ -34,7 +34,7 @@ RUN \
       && bundle install --jobs "$(nproc)" --no-cache --quiet \
     ;fi \
     && bundle lock \ 
-    && bundle config set --local deployment true
+    && bundle config set --local deployment true \
     && bundle install --jobs "$(nproc)" --no-cache --quiet \
   # Cleanup
     && bundle clean --force  \
