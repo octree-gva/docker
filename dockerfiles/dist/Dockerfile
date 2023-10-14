@@ -24,15 +24,18 @@ COPY ./Dockerfile ./docker-compose.yml $ROOT/
 RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
+    bundle config set --local path "vendor" \
     if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config --global without "" \
-        && bundle install --jobs "$(nproc)" --no-cache --quiet \
+        bundle config set --local without "" \
         && NODE_ENV=development npm install \
     ;else \
-      bundle config --global without "test:development" \
-      && bundle install --jobs "$(nproc)" --no-cache --quiet \
+      bundle config set --local without "test:development" \
       && NODE_ENV=production npm install --production \
+      && bundle install --jobs "$(nproc)" --no-cache --quiet \
     ;fi \
+    && bundle lock \ 
+    && bundle config set --local deployment true
+    && bundle install --jobs "$(nproc)" --no-cache --quiet \
   # Cleanup
     && bundle clean --force  \
     && rm -rf  /usr/local/bundle/* \
@@ -172,7 +175,8 @@ COPY --chown=decidim ./bin $ROOT/bin/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
-    bundle config set --global path "vendor" \
+  # Precompile assets
+    && SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile \
   # Precompile the application with bootsnap.
   # Check tmp/cache/bootsnap*
     && bundle exec bootsnap precompile --gemfile app/ lib/ \
