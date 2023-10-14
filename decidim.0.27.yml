@@ -26,7 +26,7 @@ services:
 
   decidim:
     container_name: decidim
-    command: start-puma
+    command: bundle exec rails s -b 0.0.0.0
     
     image: hfroger/decidim:0.27
     volumes:

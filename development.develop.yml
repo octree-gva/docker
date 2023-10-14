@@ -26,9 +26,9 @@ services:
 
   decidim:
     container_name: decidim
-    command: start-puma
+    command: bundle exec rails s -b 0.0.0.0
     # DON'T USE THIS IN PRODUCTION, this is an unstable version
-    image: hfroger/decidim:#<DecidimVersion:0x000055af07167e28>-dev
+    image: hfroger/decidim:#<DecidimVersion:0x000055eebb4e7f00>-dev
     volumes:
       - storage:/home/decidim/app/storage
       - bundle:/home/decidim/app/vendor
