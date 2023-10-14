@@ -143,11 +143,13 @@ Before running the docker command, we go through [entrypoints scripts](./bundle/
 * **50_upsert-sysadmin**: Check your `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD` and update the first /system administrator
 
 ### Command
-You can set as command whatever you want. We pre-defined these binaries:
+You can update your docker-compose command to whatever you want.
+It is common to see one of these:
 
-* **start-puma**: start a puma server.
-* **start-sidekiq**: start a sidekiq worker.
-* **start-cron**: start cron in forground.
+* **bundle exec rails server -b 0.0.0.0**: start a puma server.
+* **bundle exec sidekiq**: start a sidekiq worker.
+* **cron start -f**: start cron in forground.
+
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 

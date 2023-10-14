@@ -26,7 +26,7 @@ services:
 
   decidim:
     container_name: decidim
-    command: start-puma
+    command: bundle exec rails s -b 0.0.0.0
     <%= "# DON'T USE THIS IN PRODUCTION, this is an unstable version" unless is_stable %>
     image: <%= docker_tag %>
     volumes:

@@ -1,4 +1,0 @@
-#! /bin/sh
-set -e
-echo "    🚀 sidekiq starting"
-bundle exec sidekiq

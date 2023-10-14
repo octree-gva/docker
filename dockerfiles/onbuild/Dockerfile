@@ -66,7 +66,7 @@ RUN \
     && gem uninstall decidim -a -x -I \
     && rm -rf /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log \
-    && rm -rf $ROOT/vendor $ROOT/Gemfile.lock $ROOT/package-lock.json $ROOT/node_modules
+    && rm -rf $ROOT/vendor $ROOT/Gemfile.lock $ROOT/package-lock.json $ROOT/node_modules $ROOT/.git $ROOT/.gem $ROOT/.npm
 
 ##########################################################################
 # STEP 2: Base image
