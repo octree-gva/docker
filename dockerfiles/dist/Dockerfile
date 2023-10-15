@@ -173,7 +173,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 RUN \
   # Enforce directory structure
     mkdir -p tmp/pids log \
-    && chown -R tmp/pids log \
+    && chown -R decidim tmp/pids log \
   # Move docker-entrypoints
     && mv $ROOT/tmp/docker-entrypoint.d /usr/local/share/docker-entrypoint.d \
   # Add imagemagick's policy to avoid 
