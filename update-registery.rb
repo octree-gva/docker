@@ -59,7 +59,7 @@ def build_images(docker_image)
         "-t", "#{source_tag}-onbuild",
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
-        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.buster_tag}",
+        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",

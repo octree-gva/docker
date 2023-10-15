@@ -16,11 +16,11 @@ ARG BUILD_DATE \
     # Optional paramenters for the generator (ex: --edge)
     GENERATOR_PARAMS 
 
-ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
+ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
     RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
-    BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle"\
+    BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUNDLE_PATH="vendor" NODE_ENV="development"
 
 WORKDIR /home/app/generator
@@ -44,6 +44,7 @@ RUN \
       nodejs \
       tzdata \
       imagemagick \
+      libicu-dev \
       libpq-dev \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
@@ -53,12 +54,18 @@ RUN \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
-  # Setup local bundle configurations
+  # Setup global bundle configurations
+  # Will use /usr/local/bundle/.bundle directory
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --global path "$BUNDLE_PATH" \
+    && bundle config --global path "vendor" \
+    && bundle config --global clean true \
   # Install the decidim generator
-    && if [ -z "$DECIDIM_VERSION" ]; then gem install decidim --no-document; else gem install decidim -v $DECIDIM_VERSION --no-document; fi \
+    && if [ -z "$DECIDIM_VERSION" ]; then \
+      gem install decidim --no-document \
+    ;else \
+      gem install decidim -v $DECIDIM_VERSION --no-document \
+    ;fi \
   # Generates the rails application at /home/decidim/app ($ROOT)
   # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
     && decidim $ROOT --queue sidekiq $GENERATOR_PARAMS \
@@ -66,7 +73,7 @@ RUN \
     && gem uninstall decidim -a -x -I \
     && rm -rf /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log \
-    && rm -rf $ROOT/vendor $ROOT/Gemfile.lock $ROOT/package-lock.json $ROOT/node_modules $ROOT/.git $ROOT/.gem $ROOT/.npm
+    && rm -rf $ROOT/vendor $ROOT/Gemfile.lock $ROOT/package-lock.json $ROOT/yarn.lock $ROOT/node_modules $ROOT/.git $ROOT/.gem $ROOT/.npm
 
 ##########################################################################
 # STEP 2: Base image
@@ -105,12 +112,14 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
-ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="buster" \
+ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} \
     RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
-    BUNDLER_VERSION=${BUNDLER_VERSION} BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
-    BUNDLE_PATH="vendor" NODE_ENV="production"
+    BUNDLER_VERSION=${BUNDLER_VERSION} \
+    BUNDLE_PATH="vendor" NODE_ENV="production" \
+    LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
+    RUBY_YJIT_ENABLE="1"
 
 RUN \
   # Update apt-get
@@ -127,6 +136,8 @@ RUN \
     && apt-get install -yq \
       build-essential \
       nodejs \
+      libjemalloc2 \
+      libicu-dev \
       tzdata \
       imagemagick \
       libpq-dev \
@@ -148,6 +159,7 @@ ONBUILD RUN \
   # Be sure we are on the current workdir
     cd $ROOT \
   # Setup local bundle configurations
-    && bundle config --global build.nokogiri --use-system-libraries \
-    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --global path "$BUNDLE_PATH" 
+    && bundle config --local build.nokogiri --use-system-libraries \
+    && bundle config --local build.charlock_holmes --with-icu-dir=/usr/include \
+    && bundle config --local path "vendor" \
+    && bundle config --local clean true

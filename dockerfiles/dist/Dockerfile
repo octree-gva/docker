@@ -25,20 +25,19 @@ RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
     if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config set --local without "" \
+        bundle config --local without "" \
         && NODE_ENV=development npm install \
     ;else \
-      bundle config set --local without "test:development" \
+      bundle config --local without "test:development" \
       && NODE_ENV=production npm install --production \
-      && bundle install --jobs "$(nproc)" --no-cache --quiet \
     ;fi \
-    && bundle config set --local path "vendor" \
+    && bundle config --local path "vendor" \
     && bundle lock \ 
-    && bundle config set --local deployment true \
+    && bundle config --local deployment true \
     && bundle install --jobs "$(nproc)" --no-cache --quiet \
   # Cleanup
     && bundle clean --force  \
-    && rm -rf  /usr/local/bundle/* \
+    && rm -rf  /usr/local/bundle/* $ROOT/vendor/cache \
     && truncate -s 0 /var/log/*log 
 
 ##########################################################################
@@ -78,7 +77,6 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable" ROOT="/home/decidim/app" HOME="/home/decidim/app" BUNDLER_VERSION=${BUNDLER_VERSION} \
-    BUNDLE_PATH="vendor" BUNDLE_USER_HOME="/home/decidim/app/.bundle" \
     DECIDIM_VERSION=${VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} \
     PATH="$PATH:/home/decidim/app/bin" EDITOR="vim" \
     LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
@@ -86,7 +84,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     RUBY_YJIT_ENABLE="1"
 
 # Decidim specifics environments variables
-ENV DATABASE_URL="" RAILS_ENV=${RAILS_ENV} NODE_ENV=${RAILS_ENV} \
+ENV DATABASE_URL="" RAILS_ENV=${RAILS_ENV:-"production"} NODE_ENV=${RAILS_ENV:-"production"} \
     SECRET_KEY_BASE="my_insecure_password" SMTP_ADDRESS="" SMTP_DOMAIN="" SMTP_PASSWORD="" \
     SMTP_USERNAME="" DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_MAILER_SENDER="change-me@example.org" SMTP_PORT="587" \
@@ -165,11 +163,11 @@ COPY --chown=decidim ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
 COPY ./crontab.d /etc/crontab.d
-# Copy ImageMagick policy
+# Copy ImageMagick policy, to secure imagemagick installation
 COPY ./imagetragick.xml /var/imagetragick.xml
 # Copy application
 COPY --from=builder --chown=decidim $ROOT ./
-# Add binaries
+# Add docker-entrypoint and wait-for-it binaries
 COPY --chown=decidim ./bin $ROOT/bin/
 # Add libpq-dev files to connect to postgres
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
