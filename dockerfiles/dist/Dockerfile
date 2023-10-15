@@ -24,19 +24,12 @@ COPY ./Dockerfile ./docker-compose.yml $ROOT/
 RUN \
   # Check the current environment, if we are in dev or test, 
   # install everything
-    if [ "$RAILS_ENV" = "development" ] || [ "$RAILS_ENV" = "test" ]; then \
-        bundle config --local without "" \
-        && NODE_ENV=development npm install \
-    ;else \
-      bundle config --local without "test:development" \
-      && NODE_ENV=production npm install --production \
-    ;fi \
+    npm install \
+    && bundle config --local with "$RAILS_ENV" \
     && bundle config --local path "vendor" \
-    && bundle lock \ 
-    && bundle config --local deployment true \
+    && bundle config --local clean true \
     && bundle install --jobs "$(nproc)" --no-cache --quiet \
   # Cleanup
-    && bundle clean --force  \
     && rm -rf  /usr/local/bundle/* $ROOT/vendor/cache \
     && truncate -s 0 /var/log/*log 
 
@@ -159,25 +152,19 @@ RUN \
 COPY ./templates /usr/local/share/decidim/templates
 # Add all the docker-entrypoints scripts (docker-entrypoint is a run-part).
 COPY --chown=decidim ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
-# Copy the shared-mime-info database
-COPY --from=builder --chown=decidim /usr/share/mime  /usr/share/mime
 # Copy cron files
 COPY ./crontab.d /etc/crontab.d
 # Copy ImageMagick policy, to secure imagemagick installation
 COPY ./imagetragick.xml /var/imagetragick.xml
 # Copy application
-COPY --from=builder --chown=decidim $ROOT ./
+COPY --from=builder --chown=decidim $ROOT $ROOT
 # Add docker-entrypoint and wait-for-it binaries
 COPY --chown=decidim ./bin $ROOT/bin/
 # Add libpq-dev files to connect to postgres
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
-  # Precompile assets
     SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile \
-  # Precompile the application with bootsnap.
-  # Check tmp/cache/bootsnap*
-    && bundle exec bootsnap precompile --gemfile app/ lib/ \
   # Enforce directory structure
     && mkdir -p tmp/pids log \
     && chown -R decidim:decidim $ROOT/tmp $ROOT/log \

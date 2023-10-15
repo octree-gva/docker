@@ -116,7 +116,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} \
-    RAILS_ENV="production" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
+    RAILS_ENV="production"  NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
     BUNDLER_VERSION=${BUNDLER_VERSION} \
     BUNDLE_PATH="vendor" NODE_ENV="production" \
     LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
