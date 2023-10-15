@@ -164,9 +164,8 @@ COPY --chown=decidim ./bin $ROOT/bin/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
-    SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile \
   # Enforce directory structure
-    && mkdir -p tmp/pids log \
+    mkdir -p tmp/pids log \
     && chown -R decidim:decidim $ROOT/tmp $ROOT/log \
     && touch /etc/motd /var/run/crond.pid \
   # Add imagemagick's policy to avoid 
