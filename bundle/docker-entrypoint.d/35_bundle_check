@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do 
+    # Check all the gems are installed or fails.
+    raise "Gems can not be installed, abort" unless system("bundle check || bundle install")
+    puts "    ✅ Gems in Gemfiles are installed" 
+
+    # Check no migrations are pending migrations
+    raise "Migration failed, abort" unless system("bundle", "exec", "rails", "db:migrate")
+    puts "    ✅ Migrations are all up"
+end

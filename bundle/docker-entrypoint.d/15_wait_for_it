@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+require "uri"
+# Wait for dependancies to be available
+Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do 
+    # If REDIS_URL is there, then we check for a running redis (cache or queue)
+    unless ENV.fetch("REDIS_URL", "").empty? 
+        redis_uri = URI.parse(ENV["REDIS_URL"])
+        unless system(
+            "wait-for-it", 
+            "-h", "#{redis_uri.host}", 
+            "-p", "#{redis_uri.port || 6379}"
+        )
+            raise "Redis is not available, abort" 
+        end
+    end
+    # If DATABASE_URL is there, then we check for a running postgres
+    unless ENV.fetch("DATABASE_URL", "").empty? 
+        database_uri = URI.parse(ENV["DATABASE_URL"])
+        unless system(
+            "wait-for-it", 
+            "-h", "#{database_uri.host}", 
+            "-p", "#{database_uri.port || 5432}"
+        )
+            raise "Databse is not available, abort" 
+        end
+    end
+    # If MEMCACHE_SERVERS is there,
+    # then we check for one of the memcached servers written (CSV)
+    unless ENV.fetch("MEMCACHE_SERVERS", "").empty?
+        memcache_servers = ENV["MEMCACHE_SERVERS"].split(",")
+        memcache_is_up = memcache_servers.map do |memcache_server|
+            (host, port) = memcache_server.strip.split(":")
+            system(
+                "wait-for-it", 
+                "-h", "#{host}", 
+                "-p", "#{port || 11211}"
+            )
+        end.any?
+        unless memcache_is_up
+            raise "No memcache server available, abort"
+        end
+    end
+end

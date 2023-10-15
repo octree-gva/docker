@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+  decidim:
+    container_name: decidim
+    build: .
+    ports:
+      - 3000:3000
+    volumes:
+      - bundle:/home/decidim/app/vendor
+      - .:/home/decidim/app
+    environment:
+      DECIDIM_SYSTEM_EMAIL: "hello@myorg.com"
+      DECIDIM_SYSTEM_PASSWORD: "my_insecure_password"
+      DATABASE_URL: "postgres://decidim:my_insecure_password@pg:5432/decidim"
+      RAILS_SERVE_STATIC_FILES: "true"
+      RAILS_FORCE_SSL: "false"
+      SMTP_ADDRESS: "mailer"
+      SMTP_PORT: "25"
+      SMTP_AUTHENTICATION: "none"
+      QUEUE_ADAPTER: "async"
+    depends_on:
+      - pg
+      - mailer
+    links:
+      - pg
+      - mailer
+    networks:
+      - private
+      - default
+
+  pg:
+    image: postgres:15-alpine
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "my_insecure_password"
+      POSTGRES_USER: "decidim"
+      POSTGRES_DB: "decidim"
+    networks:
+      - private
+
+  mailer:
+    image: tophfr/mailcatcher
+    ports:
+      # SMTP port is 25, webinterface is on 80
+      - 1080:80
+    networks:
+      - private
+      - default
+
+volumes:
+  pg-data: {}
+  bundle: {}
+
+networks:
+  private:
+    internal: true
