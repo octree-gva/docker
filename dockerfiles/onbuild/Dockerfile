@@ -46,6 +46,7 @@ RUN \
       imagemagick \
       libicu-dev \
       libpq-dev \
+      git-core \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
   # Install bundler
