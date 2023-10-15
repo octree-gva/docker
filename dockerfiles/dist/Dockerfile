@@ -176,7 +176,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
 RUN \
   # Precompile assets
-    && SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile \
+    SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile \
   # Precompile the application with bootsnap.
   # Check tmp/cache/bootsnap*
     && bundle exec bootsnap precompile --gemfile app/ lib/ \
