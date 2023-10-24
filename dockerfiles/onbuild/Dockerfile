@@ -28,7 +28,6 @@ WORKDIR /home/app/generator
 RUN \
   # Update apt-get
     mkdir -p $ROOT \
-    && apt-get upgrade -yq \
     && apt-get update -yq \
   # Prepare node installation
     && apt-get install -yq ca-certificates curl gnupg \
@@ -125,7 +124,6 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
 RUN \
   # Update apt-get
     mkdir -p $ROOT \
-    && apt-get upgrade -yq \
     && apt-get update -yq \
   # Prepare node installation
     && apt-get install -y ca-certificates curl gnupg \

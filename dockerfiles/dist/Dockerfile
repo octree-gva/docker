@@ -27,8 +27,7 @@ COPY ./Dockerfile ./docker-compose.yml $ROOT/
 
 RUN \
   # Prepare apt-get 
-    apt-get upgrade -yq \
-    && apt-get update -yq \
+    apt-get update -yq \
   # Cleanup apt-get
     && apt-get install -yq --no-install-recommends git-core \
     && apt-get clean \
@@ -142,7 +141,7 @@ RUN \
       vim \
       # Cron... to run cron
       cron \
-      # Git to fetch gemfile from git.
+      # Git to fetch rubygems from git.
       git-core \
       # Alternative malloc implementation
       libjemalloc2 \
