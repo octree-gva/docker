@@ -216,6 +216,7 @@ ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY --from=generator $ROOT/Gemfile .
 COPY --from=production_bundle $ROOT/Gemfile.lock .
+COPY --from=production_bundle $ROOT/vendor .
 RUN bundle config set without "" \
   && bundle install --quiet \
   && rm -rf vendor/cache .bundle/cache
