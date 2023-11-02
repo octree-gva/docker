@@ -46,17 +46,14 @@ end
 ##
 # Build docker images related to metadatas (version, compatible debian and node versions, etc.)
 def build_images(docker_image)
-    decidim_version_string = docker_image.decidim_version.version.join(".")
+    decidim_version_string = docker_image.version.join(".")
     source_tag = "decidim:#{decidim_version_string}"
     build_date = Time.now.utc.strftime("%Y-%m-%dT%H:%MZ")
-    is_stable = docker_image.decidim_version.github_branch.include?("stable")
-    node_major_version = docker_image.decidim_version.node_version[0]
-    bundler_version = docker_image.decidim_version.bundler_version.join(".")
+    is_stable = docker_image.github_branch.include?("stable")
+    node_major_version = docker_image.node_version[0]
+    bundler_version = docker_image.bundler_version.join(".")
     generator_params = is_stable ? [] : ["--build-arg", "GENERATOR_PARAMS=--edge"]
-
-    docker_cmd = [
-        "docker", "build",
-        "-t", "#{source_tag}-onbuild",
+    docker_build_args = [        
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
@@ -64,76 +61,55 @@ def build_images(docker_image)
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
         "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
         "--build-arg", "BUILD_DATE=#{build_date}",
-        "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "--network=host",
-        "-f", "./dockerfiles/onbuild/Dockerfile", "./bundle"
-    ]
-    puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string}-onbuild image" unless system(*docker_cmd)
-    docker_cmd = [
-        "docker", "build",
-        "-t", "#{source_tag}-dist",
-        "--build-arg", "FROM_IMAGE=#{source_tag}-onbuild",
-        "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
-        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
-        "--build-arg", "BUILD_DATE=#{build_date}",
-        "--build-arg", "RAILS_ENV=production",
-        "--build-arg", "VERSION=#{decidim_version_string}",
+        "--build-arg", "VCS_REF=#{docker_image.commit_rev}",
         "--build-arg", "GROUP_ID=1001",
         "--build-arg", "USER_ID=1001",
-        "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
-        "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
         "--network=host",
-        "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
-      ]
-    puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string} image" unless system(*docker_cmd)
-    docker_cmd = [
-        "docker", "build",
-        "-t", "#{source_tag}-dev",
-        "--build-arg", "FROM_IMAGE=#{source_tag}-onbuild",
-        "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
-        "--build-arg", "BASE_IMAGE=ruby:#{docker_image.slim_buster_tag}",
-        "--build-arg", "BUILD_DATE=#{build_date}",
-        "--build-arg", "RAILS_ENV=development",
-        "--build-arg", "VERSION=#{decidim_version_string}",
-        "--build-arg", "GROUP_ID=1001",
-        "--build-arg", "USER_ID=1001",
-        "--build-arg", "NODE_MAJOR_VERSION=#{node_major_version}",
-        "--build-arg", "VCS_REF=#{docker_image.decidim_version.commit_rev}",
-        "--network=host",
-        "-f", "./dockerfiles/dist/Dockerfile", "./bundle"
+        "-f", "./Dockerfile", "./bundle"
     ]
-    puts docker_cmd.join(" ")
-    raise "docker failed to build #{decidim_version_string}-dev image" unless system(*docker_cmd)
+    # Tags we want to make, [<docker tag>, <docker stage target>]
+    tags = [
+        ["#{source_tag}-dist", "decidim-production"],
+        ["#{source_tag}-onbuild", "decidim-production-onbuild"],
+        ["#{source_tag}-dev", "decidim-development"],
+    ]
+    tags.each do |docker_tag, docker_target|
+        docker_cmd = [
+            "docker", "build",
+            "--tag", docker_tag,
+            "--target", docker_target,
+            *docker_build_args
+        ];
+        puts docker_cmd.join(" ")
+        raise "docker failed to build #{decidim_version_string}-dist image" unless system(*docker_cmd)
+    end
 end
 
 image = "#{REGISTERY_USERNAME}/decidim"
-
-
 supported_versions.map do |version| 
     docker_image = DockerImage.new(version)
-    decidim_version_string = docker_image.decidim_version.version.join(".")
+    decidim_version_string = docker_image.version.join(".")
     source_tag = "decidim:#{decidim_version_string}"
-    is_stable = docker_image.decidim_version.github_branch.include?("stable")
+    is_stable = docker_image.github_branch.include?("stable")
     File.write("./bundle/docker-compose.yml", template_docker_compose.result_with_hash(
         is_stable: is_stable,
     ))
     File.write("./bundle/Dockerfile", template_dockerfile.result_with_hash(
-        docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker_image.decidim_version.version.first(2).join(".")}",
+        docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker_image.version.first(2).join(".")}-onbuild",
     ))
     build_images(docker_image)
     if is_stable
         # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
-        tag_versions(docker_image.decidim_version.version) do |version|
+        tag_versions(docker_image.version) do |version|
             push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
         end
     else
-        version = docker_image.decidim_version.github_branch
+        version = docker_image.github_branch
         push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
         push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
         push_image("#{source_tag}-dist", "#{image}:#{version}")
     end
 end
+

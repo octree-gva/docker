@@ -11,6 +11,7 @@ class DecidimVersion
         self.github_branch = github_branch
         parse_metadatas!
     end
+
     def to_json(*args)
         {
           github_branch: github_branch,
@@ -24,6 +25,8 @@ class DecidimVersion
     
     private
 
+    ##
+    # Get all the information needed for a given decidim version.
     def parse_metadatas!
         self.commit_rev = `git log -1 \"#{github_branch}\" --pretty=format:\"%H\"`
         self.node_version = read_node_version
@@ -31,18 +34,29 @@ class DecidimVersion
         self.version = read_decidim_version
         self.bundler_version = read_bundler_version
     end
-
+    ##
+    # Fetch the package.json in the remote github repo. 
+    # Identifies the node version and returns an array representing 
+    # the semver version: [major, minor, patch]. 
     def read_node_version
         package_json = JSON.parse(URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/package.json").read)
         version_string = package_json['engines']['node'] || "16.20.0"   
         major, minor, patch = version_string.scan(/\d+/) 
     end
-    
+    ##
+    # Fetch the .ruby-version in the remote github repo. 
+    # Identifies the ruby version and returns an array representing 
+    # the semver version: [major, minor, patch]. 
     def read_ruby_version
         version_string = URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/.ruby-version").read.gsub("ruby-", "").strip
         major, minor, patch = version_string.scan(/\d+/)
     end
-    
+    ##
+    # Fetch the version.rb in the remote github repo. 
+    # Identifies the Decidim version and compares it to the ones available
+    # in RubyGem. 
+    # The best match beween wanted version (version.rb) and the available (RubyGem)
+    # is returned in a an array representing semver version: [major, minor, patch]. 
     def read_decidim_version
         version_string = URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/lib/decidim/version.rb").read.strip
         major, minor, patch = version_string.scan(/\d+/)
@@ -61,7 +75,10 @@ class DecidimVersion
         end
         return [major, minor, patch]
     end
-    
+    ##
+    # Read the remote Gemfile.lock to identifies the bundler version
+    # used. 
+    # Return an array representing semver version: [major, minor, patch]. 
     def read_bundler_version
         gemfile_lock = URI.open("https://raw.githubusercontent.com/decidim/decidim/#{github_branch}/Gemfile.lock").read.strip
         version_string = gemfile_lock.match(/^BUNDLED\s+WITH\s+(\d+\.\d+\.\d+)/)[1]

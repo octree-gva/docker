@@ -1,4 +1,5 @@
 FROM <%= docker_tag %>
-USER decidim
-COPY . /home/decidim/app
-RUN bundle install --jobs "$(nproc)" --retry 3 --no-cache --quiet
+LABEL org.opencontainers.image.url="https://github.com/my-decidim" \
+    org.opencontainers.image.source="https://github.com/my-decidim" \
+    org.opencontainers.image.vendor="Your Name Here" \
+    maintainer="Your Name <your@ema.il>"

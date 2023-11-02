@@ -10,7 +10,7 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
             "-h", "#{redis_uri.host}", 
             "-p", "#{redis_uri.port || 6379}"
         )
-            raise "Redis is not available, abort" 
+            raise "Redis #{redis_uri.host}:#{redis_uri.port || 6379} is not available, abort" 
         end
     end
     # If DATABASE_URL is there, then we check for a running postgres
