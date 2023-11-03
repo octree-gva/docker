@@ -1,5 +1,32 @@
+##
+# ASSETS STEP
+# Install vendors in development, to build assets. 
+# The result of the compilation will be send to the final step. 
+FROM <%= docker_tag %> as assets
+ENV NODE_ENV=development \
+    RAILS_ENV=development
+RUN bundle config set without ""
+COPY --chown=decidim:decidim ./Gemfile* $ROOT
+RUN bundle install --quiet \
+  && rm -rf vendor/cache .bundle/cache
+COPY --chown=decidim:decidim . $ROOT
+RUN npm install \
+  && bundle exec rails assets:precompile \
+  && rm -rf node_modules
+
+##
+# FINAL STEP
+# Take assets and rails application, and 
+# use a non-root user.
 FROM <%= docker_tag %>
 LABEL org.opencontainers.image.url="https://github.com/my-decidim" \
     org.opencontainers.image.source="https://github.com/my-decidim" \
     org.opencontainers.image.vendor="Your Name Here" \
-    maintainer="Your Name <your@ema.il>"
+    maintainer="Your Name <youremail@example.org>"
+RUN bundle config set without "development:test"
+COPY --chown=decidim:decidim ./Gemfile* $ROOT
+RUN bundle install --quiet \
+  && rm -rf vendor/cache .bundle/cache
+USER decidim
+COPY --chown=decidim:decidim . $ROOT
+COPY --from=assets --chown=decidim:decidim $ROOT/public/decidim-packs $ROOT/public/decidim-packs

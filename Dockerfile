@@ -79,7 +79,7 @@ RUN \
     && gem uninstall decidim -a -x -I \
     && rm -rf /usr/local/bundle/* \
     && truncate -s 0 /var/log/*log \
-    && rm -rf $ROOT/vendor $ROOT/Gemfile.lock \
+    && rm -rf $ROOT/vendor \
        $ROOT/package-lock.json $ROOT/yarn.lock \
        $ROOT/node_modules $ROOT/.git \
        $ROOT/.gem $ROOT/.npm \
@@ -202,7 +202,7 @@ RUN \
 # Installation of application gems for production
 ##########################################################################
 FROM base as production_bundle
-COPY --from=generator $ROOT/Gemfile* .
+COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
 RUN bundle config set without "development:test" \
   && bundle install --quiet \
   && rm -rf vendor/cache .bundle/cache
@@ -214,9 +214,7 @@ RUN bundle config set without "development:test" \
 FROM base as development_bundle
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
-COPY --from=generator $ROOT/Gemfile .
-COPY --from=production_bundle $ROOT/Gemfile.lock .
-COPY --from=production_bundle $ROOT/vendor .
+COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
 RUN bundle config set without "" \
   && bundle install --quiet \
   && rm -rf vendor/cache .bundle/cache
@@ -246,17 +244,10 @@ COPY --from=generator --chown=decidim:decidim $ROOT .
 COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
 COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
 
-RUN bundle config set without "development:test"
+# Onbuild image will probably have they own gem, no need to ship
+# vendors.
+RUN rm -rf $ROOT/vendor 
 
-ONBUILD COPY --chown=decidim:decidim ./Gemfile* $ROOT
-ONBUILD RUN bundle install --quiet \
-  && rm -rf vendor/cache .bundle/cache
-ONBUILD COPY --chown=decidim:decidim . $ROOT
-ONBUILD RUN npm install \
-  && bundle exec rails assets:precompile \
-  && rm -rf node_modules \
-  && bundle exec bootsnap precompile --gemfile app/ lib/
-ONBUILD USER decidim
 
 ##########################################################################
 # DECIDIM PRODUCTION 

@@ -6,7 +6,7 @@ require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
 require "erb"
 REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
-DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.27-stable").split(",")
+DECIDIM_VERSIONS = ENV.fetch("DECIDIM_VERSION_BRANCHES", "release/0.26-stable").split(",")
 
 template_docker_compose = ERB.new(File.read('templates/container-docker-compose.yml.erb'))
 template_dockerfile = ERB.new(File.read('templates/container-Dockerfile.erb'))
