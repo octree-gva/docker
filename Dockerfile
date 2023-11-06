@@ -172,7 +172,7 @@ WORKDIR $ROOT
 
 COPY ./imagetragick.xml $ROOT/tmp/
 COPY ./Dockerfile ./docker-compose.yml ./
-COPY ./docker-entrypoint.d /usr/local/share/
+COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
 # Templates used by our `45_template` docker-entrypoint script. 
 COPY ./templates /usr/local/share/decidim/templates
 # Copy cron files
@@ -243,11 +243,12 @@ CMD ["bundle", "exec", "puma"]
 COPY --from=generator --chown=decidim:decidim $ROOT .
 COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
 COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
+COPY ./bin/* bin/
 
 # Onbuild image will probably have they own gem, no need to ship
 # vendors.
 RUN rm -rf $ROOT/vendor 
-
+ENTRYPOINT "./bin/docker-entrypoint"
 
 ##########################################################################
 # DECIDIM PRODUCTION 
@@ -259,6 +260,8 @@ COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
 COPY --from=production_bundle $ROOT/vendor ./vendor
 COPY --from=production_bundle $ROOT/Gemfile.lock .
+COPY ./bin/* bin/
+ENTRYPOINT "./bin/docker-entrypoint"
 CMD ["bundle", "exec", "puma"]
 
 ##########################################################################
@@ -268,6 +271,7 @@ CMD ["bundle", "exec", "puma"]
 FROM base as decidim-development
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
+COPY ./bin/* bin/
 COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
 COPY --from=assets $ROOT/package-lock.json ./
@@ -276,4 +280,5 @@ COPY --from=development_bundle $ROOT/Gemfile.lock ./
 COPY --from=development_bundle $ROOT/vendor ./vendor
 RUN bundle config set without "" \
     bundle binstubs webpack-dev-server
+ENTRYPOINT "./bin/docker-entrypoint"
 CMD ["bundle", "exec", "puma"]
