@@ -27,7 +27,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" DEBIAN_RELEASE="slim-buster" \
     DEBIAN_SUITE="oldstable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
     DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_PARAMS=${GENERATOR_PARAMS} \
     RAILS_ENV="development" NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
-    BUNDLER_VERSION=${BUNDLER_VERSION} \
+    BUNDLER_VERSION=${BUNDLER_VERSION} \ 
     BUNDLE_PATH="vendor" NODE_ENV="development"
 
 WORKDIR /home/app/generator
@@ -155,7 +155,7 @@ RUN \
     && for x in `gem list --no-versions`; do gem uninstall $x -a -x -I; done \
   # Add a non-root user
     && groupadd -g $GROUP_ID decidim \
-    && useradd -u $USER_ID -g $GROUP_ID -r -s /bin/sh decidim \
+    && useradd -u $USER_ID -g $GROUP_ID -d $ROOT -r -s /bin/sh decidim \
   # Configure bundler
     && bundle config set build.nokogiri --use-system-libraries \
     && bundle config set build.nokogiri --use-system-libraries \
@@ -255,6 +255,7 @@ ENTRYPOINT "./bin/docker-entrypoint"
 # To run a fresh Decidim application (non-root mode).
 ##########################################################################
 FROM base as decidim-production
+ENV BUNDLE_APP_CONFIG="/home/decidim/app" 
 USER decidim
 COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
