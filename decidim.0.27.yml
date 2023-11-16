@@ -35,8 +35,10 @@ services:
       SMTP_AUTHENTICATION: "none"
       QUEUE_ADAPTER: "async"
     depends_on:
-      - pg
-      - mailer
+      pg:
+        condition: service_healthy
+      mailer:
+        condition: service_healthy
     links:
       - pg
       - mailer
@@ -53,6 +55,9 @@ services:
       POSTGRES_DB: "decidim"
     networks:
       - private
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
 
   mailer:
     image: tophfr/mailcatcher
