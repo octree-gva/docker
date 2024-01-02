@@ -276,7 +276,7 @@ COPY ./bin/* bin/
 COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
 COPY --from=assets $ROOT/package-lock.json ./
-COPY --from=assets $ROOT/node_modules .
+COPY --from=assets $ROOT/node_modules ./node_modules
 COPY --from=development_bundle $ROOT/Gemfile.lock ./
 COPY --from=development_bundle $ROOT/vendor ./vendor
 RUN bundle config set without "" \
