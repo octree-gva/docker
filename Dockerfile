@@ -227,7 +227,8 @@ FROM base as assets
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY --from=generator $ROOT/package.json .
-RUN npm install
+RUN npm install -D webpack-dev-server \
+  && npm install
 COPY --from=generator $ROOT .
 COPY --from=development_bundle $ROOT/vendor ./vendor
 COPY --from=development_bundle $ROOT/Gemfile.lock .
