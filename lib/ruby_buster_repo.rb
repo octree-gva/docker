@@ -21,6 +21,6 @@ class RubyBusterRepo
             end
             page += 1
         end
-        versions.sort_by { |tag, ruby_version| ruby_version.join(".") }.reverse
+        versions.sort_by { |tag, ruby_version| ruby_version.join(".") }.sort
     end
 end

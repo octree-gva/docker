@@ -33,7 +33,7 @@ class DockerImage
         self.slim_buster_tag = RubyBusterRepo.versions.find do |buster_t, ruby|
             r_major, r_minor, r_patch = ruby
             t_major, t_minor, t_patch = @decidim_version.ruby_version
-            r_major == t_major && r_minor == t_minor
+            r_major == t_major
         end.first
     end
 end
