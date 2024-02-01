@@ -23,8 +23,9 @@ jobs:
           npm install -g doctoc
           export REGISTRY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           export DECIDIM_VERSION_COUNT=3
-          export REGISTERY_PUSH=true
-          ./update-registery.rb
+          export REGISTRY_PUSH=true
+          ./update-registry.rb
+
   update-and-publish:
     runs-on: ubuntu-latest
     needs: [decidim-docker]

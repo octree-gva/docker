@@ -2,11 +2,11 @@ require 'net/http'
 require 'json'
 
 # Checks if operations should push changes to the remote registry or perform a dry-run.
-# The decision is based on the environment variable `REGISTERY_PUSH`.
+# The decision is based on the environment variable `REGISTRY_PUSH`.
 #
 # @return [Boolean] true if the environment variable indicates that pushing is enabled; false otherwise.
 def push_to_registry?
-  # Corrected spelling from "registery" to "registry"
+  # Corrected spelling from "registry" to "registry"
   ["1", "true", "enable"].include?(ENV.fetch("REGISTRY_PUSH", "false"))
 end
 
@@ -45,7 +45,7 @@ def build_images(docker_image)
     generator_params = is_stable ? [] : ["--build-arg", "GENERATOR_PARAMS=--edge"]
     docker_build_args = [        
         *generator_params,
-        "--build-arg", "DECIDIM_VERSION=#{decidim_version_string}",
+        "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.ruby_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
@@ -80,7 +80,7 @@ end
 def push_image(source, destination)
     tag_image(source, destination)
     push_command = ["docker", "push", "#{destination}"]
-    if push_to_registery?
+    if push_to_registry?
         raise "docker failed to push #{destination}. command: #{push_command.join(" ")}" unless system(*push_command)
     else
         puts "--dry-run: #{push_command.join(" ")}"
@@ -91,7 +91,7 @@ end
 # Docker tag an image name to a new image name
 def tag_image(source, destination)
     tag_command = ["docker", "tag", "#{source}", "#{destination}"]
-    if push_to_registery?
+    if push_to_registry?
         raise "docker failed to tag #{destination}. command: #{tag_command.join(" ")}" unless system(*tag_command)
     else
         puts "--dry-run: #{tag_command.join(" ")}"

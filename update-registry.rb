@@ -5,7 +5,7 @@ require_relative 'lib/ruby_repo'
 require_relative 'lib/docker_image'
 require_relative 'lib/helpers'
 require "erb"
-REGISTERY_USERNAME = ENV.fetch("REGISTERY_USERNAME", "decidim")
+REGISTRY_USERNAME = ENV.fetch("REGISTRY_USERNAME", "decidim")
 DECIDIM_VERSIONS_COUNT = ENV.fetch("DECIDIM_VERSION_COUNT", "2").to_i
 
 template_docker_compose = ERB.new(File.read('templates/container-docker-compose.yml.erb'))
@@ -27,7 +27,7 @@ end
 
 
 
-image = "#{REGISTERY_USERNAME}/decidim"
+image = "#{REGISTRY_USERNAME}/decidim"
 supported_versions.map do |version| 
     docker_image = DockerImage.new(version)
     decidim_version_string = docker_image.version.join(".")
@@ -37,7 +37,7 @@ supported_versions.map do |version|
         is_stable: is_stable,
     ))
     File.write("./bundle/Dockerfile", template_dockerfile.result_with_hash(
-        docker_tag: "#{REGISTERY_USERNAME}/decidim:#{docker_image.version.first(2).join(".")}-onbuild",
+        docker_tag: "#{REGISTRY_USERNAME}/decidim:#{docker_image.version.first(2).join(".")}-onbuild",
     ))
     build_images(docker_image)
     if is_stable
