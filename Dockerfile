@@ -137,14 +137,17 @@ WORKDIR $ROOT
 
 RUN \
   # Install the decidim generator with bundle, it resolves better than gem install for old versions.
-    echo "source 'https://rubygems.org'; gem 'decidim', '$DECIDIM_VERSION'" > Gemfile.gen \
-    && bundle install --gemfile Gemfile.gen \
+    echo "\n\
+      source 'https://rubygems.org';\n\
+      gem 'decidim', '$DECIDIM_VERSION'\n\
+    " > $ROOT/Gemfile.tmp \
+    && bundle install --gemfile Gemfile.tmp \
   # Generates the rails application at /home/decidim/app ($ROOT)
   # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
-    && bundle exec --gemfile Gemfile.gen decidim . --queue sidekiq $GENERATOR_PARAMS --skip_bootsnap \
+    && bundle exec --gemfile Gemfile.tmp decidim . $GENERATOR_PARAMS --skip_bootsnap \
     && truncate -s 0 /var/log/*log \
     && rm -rf $ROOT/vendor \
-       $ROOT/Gemfile.gen* \
+       $ROOT/Gemfile.tmp* \
        $ROOT/package-lock.json $ROOT/yarn.lock \
        $ROOT/node_modules $ROOT/.git \
        $ROOT/.gem $ROOT/.npm \
@@ -213,7 +216,8 @@ FROM ruby_base as decidim-production
 ENV BUNDLE_APP_CONFIG="/home/decidim/app"
 # Symlink logs to a common linux place
 RUN ln -s $ROOT/log /var/log/decidim \
-    && truncate -s 0 /var/log/*log 
+    && truncate -s 0 /var/log/*log
+
 COPY --from=generator --chown=decidim:decidim $ROOT .
 
 USER decidim
@@ -240,10 +244,11 @@ COPY --from=assets $ROOT/package-lock.json ./
 COPY --from=assets $ROOT/node_modules ./node_modules
 COPY --from=development_bundle $ROOT/Gemfile.lock ./
 COPY --from=development_bundle $ROOT/vendor ./vendor
+
 RUN bundle config set without "" \
 # Symlink logs to a common linux place
   && ln -s $ROOT/log /var/log/decidim \
-  && truncate -s 0 /var/log/*log 
+  && truncate -s 0 /var/log/*log
 
 ENTRYPOINT "./bin/docker-entrypoint"
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
