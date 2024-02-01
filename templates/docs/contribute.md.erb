@@ -66,8 +66,8 @@ We do these following steps while building the images:
         1. Take back the onbuild image, and insert Dockerfile, docker-compose.yml files 
 
 From these steps are build the following images:
-- `<%= registery_username %>/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
-- `<%= registery_username %>/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
-- `<%= registery_username %>/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
+- `<%= REGISTRY_USERNAME %>/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
+- `<%= REGISTRY_USERNAME %>/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
+- `<%= REGISTRY_USERNAME %>/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
 
 

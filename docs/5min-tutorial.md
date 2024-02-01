@@ -38,12 +38,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ## Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.28.0.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.27.4.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.28.0.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
@@ -55,7 +55,7 @@ docker-compose up
 Now you can access [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system). And use the credentials presents in the docker-compose: 
 
 ```
-DECIDIM_SYSTEM_EMAIL=hello@myorg.com
+DECIDIM_SYSTEM_EMAIL=hello@example.org
 DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
@@ -88,13 +88,13 @@ docker cp decidim:/home/decidim/app/db/migrate db/migrate
 And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
-    image: decidim/decidim:0.27.4
+    image: decidim/decidim:0.28.0
     volumes:
       - storage:/home/decidim/app/storage
 +     - ./db/migrate:/home/decidim/app/migrate
 +   environment:
 -   environment:    
-      - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
+      - DECIDIM_SYSTEM_EMAIL=hello@example.org
       - DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
@@ -110,4 +110,4 @@ That's it, you've got your participatory platform!
 | [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
 | [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
-Before deploying, be sure to read the [good practices](./good-practices).
+Before going to production, be sure to read the [good practices](./good-practices).

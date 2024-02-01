@@ -25,6 +25,7 @@ Don't edit it directly.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Dockerhub](#dockerhub)
 - [▶️ 5min tutorial](#-5min-tutorial)
   - [Eject you decidim instance](#eject-you-decidim-instance)
@@ -35,6 +36,8 @@ Don't edit it directly.
   - [Extend Decidim Images](#extend-decidim-images)
   - [Run Decidim in development/test mode](#run-decidim-in-developmenttest-mode)
   - [Contribute](#contribute)
+    - [How Does It Works](#how-does-it-works)
+    - [Repository Structure](#repository-structure)
   - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -45,12 +48,12 @@ Don't edit it directly.
 
 **Stable tags**
 
-[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27)
+[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.28)
 
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
+[:develop](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=develop)
 
 # [▶️ 5min tutorial](./docs/5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
@@ -166,7 +169,7 @@ It is common to see one of these:
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
-FROM decidim:0.27.4
+FROM decidim:0.28.0
 RUN apk --update --no-cache restic
 # You are done, restic is now available in your image.
 ```
@@ -179,6 +182,29 @@ They are larger images, and are not suited for production usage.
 ## Contribute
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more informations.
 [PR are Welcome](./CONTRIBUTING.md) ❤️ 
+
+### How Does It Works
+This repository is designed to automate the management and deployment of Decidim versions using Docker containers, along with generating relevant documentation.
+
+**Decidim Version Management**
+
+* `lib/decidim_version.rb`: Represents a specific version of Decidim, fetching version details (Ruby, Node.js versions, etc.) from the Decidim GitHub repository.
+* `lib/docker_image.rb`: Builds upon DecidimVersion to create Docker images tailored for each Decidim version, identifying the appropriate Debian Release image and setting up environment variables.
+
+**Docker Image Automation**
+
+* `update-registery.rb`: Manages Docker images by building, tagging, and optionally pushing them to a Docker registry. It utilizes ERB templates to generate Docker-related files dynamically.
+* `lib/helpers.rb`: Provides utility functions for common tasks, such as determining whether to push to a registry and tagging versions correctly.
+
+**Documentation Generation**
+
+* `update-documentation.rb`: Automatically generates documentation for each supported Decidim version. It uses ERB templates to create version-specific docker-compose files and a README.md, outlining available Docker images and setup instructions.
+
+
+###  Repository Structure
+* `lib/`: Contains core classes and modules for version management and Docker image creation.
+* `templates/`: Holds ERB templates for Docker configurations and documentation.
+* Scripts: `update-registery.rb` and `update-documentation.rb` automate Docker image management and documentation generation.
 
 ## License
 This repository is under [GNU AFFERO GENERAL PUBLIC LICENSE, V3](./LICENSE).

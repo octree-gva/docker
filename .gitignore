@@ -4,3 +4,4 @@ versions.csv
 .env
 bundle/Dockerfile
 bundle/docker-compose.yml
+decidim-repo

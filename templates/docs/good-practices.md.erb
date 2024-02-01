@@ -35,5 +35,19 @@ A common way to put this in practice is to have CI/CD deployment script (through
 - While deploying, deploy a temporary instance (sidecars) with priviliged database access. Migrate the database.
 - Once `rails db:migrate:status` gives only `up` migrations, redeploy an instance without priviliged accesses.
 
-**NB** running `rails db:migrate` while a rails application is running is most of the time a bad idea (connection to postgres can hangs). Always check `rails db:migrate:status` after a migration, to be sure all migration passed.
+**NB** running `rails db:migrate` while a rails application is running is most of the time a bad idea (connection to postgres can hangs). So consider put your instance in maintenance while migrating. 
 
+**NBB** Always check `rails db:migrate:status` after a migration, to be sure all migration passed.
+
+## Setup dkim for your emails
+To prevent spam, more and more email clients like GMail will check email signatures.
+To sign emails in ruby on rails, you can use the [dkim gem](https://rubygems.org/gems/dkim)
+
+## Setup HTTP Strict Transport Security (HSTS)
+Even decidim can force ssl, it does not add `HSTS` headers. 
+You should take care of the HTTP Strict Transport Security in your loadbalancer or reverse-proxy.
+
+## Forward ip address to decidim
+Decidim comes with an application firewall, `Rack::Attack`. 
+This one is setup by default to limit the number of requests per minutes, per ip adress.
+If your infrastructure uses a reverse-proxy, be sure you pass `REMOTE_ADDR` header.

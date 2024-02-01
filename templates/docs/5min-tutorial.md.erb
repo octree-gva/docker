@@ -45,7 +45,7 @@ docker-compose up
 Now you can access [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system). And use the credentials presents in the docker-compose: 
 
 ```
-DECIDIM_SYSTEM_EMAIL=hello@myorg.com
+DECIDIM_SYSTEM_EMAIL=hello@example.org
 DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
@@ -84,7 +84,7 @@ And add these lines in your docker-compose.yml file:
 +     - ./db/migrate:/home/decidim/app/migrate
 +   environment:
 -   environment:    
-      - DECIDIM_SYSTEM_EMAIL=hello@myorg.com
+      - DECIDIM_SYSTEM_EMAIL=hello@example.org
       - DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 ```
 
@@ -100,4 +100,4 @@ That's it, you've got your participatory platform!
 | [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
 | [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
-Before deploying, be sure to read the [good practices](./good-practices).
+Before going to production, be sure to read the [good practices](./good-practices).
