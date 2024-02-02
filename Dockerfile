@@ -5,6 +5,7 @@ ARG BASE_IMAGE\
     # Version of Decidim
     VERSION \
     DECIDIM_VERSION \
+    GENERATOR_GEMINSTALL \
     # Node used
     NODE_MAJOR_VERSION \
     # Bundler used
@@ -17,10 +18,10 @@ ARG BASE_IMAGE\
 FROM $BASE_IMAGE as ruby_base
 # An ARG instruction goes out of scope at the end of the build stage where it was defined. 
 # To use an arg in multiple stages, each stage must include the ARG instruction.
-ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
+ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" \
     DEBIAN_SUITE="stable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
-    DECIDIM_VERSION=${DECIDIM_VERSION} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} EDITOR="vim"\
+    DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_GEMINSTALL=${GENERATOR_GEMINSTALL} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} EDITOR="vim"\
     PATH="$PATH:/home/decidim/app/bin" \
     RAILS_ENV="production"  NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
     BUNDLER_VERSION=${BUNDLER_VERSION} \
@@ -131,24 +132,25 @@ RUN \
 FROM ruby_base as generator
 # An ARG instruction goes out of scope at the end of the build stage where it was defined. 
 # To use an arg in multiple stages, each stage must include the ARG instruction.
-ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
+ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
 
 WORKDIR $ROOT
 
 RUN \
-  # Install the decidim generator with bundle, it resolves better than gem install for old versions.
+  # Install the decidim generator with bundle, 
+  # it resolves better than `gem install` for older rubies.
     echo "\n\
-      source 'https://rubygems.org';\n\
-      gem 'decidim', '$DECIDIM_VERSION'\n\
+      source 'https://rubygems.org'\n\
+      ruby '$RUBY_VERSION'\n\
+      gem 'decidim', $GENERATOR_GEMINSTALL\n\
     " > $ROOT/Gemfile.tmp \
     && bundle install --gemfile Gemfile.tmp \
   # Generates the rails application at /home/decidim/app ($ROOT)
   # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
-    && bundle exec --gemfile Gemfile.tmp decidim . $GENERATOR_PARAMS --skip_bootsnap \
+    && bundle exec --gemfile Gemfile.tmp decidim . $GENERATOR_PARAMS  --skip_bundle --skip_bootsnap   \
     && truncate -s 0 /var/log/*log \
     && rm -rf $ROOT/vendor \
        $ROOT/Gemfile.tmp* \
-       $ROOT/package-lock.json $ROOT/yarn.lock \
        $ROOT/node_modules $ROOT/.git \
        $ROOT/.gem $ROOT/.npm \
        $ROOT/.local \
@@ -183,9 +185,8 @@ RUN bundle config set without "" \
 FROM ruby_base as assets
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
-COPY --from=generator $ROOT/package.json .
-RUN npm install -D webpack-dev-server \
-  && npm install
+COPY --from=generator $ROOT/package* $ROOT/package.json ./
+RUN npm ci
 COPY --from=generator $ROOT .
 COPY --from=development_bundle $ROOT/vendor ./vendor
 COPY --from=development_bundle $ROOT/Gemfile.lock .

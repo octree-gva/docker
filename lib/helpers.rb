@@ -42,10 +42,19 @@ def build_images(docker_image)
     is_stable = docker_image.github_branch.include?("stable")
     node_major_version = docker_image.node_version[0]
     bundler_version = docker_image.bundler_version.join(".")
-    generator_params = is_stable ? [] : ["--build-arg", "GENERATOR_PARAMS=--edge"]
+    generator_params = if is_stable 
+        [
+            "--build-arg", "GENERATOR_GEMINSTALL='#{decidim_version_string}'"
+        ]
+    else
+        [
+            "--build-arg", "GENERATOR_GEMINSTALL=git: 'https://github.com/decidim/decidim', branch: '#{docker_image.github_branch}'",
+            "--build-arg",  "GENERATOR_PARAMS=--branch=develop"
+        ]
+    end
     docker_build_args = [        
         *generator_params,
-        "--build-arg", "DECIDIM_VERSION=#{is_stable ? decidim_version_string : ''}",
+        "--build-arg", "DECIDIM_VERSION=#{decidim_version_string}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.ruby_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",
