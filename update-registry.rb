@@ -50,12 +50,28 @@ supported_versions.map do |version|
                 push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
                 push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
                 push_image("#{source_tag}-dist", "#{image}:#{version}")
+                remove_images([
+                    "#{source_tag}-onbuild",
+                    "#{image}:#{version}-onbuild",
+                    "#{source_tag}-dev",
+                    "#{image}:#{version}-dev",
+                    "#{source_tag}-dist",
+                    "#{image}:#{version}"
+                ])
             end
         else
             version = docker_image.github_branch
             push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
             push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
             push_image("#{source_tag}-dist", "#{image}:#{version}")
+            remove_images(
+                "#{source_tag}-onbuild",
+                "#{image}:#{version}-onbuild",
+                "#{source_tag}-dev",
+                "#{image}:#{version}-dev",
+                "#{source_tag}-dist",
+                "#{image}:#{version}"
+            )
         end
     rescue => error
         errors.push("Errors on #{source_tag}. #{error}")

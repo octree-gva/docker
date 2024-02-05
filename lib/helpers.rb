@@ -97,6 +97,13 @@ def push_image(source, destination)
 end
 
 ##
+# Remove given docker images with `docker rmi`
+def remove_images(tags)
+    remove_images_command = ["docker", "rmi", *tags]
+    raise "docker failed to remove #{tags.join(" ")}. command: #{remove_images_command.join(" ")}" unless system(*remove_images_command)
+end
+
+##
 # Docker tag an image name to a new image name
 def tag_image(source, destination)
     tag_command = ["docker", "tag", "#{source}", "#{destination}"]
