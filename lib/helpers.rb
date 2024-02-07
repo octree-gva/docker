@@ -68,9 +68,9 @@ def build_images(docker_image)
     ]
     # Tags we want to make, [<docker tag>, <docker stage target>]
     tags = [
-        ["#{source_tag}-dist", "decidim-production"],
-        ["#{source_tag}-onbuild", "decidim-production-onbuild"],
         ["#{source_tag}-dev", "decidim-development"],
+        ["#{source_tag}-onbuild", "decidim-production-onbuild"],
+        ["#{source_tag}-dist", "decidim-production"],
     ]
     tags.each do |docker_tag, docker_target|
         docker_cmd = [

@@ -53,9 +53,9 @@ supported_versions.map do |version|
             end
         else
             version = docker_image.github_branch
-            push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
-            push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
-            push_image("#{source_tag}-dist", "#{image}:#{version}")
+            push_image("#{source_tag}-onbuild", "#{image}:nightly-onbuild")
+            push_image("#{source_tag}-dev", "#{image}:nightly-dev")
+            push_image("#{source_tag}-dist", "#{image}:nightly")
         end
         # Clean all the images and cache before continuing
         system("docker", "prune", "-af")

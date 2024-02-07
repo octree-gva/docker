@@ -92,11 +92,7 @@ RUN \
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
     && bundle config --global path "vendor" \
-    && bundle config --global app_config ".bundle" \
-  # Create non-root user and group with the given ids.
-    && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim
-
-
+    && bundle config --global app_config ".bundle" 
 
 # libjemalloc2 is installed, can set the env.
 ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
@@ -190,9 +186,8 @@ RUN bundle config set without "" \
 FROM ruby_base as assets
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
-COPY --from=generator $ROOT/package* $ROOT/package.json ./
-RUN npm ci
 COPY --from=generator $ROOT .
+RUN npm ci
 COPY --from=development_bundle $ROOT/vendor ./vendor
 COPY --from=development_bundle $ROOT/Gemfile.lock .
 RUN bundle exec rails assets:precompile
@@ -205,10 +200,10 @@ RUN bundle exec rails assets:precompile
 FROM ruby_base as decidim-production-onbuild
 CMD ["bundle", "exec", "puma"]
 
-COPY --from=generator --chown=decidim:decidim decidim:decidim $ROOT .
-COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
-COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
-COPY --chown=decidim:decidim ./bin/* bin/
+COPY --from=generator $ROOT .
+COPY --from=production_bundle $ROOT/vendor ./vendor
+COPY --from=production_bundle $ROOT/Gemfile.lock .
+COPY ./bin/* bin/
 
 # Onbuild image will probably have they own gem, no need to ship
 # vendors.
@@ -223,16 +218,18 @@ FROM ruby_base as decidim-production
 ENV BUNDLE_APP_CONFIG="/home/decidim/app"
 # Symlink logs to a common linux place
 RUN ln -s $ROOT/log /var/log/decidim \
-    && truncate -s 0 /var/log/*log
+    && truncate -s 0 /var/log/*log \
+  # Create non-root user and group with the given ids.
+    && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim
 
 COPY --from=generator --chown=decidim:decidim $ROOT .
 
 USER decidim
 
-COPY --from=assets --chown=decidim:decidim $ROOT/public/decidim-packs ./public/decidim-packs
-COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
-COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
-COPY --chown=decidim:decidim ./bin/* bin/
+COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
+COPY --from=production_bundle $ROOT/vendor ./vendor
+COPY --from=production_bundle $ROOT/Gemfile.lock .
+COPY ./bin/* bin/
 
 ENTRYPOINT "./bin/docker-entrypoint"
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
@@ -245,12 +242,12 @@ FROM ruby_base as decidim-development
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY ./bin/* bin/
-COPY --from=generator --chown=decidim:decidim $ROOT .
-COPY --from=assets --chown=decidim:decidim $ROOT/public/decidim-packs ./public/decidim-packs
-COPY --from=assets --chown=decidim:decidim $ROOT/package-lock.json ./
-COPY --from=assets --chown=decidim:decidim $ROOT/node_modules ./node_modules
-COPY --from=development_bundle --chown=decidim:decidim $ROOT/Gemfile.lock ./
-COPY --from=development_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
+COPY --from=generator $ROOT .
+COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
+COPY --from=assets $ROOT/package-lock.json ./
+COPY --from=assets $ROOT/node_modules ./node_modules
+COPY --from=development_bundle $ROOT/Gemfile.lock ./
+COPY --from=development_bundle $ROOT/vendor ./vendor
 
 RUN bundle config set without "" \
 # Symlink logs to a common linux place
