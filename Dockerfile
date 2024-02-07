@@ -205,10 +205,10 @@ RUN bundle exec rails assets:precompile
 FROM ruby_base as decidim-production-onbuild
 CMD ["bundle", "exec", "puma"]
 
-COPY --from=generator --chown decidim:decidim $ROOT .
-COPY --from=production_bundle $ROOT/vendor ./vendor
-COPY --from=production_bundle $ROOT/Gemfile.lock .
-COPY ./bin/* bin/
+COPY --from=generator --chown=decidim:decidim decidim:decidim $ROOT .
+COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
+COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
+COPY --chown=decidim:decidim ./bin/* bin/
 
 # Onbuild image will probably have they own gem, no need to ship
 # vendors.
@@ -229,10 +229,10 @@ COPY --from=generator --chown=decidim:decidim $ROOT .
 
 USER decidim
 
-COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
-COPY --from=production_bundle $ROOT/vendor ./vendor
-COPY --from=production_bundle $ROOT/Gemfile.lock .
-COPY ./bin/* bin/
+COPY --from=assets --chown=decidim:decidim $ROOT/public/decidim-packs ./public/decidim-packs
+COPY --from=production_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
+COPY --from=production_bundle --chown=decidim:decidim $ROOT/Gemfile.lock .
+COPY --chown=decidim:decidim ./bin/* bin/
 
 ENTRYPOINT "./bin/docker-entrypoint"
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
@@ -245,12 +245,12 @@ FROM ruby_base as decidim-development
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY ./bin/* bin/
-COPY --from=generator $ROOT .
-COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
-COPY --from=assets $ROOT/package-lock.json ./
-COPY --from=assets $ROOT/node_modules ./node_modules
-COPY --from=development_bundle $ROOT/Gemfile.lock ./
-COPY --from=development_bundle $ROOT/vendor ./vendor
+COPY --from=generator --chown=decidim:decidim $ROOT .
+COPY --from=assets --chown=decidim:decidim $ROOT/public/decidim-packs ./public/decidim-packs
+COPY --from=assets --chown=decidim:decidim $ROOT/package-lock.json ./
+COPY --from=assets --chown=decidim:decidim $ROOT/node_modules ./node_modules
+COPY --from=development_bundle --chown=decidim:decidim $ROOT/Gemfile.lock ./
+COPY --from=development_bundle --chown=decidim:decidim $ROOT/vendor ./vendor
 
 RUN bundle config set without "" \
 # Symlink logs to a common linux place
