@@ -92,11 +92,16 @@ RUN \
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
     && bundle config --global path "vendor" \
-    && bundle config --global app_config ".bundle"
+    && bundle config --global app_config ".bundle" \
+  # Create non-root user and group with the given ids.
+    && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim
+
+
 
 # libjemalloc2 is installed, can set the env.
 ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
   MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true"
+
 WORKDIR $ROOT
 
 COPY ./imagetragick.xml $ROOT/tmp/
@@ -199,7 +204,8 @@ RUN bundle exec rails assets:precompile
 ##########################################################################
 FROM ruby_base as decidim-production-onbuild
 CMD ["bundle", "exec", "puma"]
-COPY --from=generator $ROOT .
+
+COPY --from=generator --chown decidim:decidim $ROOT .
 COPY --from=production_bundle $ROOT/vendor ./vendor
 COPY --from=production_bundle $ROOT/Gemfile.lock .
 COPY ./bin/* bin/
