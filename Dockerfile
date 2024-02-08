@@ -54,7 +54,9 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
-RUN \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  --mount=type=tmpfs,target=/var/log \
   # Update apt-get
     apt-get update -yq \
   # Prepare node installation
@@ -84,17 +86,15 @@ RUN \
        else \
          echo "npm not found, installing npm..."; \
          apt-get install -yq --no-install-recommends npm; \
-       fi  \
-  # Update yarn to a more recent version
-    && npm -g install yarn --force \
+       fi \
+  # Clean installation clutters
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache
+
+# Setup global bundle configurations
+# Will use /usr/local/bundle/.bundle directory
+RUN npm -g install yarn --force \
   # Install bundler
     && gem install bundler -v $BUNDLER_VERSION \
-  # Clean installation clutters
-    && apt-get clean \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache \
-  # Setup global bundle configurations
-  # Will use /usr/local/bundle/.bundle directory
     && bundle config --global build.nokogiri --use-system-libraries \
     && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
     && bundle config --global path "vendor" \
@@ -121,7 +121,8 @@ RUN \
   #   CVE-2016-3716
   #   CVE-2016-3717
   # There is no simple way to get the policy.xml path, so we need some magics:
-    IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) && mv $ROOT/tmp/imagetragick.xml $IMAGEMAGIC_POLICY \
+    IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) \
+    && mv $ROOT/tmp/imagetragick.xml $IMAGEMAGIC_POLICY \
   # Allow motd to be written by our docker-entrypoint script
     && touch /etc/motd  \
   # Setup crontab (work only if image is run as root)
