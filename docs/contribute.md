@@ -29,10 +29,9 @@ To debug and rebuild the images locally, you can:
 
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
-| `0.26.9`          | `ruby:2.7.8-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.26.yml up` |
 | `0.27.5`          | `ruby:3.0.6-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
 | `0.28.0`          | `ruby:3.1.4-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.0.28.yml up` |
-| `develop`         | `ruby:3.2.3-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.develop.yml up` |
+| `develop`         | `ruby:3.2.3-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.nightly.yml up` |
 
 ## Templates
 
@@ -79,8 +78,8 @@ We do these following steps while building the images:
         1. Take back the onbuild image, and insert Dockerfile, docker-compose.yml files 
 
 From these steps are build the following images:
-- `hfroger/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
-- `hfroger/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
-- `hfroger/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
+- `decidim/decidim:0.27-onbuild` is the result of  the `onbuild` docker file
+- `decidim/decidim:0.27` is the result of the `dist` file with arg `RAILS_ENV=production`
+- `decidim/decidim:0.27-dev` is the result of the `dist` file with arg `RAILS_ENV=development`
 
 

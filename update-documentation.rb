@@ -56,12 +56,12 @@ supported_versions.map do |version|
             stable_images.push(
                 "[:#{version}](https://hub.docker.com/r/#{REGISTRY_USERNAME}/decidim/tags?page=1&name=#{version})"
             )
-            File.write("./decidim.#{version}.yml", template_quickstart.result_with_hash(
+            File.write("./docker-compose.#{version}.yml", template_quickstart.result_with_hash(
                 is_stable: true,
                 registry_username: REGISTRY_USERNAME,
                 docker_tag: "#{REGISTRY_USERNAME}/decidim:#{version}"
             ))
-            File.write("./development.#{version}.yml", template_quickstart.result_with_hash(
+            File.write("./docker-compose.#{version}.dev.yml", template_quickstart.result_with_hash(
                 is_stable: false,
                 registry_username: REGISTRY_USERNAME,
                 docker_tag: "#{REGISTRY_USERNAME}/decidim:#{version}-dev"
@@ -71,22 +71,17 @@ supported_versions.map do |version|
         end
     else
         dev_images.push(
-            "[:#{docker.decidim_version.github_branch}](https://hub.docker.com/r/#{REGISTRY_USERNAME}/decidim/tags?page=1&name=#{docker.decidim_version.github_branch})"
+            "[:nightly](https://hub.docker.com/r/#{REGISTRY_USERNAME}/decidim/tags?page=1&name=nightly)"
         )
         decidim_table.push([
             docker.decidim_version.github_branch,
             "ruby:#{docker.ruby_tag}",
             "node_#{node_major_version}_x",
-            "docker-compose -f decidim.#{docker.decidim_version.github_branch}.yml up"
+            "docker-compose -f decidim.nightly.yml up"
         ])
-        File.write("./decidim.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
+        File.write("./docker-compose.nightly.yml", template_quickstart.result_with_hash(
             is_stable: false,
-            docker_tag: "#{REGISTRY_USERNAME}/decidim:#{docker.decidim_version.github_branch}",
-            registry_username: REGISTRY_USERNAME
-        ))
-        File.write("./development.#{docker.decidim_version.github_branch}.yml", template_quickstart.result_with_hash(
-            is_stable: false,
-            docker_tag: "#{REGISTRY_USERNAME}/decidim:#{version}-dev",
+            docker_tag: "#{REGISTRY_USERNAME}/decidim:nightly-dev",
             registry_username: REGISTRY_USERNAME
         ))
     end

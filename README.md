@@ -25,6 +25,7 @@ Don't edit it directly.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Dockerhub](#dockerhub)
 - [▶️ 5min tutorial](#-5min-tutorial)
   - [Eject you decidim instance](#eject-you-decidim-instance)
@@ -47,12 +48,12 @@ Don't edit it directly.
 
 **Stable tags**
 
-[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.28)
+[:0.27](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=0.28)
 
 
 **Development tags**
 
-[:develop](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=develop)
+[:nightly](https://hub.docker.com/r/decidim/decidim/tags?page=1&name=nightly)
 
 # [▶️ 5min tutorial](./docs/5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
@@ -162,19 +163,20 @@ It is common to see one of these:
 * **bundle exec rails server -b 0.0.0.0**: start a puma server.
 * **bundle exec sidekiq**: start a sidekiq worker.
 * **cron start -f**: start cron in forground.
+* **sleep infinity**: do nothing, and let you exec processes in the container with `docker exec decidim`.
 
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
-FROM decidim:0.28.0
+FROM decidim:0.28.0-onbuild
 RUN apk --update --no-cache restic
 # You are done, restic is now available in your image.
 ```
 
 ## Run Decidim in development/test mode
-The docker-compose `development.NAME_YOUR_VERSION.yml` allows you to run decidim in `development` or `test` mode. 
+The docker-compose `docker-compose.NAME_YOUR_VERSION.dev.yml` allows you to run decidim in `development` or `test` mode. 
 They are larger images, and are not suited for production usage.
 
 
@@ -183,17 +185,17 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for more informations.
 [PR are Welcome](./CONTRIBUTING.md) ❤️ 
 
 ### How Does It Works
-This repository is designed to automate the management and deployment of Decidim versions using Docker containers, along with generating relevant documentation.
+This repository is designed to automate the publication of Decidim versions using Docker containers, along with generating documentation to use these containers.
 
 **Decidim Version Management**
 
-* `lib/decidim_version.rb`: Represents a specific version of Decidim, fetching version details (Ruby, Node.js versions, etc.) from the Decidim GitHub repository.
-* `lib/docker_image.rb`: Builds upon DecidimVersion to create Docker images tailored for each Decidim version, identifying the appropriate Debian Release image and setting up environment variables.
+* `lib/decidim_version.rb`: For a specific Decidim version, retrieve dependancies (Ruby, Node.js, Bundler) versions.
+* `lib/docker_image.rb`: Match dependancies with the right ruby docker image
 
 **Docker Image Automation**
 
 * `update-registry.rb`: Manages Docker images by building, tagging, and optionally pushing them to a Docker registry. It utilizes ERB templates to generate Docker-related files dynamically.
-* `lib/helpers.rb`: Provides utility functions for common tasks, such as determining whether to push to a registry and tagging versions correctly.
+* `lib/helpers.rb`: Utility function to manage images.
 
 **Documentation Generation**
 

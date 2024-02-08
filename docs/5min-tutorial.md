@@ -38,12 +38,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ## Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/decidim.0.28.0.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/docker-compose.0.28.0.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/decidim.0.28.0.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/decidim/docker/master/docker-compose.0.28.0.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
@@ -74,13 +74,16 @@ Then you can define your new organization:
 - **Available Authorizations**: Leave empty
 
 And click on `Create organization & invite admin`.
-You will then receive an email on this link: [http://127.0.0.1:1080](http://127.0.0.1:1080). You can there accept the invite.
+You will then receive an email on this link: [http://127.0.0.1:1080](http://127.0.0.1:1080). 
+Accept the invite.
 
 ### Safeguard your migrations files
-Your instance now completly rely on the docker image you build. But it is sensible to changes. 
-In order to be a bit more resilient, keep a copy of your migrations files and bind them as volume: 
+Your instance now completly rely on the docker image you build.
+But the migrations files will change in the image published everyday on docker hub. 
+In order to be resilient to re-build, keep a copy of your migrations files and bind them as volume: 
 
 ```
+# Ensure you still have a docker-compose up running. 
 # Copy files from the decidim container in a local `db/migrate` directory
 docker cp decidim:/home/decidim/app/db/migrate db/migrate
 ```
@@ -93,9 +96,7 @@ And add these lines in your docker-compose.yml file:
       - storage:/home/decidim/app/storage
 +     - ./db/migrate:/home/decidim/app/migrate
 +   environment:
--   environment:    
-      - DECIDIM_SYSTEM_EMAIL=hello@example.org
-      - DECIDIM_SYSTEM_PASSWORD=my_insecure_password
+-   environment:
 ```
 
 You can now `docker-compose up` again and have a safer place to tweak decidim.

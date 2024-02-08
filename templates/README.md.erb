@@ -149,19 +149,20 @@ It is common to see one of these:
 * **bundle exec rails server -b 0.0.0.0**: start a puma server.
 * **bundle exec sidekiq**: start a sidekiq worker.
 * **cron start -f**: start cron in forground.
+* **sleep infinity**: do nothing, and let you exec processes in the container with `docker exec decidim`.
 
 
 ## Extend Decidim Images
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
-FROM decidim:<%= last_stable %>
+FROM decidim:<%= last_stable %>-onbuild
 RUN apk --update --no-cache restic
 # You are done, restic is now available in your image.
 ```
 
 ## Run Decidim in development/test mode
-The docker-compose `development.NAME_YOUR_VERSION.yml` allows you to run decidim in `development` or `test` mode. 
+The docker-compose `docker-compose.NAME_YOUR_VERSION.dev.yml` allows you to run decidim in `development` or `test` mode. 
 They are larger images, and are not suited for production usage.
 
 
