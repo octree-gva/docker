@@ -58,7 +58,7 @@ supported_versions.map do |version|
             push_image("#{source_tag}-dist", "#{image}:nightly")
         end
         # Clean all the images and cache before continuing
-        system("docker", "prune", "-af")
+        system("docker", "system", "prune", "-af")
     rescue => error
         errors.push("Errors on #{source_tag}. #{error}")
     end
