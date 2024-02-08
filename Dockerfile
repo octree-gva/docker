@@ -149,7 +149,7 @@ WORKDIR $ROOT
 
 RUN \
   # Install the decidim generator with bundle, 
-  # it resolves better than `gem install` for older rubies.
+  # it resolves better dependancies than `gem install` for older rubies.
     echo "\n\
       source 'https://rubygems.org'\n\
       ruby '$RUBY_VERSION'\n\

@@ -34,8 +34,8 @@ errors = []
 supported_versions.map do |version| 
     docker_image = DockerImage.new(version)
     decidim_version_string = docker_image.version.join(".")
-    source_tag = "decidim:#{decidim_version_string}"
     is_stable = docker_image.github_branch.include?("stable")
+    source_tag = "decidim:#{is_stable ? decidim_version_string : "nightly"}"
     File.write("./bundle/docker-compose.yml", template_docker_compose.result_with_hash(
         is_stable: is_stable,
     ))
@@ -43,19 +43,19 @@ supported_versions.map do |version|
         docker_tag: "#{REGISTRY_USERNAME}/decidim:#{docker_image.version.first(2).join(".")}-onbuild",
     ))
     begin
-        build_images(docker_image)
+        build_images(docker_image, image)
         if is_stable
             # Stable versions 0.27.3 => publish to 0.27 and 0.27.3
             tag_versions(docker_image.version) do |version|
                 push_image("#{source_tag}-onbuild", "#{image}:#{version}-onbuild")
                 push_image("#{source_tag}-dev", "#{image}:#{version}-dev")
-                push_image("#{source_tag}-dist", "#{image}:#{version}")
+                push_image("#{source_tag}", "#{image}:#{version}")
             end
         else
             version = docker_image.github_branch
             push_image("#{source_tag}-onbuild", "#{image}:nightly-onbuild")
             push_image("#{source_tag}-dev", "#{image}:nightly-dev")
-            push_image("#{source_tag}-dist", "#{image}:nightly")
+            push_image("#{source_tag}", "#{image}:nightly")
         end
         # Clean all the images and cache before continuing
         system("docker", "system", "prune", "-af")

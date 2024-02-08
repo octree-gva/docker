@@ -170,17 +170,17 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for more informations.
 [PR are Welcome](./CONTRIBUTING.md) ❤️ 
 
 ### How Does It Works
-This repository is designed to automate the management and deployment of Decidim versions using Docker containers, along with generating relevant documentation.
+This repository is designed to automate the publication of Decidim versions using Docker containers, along with generating documentation to use these containers.
 
 **Decidim Version Management**
 
-* `lib/decidim_version.rb`: Represents a specific version of Decidim, fetching version details (Ruby, Node.js versions, etc.) from the Decidim GitHub repository.
-* `lib/docker_image.rb`: Builds upon DecidimVersion to create Docker images tailored for each Decidim version, identifying the appropriate Debian Release image and setting up environment variables.
+* `lib/decidim_version.rb`: For a specific Decidim version, retrieve dependancies (Ruby, Node.js, Bundler) versions.
+* `lib/docker_image.rb`: Match dependancies with the right ruby docker image
 
 **Docker Image Automation**
 
 * `update-registry.rb`: Manages Docker images by building, tagging, and optionally pushing them to a Docker registry. It utilizes ERB templates to generate Docker-related files dynamically.
-* `lib/helpers.rb`: Provides utility functions for common tasks, such as determining whether to push to a registry and tagging versions correctly.
+* `lib/helpers.rb`: Utility function to manage images.
 
 **Documentation Generation**
 

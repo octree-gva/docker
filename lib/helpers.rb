@@ -35,13 +35,14 @@ end
 
 ##
 # Build docker images related to metadatas (version, compatible debian and node versions, etc.)
-def build_images(docker_image)
+def build_images(docker_image, remote_image)
     decidim_version_string = docker_image.version.join(".")
-    source_tag = "decidim:#{decidim_version_string}"
     build_date = Time.now.utc.strftime("%Y-%m-%dT%H:%MZ")
     is_stable = docker_image.github_branch.include?("stable")
+    source_tag = "decidim:#{is_stable ? decidim_version_string : "nightly"}"
     node_major_version = docker_image.node_version[0]
     bundler_version = docker_image.bundler_version.join(".")
+
     generator_params = if is_stable 
         [
             "--build-arg", "GENERATOR_GEMINSTALL='#{decidim_version_string}'"
@@ -68,14 +69,17 @@ def build_images(docker_image)
     ]
     # Tags we want to make, [<docker tag>, <docker stage target>]
     tags = [
-        ["#{source_tag}-dev", "decidim-development"],
-        ["#{source_tag}-onbuild", "decidim-production-onbuild"],
-        ["#{source_tag}-dist", "decidim-production"],
+        ["-dev", "decidim-development"],
+        ["-onbuild", "decidim-production-onbuild"],
+        ["", "decidim-production"],
     ]
-    tags.each do |docker_tag, docker_target|
+    tags.each do |docker_tag_suffix, docker_target|
+        cache_from = "#{remote_image}:#{decidim_version_string}#{docker_tag_suffix}"
+        system("docker", "pull", cache_from)
         docker_cmd = [
             "docker", "build",
-            "--tag", docker_tag,
+            "--cache-from", cache_from,
+            "--tag", "#{source_tag}#{docker_tag_suffix}",
             "--target", docker_target,
             *docker_build_args
         ];
