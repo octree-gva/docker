@@ -21,12 +21,18 @@ FROM $BASE_IMAGE as ruby_base
 ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
 ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" \
     DEBIAN_SUITE="stable"  ROOT="/home/decidim/app" HOME="/home/decidim/app" \
-    DECIDIM_VERSION=${DECIDIM_VERSION} GENERATOR_GEMINSTALL=${GENERATOR_GEMINSTALL} GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} EDITOR="vim"\
+    DECIDIM_VERSION=${DECIDIM_VERSION} \
+    GROUP_ID=${GROUP_ID} USER_ID=${USER_ID} \
+    EDITOR="vim" \
     PATH="$PATH:/home/decidim/app/bin" \
-    RAILS_ENV="production"  NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
-    BUNDLER_VERSION=${BUNDLER_VERSION} \
+    RAILS_ENV="production"  \
     NODE_ENV="production" \
-    RUBY_YJIT_ENABLE="1" 
+    NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
+    BUNDLER_VERSION=${BUNDLER_VERSION} \
+    RUBY_YJIT_ENABLE="1" \
+    LANG=C.UTF-8 \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
     
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -52,14 +58,14 @@ RUN \
   # Update apt-get
     apt-get update -yq \
   # Prepare node installation
-    && apt-get install -yq ca-certificates curl gnupg \
+    && apt-get install -yq --no-install-recommends ca-certificates curl gnupg \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
     && apt-get update -yq \
     && apt-get purge -y nodejs npm \
   # Install native deps
-    && apt-get install -yq \
+    && apt-get install -yq --no-install-recommends \
       build-essential \
       python3-pip \
       python3-setuptools \
@@ -77,7 +83,7 @@ RUN \
          echo "npm is already installed."; \
        else \
          echo "npm not found, installing npm..."; \
-         apt-get install -yq npm; \
+         apt-get install -yq --no-install-recommends npm; \
        fi  \
   # Update yarn to a more recent version
     && npm -g install yarn --force \
@@ -125,6 +131,8 @@ RUN \
     && bundle config set path "vendor" \
     && bundle config set app_config ".bundle"
 
+ENTRYPOINT "./bin/docker-entrypoint"
+CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 
 ##########################################################################
 # GENERATOR
@@ -134,7 +142,8 @@ FROM ruby_base as generator
 # An ARG instruction goes out of scope at the end of the build stage where it was defined. 
 # To use an arg in multiple stages, each stage must include the ARG instruction.
 ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
-
+ENV GENERATOR_GEMINSTALL=${GENERATOR_GEMINSTALL} \
+  GENERATOR_PARAMS=${GENERATOR_PARAMS}
 WORKDIR $ROOT
 
 RUN \
@@ -145,7 +154,7 @@ RUN \
       ruby '$RUBY_VERSION'\n\
       gem 'decidim', $GENERATOR_GEMINSTALL\n\
     " > $ROOT/Gemfile.tmp \
-    && bundle install --gemfile Gemfile.tmp \
+    && bundle install --gemfile Gemfile.tmp --quiet \
   # Generates the rails application at /home/decidim/app ($ROOT)
   # pass GENERATOR_PARAMS="--edge" to generate a decidim app for develop
     && bundle exec --gemfile Gemfile.tmp decidim . $GENERATOR_PARAMS  --skip_bundle --skip_bootsnap   \
@@ -156,6 +165,7 @@ RUN \
        $ROOT/.gem $ROOT/.npm \
        $ROOT/.local \
        $ROOT/.bundle $ROOT/tmp/*
+COPY ./bin* $ROOT/bin/
 
 ##########################################################################
 # PRODUCTION_BUNDLE
@@ -198,17 +208,8 @@ RUN bundle exec rails assets:precompile
 # customized application.
 ##########################################################################
 FROM ruby_base as decidim-production-onbuild
-CMD ["bundle", "exec", "puma"]
-
 COPY --from=generator $ROOT .
-COPY --from=production_bundle $ROOT/vendor ./vendor
 COPY --from=production_bundle $ROOT/Gemfile.lock .
-COPY ./bin/* bin/
-
-# Onbuild image will probably have they own gem, no need to ship
-# vendors.
-RUN rm -rf $ROOT/vendor 
-ENTRYPOINT "./bin/docker-entrypoint"
 
 ##########################################################################
 # DECIDIM PRODUCTION 
@@ -222,17 +223,13 @@ RUN ln -s $ROOT/log /var/log/decidim \
   # Create non-root user and group with the given ids.
     && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim
 
-COPY --from=generator --chown=decidim:decidim $ROOT .
-
 USER decidim
 
+COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
 COPY --from=production_bundle $ROOT/vendor ./vendor
 COPY --from=production_bundle $ROOT/Gemfile.lock .
-COPY ./bin/* bin/
 
-ENTRYPOINT "./bin/docker-entrypoint"
-CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 
 ##########################################################################
 # DECIDIM DEVELOPMENT 
@@ -241,18 +238,13 @@ CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 FROM ruby_base as decidim-development
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
-COPY ./bin/* bin/
+
 COPY --from=generator $ROOT .
 COPY --from=assets $ROOT/public/decidim-packs ./public/decidim-packs
 COPY --from=assets $ROOT/package-lock.json ./
 COPY --from=assets $ROOT/node_modules ./node_modules
 COPY --from=development_bundle $ROOT/Gemfile.lock ./
-COPY --from=development_bundle $ROOT/vendor ./vendor
 
 RUN bundle config set without "" \
 # Symlink logs to a common linux place
-  && ln -s $ROOT/log /var/log/decidim \
-  && truncate -s 0 /var/log/*log
-
-ENTRYPOINT "./bin/docker-entrypoint"
-CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
+  && ln -s $ROOT/log /var/log/decidim 
