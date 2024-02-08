@@ -38,12 +38,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ## Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/decidim/docker/master/docker-compose.0.28.0.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.28.0.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/docker-compose.0.28.0.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.28.0.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
