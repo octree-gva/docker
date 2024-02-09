@@ -87,6 +87,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
       libjemalloc2 \
       cron \
       vim \
+      libxml2-dev \
+      libxslt-dev \
   # Check if npm is installed, if not install it
     && if command -v npm >/dev/null 2>&1; then \
          echo "npm is already installed."; \
@@ -177,7 +179,7 @@ FROM ruby_base as production_bundle
 COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
 RUN bundle config set without "development:test" \
   && bundle install --quiet \
-  && rm -rf vendor/cache .bundle/cache
+  && rm -rf .bundle/cache
 
 ##########################################################################
 # DEVELOPMENT_BUNDLE
@@ -189,7 +191,7 @@ ENV NODE_ENV="development" \
 COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
 RUN bundle config set without "" \
   && bundle install --quiet \
-  && rm -rf vendor/cache .bundle/cache
+  && rm -rf .bundle/cache
 
 ##########################################################################
 # ASSETS
