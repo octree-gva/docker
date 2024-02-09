@@ -104,10 +104,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN npm -g install yarn --force \
   # Install bundler
     && gem install bundler -v $BUNDLER_VERSION \
-    && bundle config --global build.nokogiri --use-system-libraries \
-    && bundle config --global build.charlock_holmes --with-icu-dir=/usr/include \
-    && bundle config --global path "vendor" \
-    && bundle config --global app_config ".bundle" 
+    && bundle config set build.nokogiri "--use-system-libraries" --global \
+    && bundle config set build.charlock_holmes "--with-icu-dir=/usr/include" --global \
+    && bundle config set path "vendor" --global \
+    && bundle config set app_config ".bundle" --global
 
 # libjemalloc2 is installed, can set the env.
 ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
