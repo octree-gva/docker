@@ -64,6 +64,7 @@ def build_images(docker_image, remote_image)
         "--build-arg", "VCS_REF=#{docker_image.commit_rev}",
         "--build-arg", "GROUP_ID=1001",
         "--build-arg", "USER_ID=1001",
+        "--build-arg", "BUILDKIT_INLINE_CACHE=1",
         "--network=host",
         "-f", "./Dockerfile", "./bundle"
     ]
@@ -74,11 +75,11 @@ def build_images(docker_image, remote_image)
         ["", "decidim-production"],
     ]
     tags.each do |docker_tag_suffix, docker_target|
-        cache_from = "#{remote_image}:#{decidim_version_string}#{docker_tag_suffix}"
+        cache_from = "#{remote_image}:#{is_stable ? decidim_version_string : "nightly"}#{docker_tag_suffix}"
         system("docker", "pull", cache_from)
         docker_cmd = [
-            "docker", "build",
-            "--cache-from", cache_from,
+            "docker", "buildx", "build",
+            "--cache-from", "type=registry,ref=#{cache_from}",
             "--tag", "#{source_tag}#{docker_tag_suffix}",
             "--target", docker_target,
             *docker_build_args

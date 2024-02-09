@@ -54,6 +54,13 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
+COPY ./imagetragick.xml $ROOT/tmp/
+COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+# Templates used by our `45_template` docker-entrypoint script. 
+COPY ./templates /usr/local/share/decidim/templates
+# Copy cron files
+COPY ./crontab.d /etc/crontab.d
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   --mount=type=tmpfs,target=/var/log \
@@ -106,13 +113,7 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
 
 WORKDIR $ROOT
 
-COPY ./imagetragick.xml $ROOT/tmp/
 COPY ./Dockerfile ./docker-compose.yml ./
-COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
-# Templates used by our `45_template` docker-entrypoint script. 
-COPY ./templates /usr/local/share/decidim/templates
-# Copy cron files
-COPY ./crontab.d /etc/crontab.d
 
 RUN \
   # Add imagemagick's policy to avoid 
@@ -211,6 +212,7 @@ RUN bundle exec rails assets:precompile
 FROM ruby_base as decidim-production-onbuild
 COPY --from=generator $ROOT .
 COPY --from=production_bundle $ROOT/Gemfile.lock .
+COPY --from=production_bundle $ROOT/vendor ./vendor
 
 ##########################################################################
 # DECIDIM PRODUCTION 
