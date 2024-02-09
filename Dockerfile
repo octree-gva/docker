@@ -29,6 +29,7 @@ ENV TERM="xterm" DEBIAN_FRONTEND="noninteractive" \
     NODE_ENV="production" \
     NODE_MAJOR_VERSION=${NODE_MAJOR_VERSION} \
     BUNDLER_VERSION=${BUNDLER_VERSION} \
+    BUNDLE_APP_CONFIG=".bundle" \
     RUBY_YJIT_ENABLE="1" \
     LANG=C.UTF-8 \
     BUNDLE_JOBS=4 \
@@ -221,7 +222,6 @@ COPY --from=production_bundle $ROOT/vendor ./vendor
 # To run a fresh Decidim application (non-root mode).
 ##########################################################################
 FROM ruby_base as decidim-production
-ENV BUNDLE_APP_CONFIG="/home/decidim/app"
 # Symlink logs to a common linux place
 RUN ln -s $ROOT/log /var/log/decidim \
     && truncate -s 0 /var/log/*log \
