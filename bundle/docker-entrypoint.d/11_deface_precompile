@@ -1,0 +1,15 @@
+#! /bin/sh
+set -e
+cd $ROOT
+
+# Deface is a gem that is quiet used in the Decidim ecosystem. 
+# We check if the 'deface' gem is listed in `Gemfile.lock`` to precompile "app/compiled_views".
+# Don't forget to set the `config.deface.enabled = ENV.fetch("DEFACE_ENABLED", "0") == "1"` in your production.rb file. 
+if grep -q 'deface ' Gemfile.lock; then
+  # Gem is listed, run the command
+    echo "    ✅ Run deface precompile"
+  DEFACE_ENABLED="1" bundle exec rails deface:precompile
+else
+  # Gem is not listed
+    echo "    ➡️ skip deface"
+fi
