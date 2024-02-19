@@ -216,6 +216,7 @@ FROM ruby_base as decidim-production-onbuild
 COPY --from=generator $ROOT .
 COPY --from=production_bundle $ROOT/Gemfile.lock .
 COPY --from=production_bundle $ROOT/vendor ./vendor
+RUN bundle config set without "development:test"
 
 ##########################################################################
 # DECIDIM PRODUCTION 
@@ -226,7 +227,8 @@ FROM ruby_base as decidim-production
 RUN ln -s $ROOT/log /var/log/decidim \
     && truncate -s 0 /var/log/*log \
   # Create non-root user and group with the given ids.
-    && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim
+    && groupadd -r -g $GROUP_ID decidim && useradd -r -u $USER_ID -g decidim decidim\
+    && bundle config set without "development:test"
 
 USER decidim
 
