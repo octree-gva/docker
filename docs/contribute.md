@@ -30,7 +30,7 @@ To debug and rebuild the images locally, you can:
 | Decidim Version   | Ruby image        | Node version      | Docker-compose command |
 | ----------------- | ----------------- | ----------------- | ---------------------- |
 | `0.26.9`          | `ruby:2.7.8-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.26.yml up` |
-| `0.27.5`          | `ruby:3.0.7-slim-bullseye`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
+| `0.27.5`          | `ruby:3.0.7-slim-buster`| `node_16_x`       | `docker-compose -f decidim.0.27.yml up` |
 | `0.28.0`          | `ruby:3.1.5-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.0.28.yml up` |
 | `develop`         | `ruby:3.2.4-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.nightly.yml up` |
 
