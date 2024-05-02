@@ -12,6 +12,7 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
         )
             raise "Redis #{redis_uri.host}:#{redis_uri.port || 6379} is not available, abort" 
         end
+        echo "    ✅ redis is up"
     end
     # If DATABASE_URL is there, then we check for a running postgres
     unless ENV.fetch("DATABASE_URL", "").empty? 
@@ -23,6 +24,7 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
         )
             raise "Databse is not available, abort" 
         end
+        echo "    ✅ database is up"
     end
     # If MEMCACHE_SERVERS is there,
     # then we check for one of the memcached servers written (CSV)
@@ -36,6 +38,7 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
                 "-p", "#{port || 11211}"
             )
         end.any?
+        echo "    ✅ memcached is up"
         unless memcache_is_up
             raise "No memcache server available, abort"
         end

@@ -168,6 +168,8 @@ RUN \
        $ROOT/Gemfile.tmp* \
        $ROOT/node_modules $ROOT/.git \
        $ROOT/.gem $ROOT/.npm \
+       $ROOT/config/master.key \
+       $ROOT/config/credentials.yml.enc \
        $ROOT/.local \
        $ROOT/.bundle $ROOT/tmp/*
 COPY ./bin* $ROOT/bin/

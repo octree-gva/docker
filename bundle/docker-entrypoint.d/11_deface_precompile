@@ -7,9 +7,10 @@ cd $ROOT
 # Don't forget to set the `config.deface.enabled = ENV.fetch("DEFACE_ENABLED", "0") == "1"` in your production.rb file. 
 if grep -q 'deface ' Gemfile.lock; then
   # Gem is listed, run the command
-    echo "    ✅ Run deface precompile"
+  echo "    ✅ Run deface precompile"
   DEFACE_ENABLED="1" bundle exec rails deface:precompile
 else
   # Gem is not listed
     echo "    ➡️ skip deface"
 fi
+exit 0
