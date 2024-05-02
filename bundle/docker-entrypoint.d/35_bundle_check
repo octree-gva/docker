@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do 
     # Check all the gems are installed or fails.
+    puts "/docker-entrypoint.d/35_bundle_check:"
     raise "Gems can not be installed, abort" unless system("bundle check || bundle install")
     puts "    ✅ Gems in Gemfiles are installed" 
 

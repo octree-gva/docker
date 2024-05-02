@@ -2,6 +2,7 @@
 require "uri"
 # Wait for dependancies to be available
 Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do 
+    puts "/docker-entrypoint.d/15_wait_for_it:"
     # If REDIS_URL is there, then we check for a running redis (cache or queue)
     unless ENV.fetch("REDIS_URL", "").empty? 
         redis_uri = URI.parse(ENV["REDIS_URL"])
@@ -12,7 +13,7 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
         )
             raise "Redis #{redis_uri.host}:#{redis_uri.port || 6379} is not available, abort" 
         end
-        echo "    ✅ redis is up"
+        puts "    ✅ redis is up"
     end
     # If DATABASE_URL is there, then we check for a running postgres
     unless ENV.fetch("DATABASE_URL", "").empty? 
@@ -22,9 +23,9 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
             "-h", "#{database_uri.host}", 
             "-p", "#{database_uri.port || 5432}"
         )
-            raise "Databse is not available, abort" 
+            raise "Database is not available, abort" 
         end
-        echo "    ✅ database is up"
+        puts "    ✅ database is up"
     end
     # If MEMCACHE_SERVERS is there,
     # then we check for one of the memcached servers written (CSV)
@@ -38,9 +39,9 @@ Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do
                 "-p", "#{port || 11211}"
             )
         end.any?
-        echo "    ✅ memcached is up"
         unless memcache_is_up
             raise "No memcache server available, abort"
         end
+        puts "    ✅ memcached is up"
     end
 end

@@ -14,5 +14,6 @@ Dir.chdir(root_dir) do
 		rails_env: ENV.fetch("RAILS_ENV"),
 		ruby_version: ENV.fetch("RUBY_VERSION")
 	))
+	puts "/docker-entrypoint.d/45_template:"
 	puts "    ✅ /etc/motd updated"
 end

@@ -56,7 +56,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       maintainer="Hadrien Froger <hadrien@octree.ch>"
 
 COPY ./imagetragick.xml $ROOT/tmp/
-COPY ./docker-entrypoint.d /usr/local/share/docker-entrypoint.d
+COPY ./docker-entrypoint.d /docker-entrypoint.d
 # Templates used by our `45_template` docker-entrypoint script. 
 COPY ./templates /usr/local/share/decidim/templates
 # Copy cron files

@@ -3,11 +3,14 @@ set -e
 cd $ROOT
 bundle exec rails c <<EOF
   if ENV["DECIDIM_SYSTEM_EMAIL"].present? && ENV["DECIDIM_SYSTEM_PASSWORD"].present?
-    Decidim::System::Admin.first_or_create(
-      email: ENV["DECIDIM_SYSTEM_EMAIL"], 
+    admin = Decidim::System::Admin.where(email: ENV["DECIDIM_SYSTEM_EMAIL"]).first_or_initialize(
+      email: ENV["DECIDIM_SYSTEM_EMAIL"],
       password: ENV["DECIDIM_SYSTEM_PASSWORD"],
       password_confirmation: ENV["DECIDIM_SYSTEM_PASSWORD"]
     )
-    puts "    ✅ /system account created from DECIDIM_SYSTEM_EMAIL"
+    admin.password_confirmation = admin.password = ENV["DECIDIM_SYSTEM_PASSWORD"]
+    admin.save
+	  puts "/docker-entrypoint.d/50_upsert-sysadmin:"
+    puts "    ✅ /system DECIDIM_SYSTEM_EMAIL account updated."
   end
 EOF

@@ -34,6 +34,10 @@ To debug and rebuild the images locally, you can:
 | `0.28.1`          | `ruby:3.1.5-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.0.28.yml up` |
 | `develop`         | `ruby:3.2.4-slim-bookworm`| `node_18_x`       | `docker-compose -f decidim.nightly.yml up` |
 
+__N.B__ Ruby images are from Debian distributions. `buster`, `booksworm`, etc. refers to the Debian version.
+
+__N.B.B__ Node version are guessed from the decidim repository, in the [package.json "engine" key](https://github.com/decidim/decidim/blob/develop/package.json#L6).
+
 ## Templates
 
 ### Documentation

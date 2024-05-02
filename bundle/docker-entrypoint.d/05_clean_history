@@ -15,7 +15,8 @@ files=(
 
 for file in "${files[@]}"; do
     if [  -f "$file" ]; then
-        echo "Clean history from file: $file."
+        echo "/docker-entrypoint.d/05_clean_history:"
+        echo "   Clean history from file: $file."
         cat /dev/null > "$file"
     fi
 done
