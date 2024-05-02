@@ -148,12 +148,14 @@ you can get the commands in the [crontab file](./bundle/crontab.d/crontab)
 
 ## Entrypoints
 Before running the docker command, we go through [entrypoints scripts](./bundle/docker-entrypoint.d).
+Theses commands will run on each container restart:
 
-* **10_remove_pids**: Remove old puma pids if exists
+* **05_clean_history**: Clean all bash and irb history from the container.
+* **10_remove_pids**: Remove old puma pids if exists.
 * **15_wait_for_it**: Run a [wait-for-it](./bundle/bin/wait-for-it) for dependancies: `REDIS_URL`, `DATABASE_URL` and `MEMCACHE_SERVERS` are supported.
 * **35_bundle_check**: Check if all your gems are installed, and your migrations are up.
 * **45_template**: Set the motd file to have a nice welcome message.
-* **50_upsert-sysadmin**: Check your `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD` and update the first /system administrator
+* **50_upsert-sysadmin**: Check your `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD` and update the first /system administrator.
 
 ### Command
 You can update your docker-compose command to whatever you want.
