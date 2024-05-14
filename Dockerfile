@@ -104,9 +104,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Will use /usr/local/bundle/.bundle directory
 RUN npm -g install yarn --force \
   # Install bundler
+    && echo "gem: --no-document" >> /etc/gemrc \
     && gem install bundler -v $BUNDLER_VERSION \
     && bundle config set build.nokogiri --use-system-libraries --with-xml2-include=/usr/include/libxml2 --with-xml2-lib=/usr/lib --global \
     && bundle config set build.charlock_holmes "--with-icu-dir=/usr/include" --global \
+    && bundle config set disable_shared_gems false --global \
     && bundle config set path "vendor" --global \
     && bundle config set app_config ".bundle" --global
 
