@@ -108,7 +108,6 @@ RUN npm -g install yarn --force \
     && gem install bundler -v $BUNDLER_VERSION \
     && bundle config set build.nokogiri --use-system-libraries --with-xml2-include=/usr/include/libxml2 --with-xml2-lib=/usr/lib --global \
     && bundle config set build.charlock_holmes "--with-icu-dir=/usr/include" --global \
-    && bundle config set disable_shared_gems false --global \
     && bundle config set path "vendor" --global \
     && bundle config set app_config ".bundle" --global
 
