@@ -37,6 +37,7 @@ end
 # Build docker images related to metadatas (version, compatible debian and node versions, etc.)
 def build_images(docker_image, remote_image)
     decidim_version_string = docker_image.version.join(".")
+    decidim_major_minor_version_string = docker_image.version[0..1].join(".")
     build_date = Time.now.utc.strftime("%Y-%m-%dT%H:%MZ")
     is_stable = docker_image.github_branch.include?("stable")
     source_tag = "decidim:#{is_stable ? decidim_version_string : "nightly"}"
@@ -56,6 +57,7 @@ def build_images(docker_image, remote_image)
     docker_build_args = [        
         *generator_params,
         "--build-arg", "DECIDIM_VERSION=#{decidim_version_string}",
+        "--build-arg", "DECIDIM_MAJOR_MINOR_VERSION=#{decidim_major_minor_version_string}",
         "--build-arg", "BASE_IMAGE=ruby:#{docker_image.ruby_tag}",
         "--build-arg", "VERSION=#{decidim_version_string}",
         "--build-arg", "BUNDLER_VERSION=#{bundler_version}",

@@ -101,6 +101,16 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.27.0/docs/modules/configure/pages/environment_variables.adoc).
 
 
+### Useful environments variables
+These environments variables are not meant to be edited, but can be usefull when you want to create
+your own images.
+
+| Env Name                      | Description                                              | Example             |
+|-------------------------------|----------------------------------------------------------|---------------------|
+| `DECIDIM_MAJOR_MINOR_VERSION` | The major and minor decidim version, separated by a dot. | `0.27`              |
+| `DECIDIM_VERSION`             | The decidim version, including major, minor, and patch.  | `0.27.6`            |
+| `ROOT`                        | Where the app is located                                 | `/home/decidim/app` |
+
 ## Cron configurations
 Cron is configured to run scripts every 15min, 1hour, daily, weekly, monthly. 
 When the times comes, it will execute all scripts present in the `/etc/periodic` directory. 
