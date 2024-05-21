@@ -22,7 +22,7 @@ jobs:
         run: |
           npm install -g doctoc
           export REGISTRY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DECIDIM_VERSION_COUNT=3
+          export DECIDIM_VERSION_COUNT=${{ secrets.DECIDIM_VERSION_COUNT }}
           export REGISTRY_PUSH=true
           ./update-registry.rb
 
@@ -41,7 +41,7 @@ jobs:
         run: |
           npm install -g doctoc
           export REGISTRY_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DECIDIM_VERSION_COUNT=3
+          export DECIDIM_VERSION_COUNT=${{ secrets.DECIDIM_VERSION_COUNT }}
           ./update-documentation.rb
       - name: Push README
         run: |
