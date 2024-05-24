@@ -2,23 +2,13 @@
 set -e
 cd $ROOT
 
-# Files that might contains history
-files=(
-    "$ROOT/.bash_history"
-    "$ROOT/.irb_history"
-    "/var/log/secure"
-    "/var/log/auth.log"
-    "/var/log/wtmp"
-    "/var/log/messages"
-    "/var/log/syslog"
-)
+# Files that might contain history
+files="$ROOT/.bash_history $ROOT/.irb_history /var/log/secure /var/log/auth.log /var/log/wtmp /var/log/messages /var/log/syslog"
 
-for file in "${files[@]}"; do
-    if [  -f "$file" ]; then
+for file in $files; do
+    if [ -f "$file" ]; then
         echo "/docker-entrypoint.d/05_clean_history:"
         echo "   Clean history from file: $file."
         cat /dev/null > "$file"
     fi
 done
-
-history -c
