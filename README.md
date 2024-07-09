@@ -47,7 +47,7 @@ Don't edit it directly.
 
 **Stable tags**
 
-[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.28)
+[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.28)
 
 
 **Development tags**
