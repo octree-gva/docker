@@ -47,7 +47,7 @@ Don't edit it directly.
 
 **Stable tags**
 
-[:0.26](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.26),[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.28)
+[:0.27](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.27),[:0.28](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.28),[:0.29](https://hub.docker.com/r/hfroger/decidim/tags?page=1&name=0.29)
 
 
 **Development tags**
@@ -171,7 +171,7 @@ It is common to see one of these:
 Let say you want to use official image, but a binary is missing. For the sake of the example, let's add `restic` a binary to manage encrypted backups. 
 ```
 # Your new custom image
-FROM decidim:0.28.1-onbuild
+FROM decidim:0.29.0.rc.2-onbuild
 RUN apk --update --no-cache restic
 # You are done, restic is now available in your image.
 ```
