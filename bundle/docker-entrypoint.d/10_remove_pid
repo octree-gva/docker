@@ -2,7 +2,7 @@
 # Remove puma pid file.
 Dir.chdir(ENV.fetch("ROOT", "/home/app/decidim")) do 
     pid_file = ENV.fetch("PIDFILE", "tmp/server.pid")
-    File.delete(pid_file) if File.exists?(pid_file)
+    File.delete(pid_file) if File.exist?(pid_file)
     puts "/docker-entrypoint.d/10_remove_pid:"
     puts "    ✅  Puma pid is removed"
 end
