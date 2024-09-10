@@ -38,12 +38,12 @@ docker-compose --version # 1.29.* is fine
 ```
 
 ## Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.29.0.rc.4.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.29.0.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.29.0.rc.4.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/hfroger/docker/master/docker-compose.0.29.0.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
@@ -91,7 +91,7 @@ docker cp decidim:/home/decidim/app/db/migrate db/migrate
 And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
-    image: decidim/decidim:0.29.0.rc.4
+    image: decidim/decidim:0.29.0
     volumes:
       - storage:/home/decidim/app/storage
 +     - ./db/migrate:/home/decidim/app/migrate
