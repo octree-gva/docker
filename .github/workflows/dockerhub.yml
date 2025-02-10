@@ -8,7 +8,7 @@ on:
 
 jobs:
   decidim-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
           ./update-registry.rb
 
   update-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [decidim-docker]
     steps:
       - name: Checkout code
