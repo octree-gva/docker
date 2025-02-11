@@ -23,7 +23,7 @@ class RubyRepo
             response = JSON.parse(URI.open(url).read)
             tags = response['results']
             break if tags.empty? || page > 5
-            selected_tags = tags.select { |tag| tag["tag_status"] == "active" && tag['name'].include?("slim-") && !tag["name"].include?('preview') }
+            selected_tags = tags.select { |tag| tag["tag_status"] == "active" && !tag['name'].include?("-") && !tag["name"].include?('preview') }
             selected_tags.each do |tag|
                 major, minor, patch = tag['name'].scan(/\d+/)
                 versions[tag["name"]] = [major, minor || "0", patch || "0"] if major

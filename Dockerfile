@@ -16,7 +16,7 @@ ARG BASE_IMAGE\
     GROUP_ID \
     USER_ID
 
-FROM $BASE_IMAGE as ruby_base
+FROM $BASE_IMAGE AS ruby_base
 # An ARG instruction goes out of scope at the end of the build stage where it was defined. 
 # To use an arg in multiple stages, each stage must include the ARG instruction.
 ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION DECIDIM_MAJOR_MINOR_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
@@ -77,14 +77,14 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get update -yq \
     && apt-get purge -y nodejs npm \
   # Install native deps
-    && apt-get install -yq --no-install-recommends \
+    && apt-get install -yq --no-install-recommends --no-upgrade \
       build-essential \
       python3-pip \
       python3-setuptools \
       nodejs \
       tzdata \
-      imagemagick \
       libicu-dev \
+      wkhtmltopdf \
       libpq-dev \
       git-core \
       libjemalloc2 \
@@ -121,17 +121,7 @@ WORKDIR $ROOT
 
 COPY ./Dockerfile ./docker-compose.yml ./
 
-RUN \
-  # Add imagemagick's policy to avoid 
-  #   CVE-2016-3714
-  #   CVE-2016-3718 - SSRF
-  #   CVE-2016-3716
-  #   CVE-2016-3717
-  # There is no simple way to get the policy.xml path, so we need some magics:
-    IMAGEMAGIC_POLICY=$(convert -list policy | grep Path: | awk '{print $2}' | head -n 1) \
-    && mv $ROOT/tmp/imagetragick.xml $IMAGEMAGIC_POLICY \
-  # Allow motd to be written by our docker-entrypoint script
-    && touch /etc/motd  \
+RUN touch /etc/motd  \
   # Setup crontab (work only if image is run as root)
     && touch /var/run/crond.pid \
     && crontab /etc/crontab.d/crontab \
@@ -146,7 +136,7 @@ CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 # GENERATOR
 # Generate a new Rails app with the decidim generator.
 ##########################################################################
-FROM ruby_base as generator
+FROM ruby_base AS generator
 # An ARG instruction goes out of scope at the end of the build stage where it was defined. 
 # To use an arg in multiple stages, each stage must include the ARG instruction.
 ARG BASE_IMAGE BUILD_DATE VCS_REF VERSION DECIDIM_VERSION DECIDIM_MAJOR_MINOR_VERSION GENERATOR_GEMINSTALL NODE_MAJOR_VERSION BUNDLER_VERSION GENERATOR_PARAMS GROUP_ID USER_ID
@@ -160,7 +150,8 @@ RUN \
     echo "\n\
       source 'https://rubygems.org'\n\
       ruby '$RUBY_VERSION'\n\
-      gem 'decidim', $GENERATOR_GEMINSTALL\n\
+      gem 'concurrent-ruby', '1.3.4'\n\
+      gem 'decidim', '$GENERATOR_GEMINSTALL'\n\
     " > $ROOT/Gemfile.tmp \
     && bundle install --gemfile Gemfile.tmp --quiet \
   # Generates the rails application at /home/decidim/app ($ROOT)
@@ -181,7 +172,7 @@ COPY ./bin* $ROOT/bin/
 # PRODUCTION_BUNDLE
 # Installation of application gems for production
 ##########################################################################
-FROM ruby_base as production_bundle
+FROM ruby_base AS production_bundle
 COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
 RUN bundle config set without "development:test" \
   && bundle install --quiet \
@@ -191,7 +182,7 @@ RUN bundle config set without "development:test" \
 # DEVELOPMENT_BUNDLE
 # Installation of application gems for development
 ##########################################################################
-FROM ruby_base as development_bundle
+FROM ruby_base AS development_bundle
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY --from=generator $ROOT/Gemfile $ROOT/Gemfile.lock .
@@ -203,7 +194,7 @@ RUN bundle config set without "" \
 # ASSETS
 # Precompile assets
 ##########################################################################
-FROM ruby_base as assets
+FROM ruby_base AS assets
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 COPY --from=generator $ROOT .
@@ -217,7 +208,7 @@ RUN bundle exec rails assets:precompile
 # Onbuild production image, to help other to create their own decidim
 # customized application.
 ##########################################################################
-FROM ruby_base as decidim-production-onbuild
+FROM ruby_base AS decidim-production-onbuild
 COPY --from=generator $ROOT .
 COPY --from=production_bundle $ROOT/Gemfile.lock .
 COPY --from=production_bundle $ROOT/vendor ./vendor
@@ -227,7 +218,7 @@ RUN bundle config set without "development:test"
 # DECIDIM PRODUCTION 
 # To run a fresh Decidim application (non-root mode).
 ##########################################################################
-FROM ruby_base as decidim-production
+FROM ruby_base AS decidim-production
 # Symlink logs to a common linux place
 RUN ln -s $ROOT/log /var/log/decidim \
     && truncate -s 0 /var/log/*log \
@@ -247,7 +238,7 @@ COPY --from=production_bundle $ROOT/Gemfile.lock .
 # DECIDIM DEVELOPMENT 
 # To run Decidim in development mode (root mode).
 ##########################################################################
-FROM ruby_base as decidim-development
+FROM ruby_base AS decidim-development
 ENV NODE_ENV="development" \
   RAILS_ENV="development"
 
