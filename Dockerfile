@@ -151,7 +151,7 @@ RUN \
       source 'https://rubygems.org'\n\
       ruby '$RUBY_VERSION'\n\
       gem 'concurrent-ruby', '1.3.4'\n\
-      gem 'decidim', '$GENERATOR_GEMINSTALL'\n\
+      gem 'decidim', $GENERATOR_GEMINSTALL \n\
     " > $ROOT/Gemfile.tmp \
     && bundle install --gemfile Gemfile.tmp --quiet \
   # Generates the rails application at /home/decidim/app ($ROOT)
@@ -161,7 +161,7 @@ RUN \
     && rm -rf $ROOT/vendor \
        $ROOT/Gemfile.tmp* \
        $ROOT/node_modules $ROOT/.git \
-       $ROOT/.gem $ROOT/.npm \
+       $ROOT/.gem $ROOT/.npm $ROOT/.yarn \
        $ROOT/config/master.key \
        $ROOT/config/credentials.yml.enc \
        $ROOT/.local \
