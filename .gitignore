@@ -1,0 +1,5 @@
+openapitools.json
+node_modules
+.env
+decidim-clone
+.DS_Store

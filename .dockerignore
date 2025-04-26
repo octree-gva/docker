@@ -1,0 +1,6 @@
+decidim-clone
+contrib
+lib
+Dockerfile
+.env
+.DS_Store
