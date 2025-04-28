@@ -65,7 +65,7 @@ jobs:
           export VERBOSE=1
           bundle exec rake docker:clean
 
-  decidim-dev:
+  decidim-prev:
     runs-on: ubuntu-25.04
     steps:
       - name: Checkout code
@@ -83,21 +83,23 @@ jobs:
       - name: Build image
         run: |
           export VERBOSE=1
-          bundle exec rake docker:build[dev]
+          bundle exec rake docker:build[prev]
       - name: Push image
         run: |
           export VERBOSE=1
           export DOCKERHUB_REGISTRY=${{ secrets.DOCKERHUB_USERNAME }}
-          bundle exec rake docker:push[dev]
+          bundle exec rake docker:push[prev]
       - name: Clean Docker clone directory
         run: |
           export VERBOSE=1
           bundle exec rake docker:clean
           
 
-  update-documentation:
+  repository-documentation:
     runs-on: ubuntu-25.04
-    needs: [decidim-docker]
+    # Needs to run after images pushes, as we will update images
+    # descriptions
+    needs: [decidim-development, decidim-last, decidim-prev]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
