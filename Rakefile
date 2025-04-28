@@ -49,7 +49,8 @@ task :"docker:push", [:version] do |_, args|
       exit 1
   end
   Docker::Task.put("Prepare #{version.decidim_version}")
-  version.parsed_version.each do |dest_version|
+  # 0.29.2 will push tags for `0.29` and `0.29.2`
+  version.parsed_version[1..].each do |dest_version|
     destination_tag = "#{registry_username}/decidim:#{dest_version}"
     Docker::Task.put("tagging #{destination_tag}")
     

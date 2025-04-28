@@ -9,5 +9,6 @@ end
 Dir.chdir("/home/decidim") do 
     # Check all the gems are installed or fails.
     raise "Gems can not be installed, abort" unless system("bundle check || bundle install")
-    puts "    ✅ Gems in Gemfiles are installed" 
+    puts "    ✅ Gems ready for #{ENV["RAILS_ENV"]}" 
+    exit 0
 end

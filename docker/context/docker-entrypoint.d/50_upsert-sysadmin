@@ -1,16 +1,16 @@
 #!/usr/bin/env ruby
 
 Dir.chdir("/home/decidim") do 
-  if ENV["DECIDIM_SYSTEM_EMAIL"].present? && ENV["DECIDIM_SYSTEM_PASSWORD"].present?
-    puts "#{__FILE__}:"
-    console_script = <<~RB
+  exit 0 unless ENV["DECIDIM_SYSTEM_EMAIL"] && ENV["DECIDIM_SYSTEM_PASSWORD"]
+  puts "#{__FILE__}:"
+  console_script = <<~RB
       admin = Decidim::System::Admin.find_or_initialize_by(
         email: ENV["DECIDIM_SYSTEM_EMAIL"]
       )
       admin.password_confirmation = admin.password = ENV["DECIDIM_SYSTEM_PASSWORD"]
       admin.save!
 RB
-    system("bundle exec rails c", in: console_script, exception: true)
-    puts "    ✅ /system DECIDIM_SYSTEM_EMAIL account updated."
-  end
+  system("bundle exec rails c", in: console_script, exception: true)
+  puts "    ✅ /system DECIDIM_SYSTEM_EMAIL account updated."
+  exit 0
 end

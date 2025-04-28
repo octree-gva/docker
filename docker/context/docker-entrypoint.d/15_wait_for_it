@@ -1,47 +1,69 @@
 #!/usr/bin/env ruby
 require "uri"
+
+def wait_for_redis
+    return if ENV.fetch("REDIS_URL", "").empty?
+    puts "    database is configured, waiting for server"
+    redis_uri = URI.parse(ENV["REDIS_URL"])
+    unless system(
+        "wait-for-it", 
+        "-h", "#{redis_uri.host}", 
+        "-p", "#{redis_uri.port || 6379}"
+    )
+        raise "Redis #{redis_uri.host}:#{redis_uri.port || 6379} is not available, abort" 
+    end
+    puts "    ✅ redis is up"
+end
+
+def wait_for_database
+    unless ENV.fetch("DATABASE_USERNAME", "").empty?
+        raise "Can't define DATABASE_URL together with DATABASE_USERNAME, abort" unless ENV.fetch("DATABASE_URL", "").empty?
+        puts "    DATABASE_USERNAME is set, updating DATABASE_URL"
+        username = ENV.fetch("DATABASE_USERNAME")
+        password = ENV.fetch("DATABASE_PASSWORD")
+        host = ENV.fetch("DATABASE_HOST", "localhost")
+        port = ENV.fetch("DATABASE_PORT", "5432")
+        database = ENV.fetch("DATABASE_NAME", "decidim")
+        ENV["DATABASE_URL"] = "postgres://#{username}:#{password}@#{host}:#{port}/#{database}"
+        puts "    DATABASE_URL is set to #{ENV["DATABASE_URL"]}"
+    end
+    # If DATABASE_URL is there, then we check for a running postgres
+    if ENV.fetch("DATABASE_URL", "").empty? 
+        raise "No database is configured, abort"
+    end
+    puts "    database is configured, waiting for server"
+    database_uri = URI.parse(ENV["DATABASE_URL"])
+    unless system(
+        "wait-for-it", 
+        "-h", "#{database_uri.host}", 
+        "-p", "#{database_uri.port || 5432}"
+    )
+        raise "Database is not available, abort" 
+    end
+    puts "    ✅ database is up"
+end
+
+def wait_for_memcached
+    return if ENV.fetch("MEMCACHE_SERVERS", "").empty?
+    puts "    memcached is configured, waiting for servers"
+    memcache_servers = ENV["MEMCACHE_SERVERS"].split(",").map(&:strip)
+    memcache_is_up = memcache_servers.map do |memcache_server|
+        (host, port) = memcache_server.strip.split(":")
+        system(
+            "wait-for-it", 
+            "-h", "#{host}", 
+            "-p", "#{port || 11211}"
+        )
+    end.any?
+    unless memcache_is_up
+        raise "No memcache server available, abort"
+    end
+end
+
 # Wait for dependancies to be available
 Dir.chdir("/home/decidim") do 
 	puts "#{__FILE__}:"
-    # If REDIS_URL is there, then we check for a running redis (cache or queue)
-    unless ENV.fetch("REDIS_URL", "").empty? 
-        redis_uri = URI.parse(ENV["REDIS_URL"])
-        unless system(
-            "wait-for-it", 
-            "-h", "#{redis_uri.host}", 
-            "-p", "#{redis_uri.port || 6379}"
-        )
-            raise "Redis #{redis_uri.host}:#{redis_uri.port || 6379} is not available, abort" 
-        end
-        puts "    ✅ redis is up"
-    end
-    # If DATABASE_URL is there, then we check for a running postgres
-    unless ENV.fetch("DATABASE_URL", "").empty? 
-        database_uri = URI.parse(ENV["DATABASE_URL"])
-        unless system(
-            "wait-for-it", 
-            "-h", "#{database_uri.host}", 
-            "-p", "#{database_uri.port || 5432}"
-        )
-            raise "Database is not available, abort" 
-        end
-        puts "    ✅ database is up"
-    end
-    # If MEMCACHE_SERVERS is there,
-    # then we check for one of the memcached servers written (CSV)
-    unless ENV.fetch("MEMCACHE_SERVERS", "").empty?
-        memcache_servers = ENV["MEMCACHE_SERVERS"].split(",")
-        memcache_is_up = memcache_servers.map do |memcache_server|
-            (host, port) = memcache_server.strip.split(":")
-            system(
-                "wait-for-it", 
-                "-h", "#{host}", 
-                "-p", "#{port || 11211}"
-            )
-        end.any?
-        unless memcache_is_up
-            raise "No memcache server available, abort"
-        end
-        puts "    ✅ memcached is up"
-    end
+    wait_for_redis
+    wait_for_database
+    wait_for_memcached
 end

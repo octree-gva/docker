@@ -5,4 +5,5 @@ Dir.chdir("/home/decidim") do
     File.delete(pid_file) if File.exist?(pid_file)
 	puts "#{__FILE__}:"
     puts "    ✅  Puma pid is removed"
+    exit 0
 end

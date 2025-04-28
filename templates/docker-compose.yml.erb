@@ -5,17 +5,11 @@
 
 # Docker compose file to test locally builds
 x-default: &default
-  ports:
-    - "3000:3000"
   depends_on:
     - db
     - redis
 
 x-default-environment: &default-environment
-  DATABASE_HOST: db
-  DATABASE_USER: postgres
-  DATABASE_PASSWORD: insecure_password
-  DATABASE_NAME: decidim_development
   RAILS_ENV: development
   NODE_ENV: development
 
@@ -30,10 +24,12 @@ services:
       <<: *default-build
       args:
         <%= develop_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+    ports:
+      - "3001:3000"
     environment:
       <<: *default-environment
       REDIS_URL: redis://redis:6379/0
-      DECIDIM_DATABASE_NAME: decidim_development
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
   decidim-last-stable:
     <<: *default
@@ -41,10 +37,12 @@ services:
       <<: *default-build
       args:
         <%= last_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+    ports:
+      - "3002:3000"
     environment:
       <<: *default-environment
       REDIS_URL: redis://redis:6379/1
-      DECIDIM_DATABASE_NAME: decidim_last
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
 
   decidim-prev-stable:
     <<: *default
@@ -52,10 +50,12 @@ services:
       <<: *default-build
       args:
         <%= prev_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+    ports:
+      - "3003:3000"
     environment:
       <<: *default-environment
       REDIS_URL: redis://redis:6379/2
-      DECIDIM_DATABASE_NAME: decidim_prev
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_prev
 
   redis:
     image: redis:7
@@ -69,37 +69,17 @@ services:
     environment:
       POSTGRES_PASSWORD: insecure_password
       POSTGRES_USER: decidim
+      POSTGRES_MULTIPLE_DATABASES: decidim_development,decidim_last,decidim_prev
     ports:
       - "5432:5432"
     volumes:
+      - ./contrib/db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
-    depends_on:
-      - create_db
-
-  # Create development, last, and prev databases 
-  create_db:
-    image: postgres:16
-    command: >
-      sh -c "
-        until pg_isready -U postgres -d postgres; do
-          sleep 1;
-          echo 'Waiting for PostgreSQL to be ready...';
-        done;
-        psql -U decidim -c 'CREATE DATABASE decidim_development;'
-        psql -U decidim -c 'CREATE DATABASE decidim_last;'
-        psql -U decidim -c 'CREATE DATABASE decidim_prev;'
-      "
-    environment:
-      POSTGRES_PASSWORD: insecure_password
-      POSTGRES_USER: decidim
     healthcheck:
-      # Check decidim_prev DB is created
-      test: ["CMD", "psql", "-U", "postgres", "-c", "SELECT 1 FROM pg_database WHERE datname = 'decidim_prev';"]
+      test: ["CMD", "psql", "-U", "decidim", "-c", "SELECT 1 FROM pg_database WHERE datname = 'decidim_prev';"]
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:

@@ -2,6 +2,7 @@
 Dir.chdir("/home/decidim") do 
 	puts "#{__FILE__}:"
     # Check no migrations are pending migrations
-    raise "Migration failed, abort" unless system("bundle", "exec", "rails", "db:migrate")
+    raise "Migration failed, abort. DATABASE_URL=#{ENV['DATABASE_URL']}" unless system("bundle", "exec", "rails", "db:migrate")
     puts "    ✅ Migrations are all up"
+    exit 0
 end

@@ -11,6 +11,8 @@ Dir.chdir("/home/decidim") do
 ---
 rails env:  <%= rails_env %>
 home: /home/decidim
+user: <%= whoami %>
+
 MOTD
 	template_motd = ERB.new(motd_content)
 	  
@@ -19,7 +21,9 @@ MOTD
 		node_version: ENV.fetch("NODE_MAJOR_VERSION", "?"),
 		rails_env: ENV.fetch("RAILS_ENV"),
 		ruby_version: ENV.fetch("RUBY_VERSION"),
-		bundler_version: ENV.fetch("BUNDLER_VERSION")
+		bundler_version: ENV.fetch("BUNDLER_VERSION"),
+		whoami: %x(whoami).strip
 	))
 	puts "    ✅ /etc/motd updated"
+	exit 0
 end

@@ -154,17 +154,18 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
   && cd $WORK_DIR \
   && mv rails_app/* . \
   && rm -rf generator rails_app \
-  && rm -rf vendor/** \
-  && bundle config set without "development:test" \
+  && rm -rf vendor/** 
+
+COPY ./context .
+
+RUN  bundle config set without "development:test" \
+  && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
   && bundle config set deployment true \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  && rm -rf vendor .npm node_modules tmp/cache /tmp/* /var/tmp/* /.root/cache .npm .local 
+  && rm -rf vendor .npm node_modules tmp/cache /tmp/* /var/tmp/* /.root/cache .npm .local
   
-COPY ./context .
-
-
 ##
 # Gems
 # Install required GEMS
