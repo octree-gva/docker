@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+require "erb"
+Dir.chdir("/home/decidim") do 
+	puts "#{__FILE__}:"
+	motd_content = <<~MOTD
+	___   ___   ___  ___  ___   ___  __  __ 
+|   \ | __| / __||_ _||   \ |_ _||  \/  |
+| |) || _| | (__  | | | |) | | | | |\/| |
+|___/ |___| \___||___||___/ |___||_|  |_|
+          v<%= decidim_version %> [ruby=<%= ruby_version %>,bundler=<%= bundler_version %>,node=[<%= node_version %>])
+---
+rails env:  <%= rails_env %>
+home: /home/decidim
+MOTD
+	template_motd = ERB.new(motd_content)
+	  
+	File.write("/etc/motd", template_motd.result_with_hash(
+		decidim_version: ENV.fetch("DECIDIM_VERSION", "?"),
+		node_version: ENV.fetch("NODE_MAJOR_VERSION", "?"),
+		rails_env: ENV.fetch("RAILS_ENV"),
+		ruby_version: ENV.fetch("RUBY_VERSION"),
+		bundler_version: ENV.fetch("BUNDLER_VERSION")
+	))
+	puts "    ✅ /etc/motd updated"
+end

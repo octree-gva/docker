@@ -1,6 +1,8 @@
 module Decidim
   class DecidimVersion
     attr_reader :decidim, :branch
+    alias :decidim_branch :branch
+
     def initialize(decidim, branch)
       @decidim = decidim
       @branch = branch
@@ -15,20 +17,31 @@ module Decidim
         RUBY_VERSION: stable_ruby_version,
         VCS_REF: checksum,
         VERSION: decidim_version,
-        BUILD_DATE: DateTime.now.iso8601
+        BUILD_DATE: DateTime.now.iso8601.to_s
       }
     end
 
+    def parsed_version
+      parsed = decidim_version.split(".")
+      prev_version = parsed.first
+      results = [prev_version]
+      parsed[1..].each do |version_seg|
+        prev_version = "#{prev_version}.#{version_seg}"
+        results << prev_version
+      end
+      results
+    end
+    
     def checksum
       @checksum ||= decidim.on_cloned_repository(branch) do
         %x(git rev-parse HEAD)
-      end
+      end.strip
     end
 
     def updated_at
       @updated_at ||= decidim.on_cloned_repository(branch) do
         %x(git log -1 --pretty=format:"%ad" --date=short)
-      end
+      end.strip
     end
 
     def decidim_version

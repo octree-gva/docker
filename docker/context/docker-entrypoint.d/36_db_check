@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+Dir.chdir("/home/decidim") do 
+	puts "#{__FILE__}:"
+    # Check no migrations are pending migrations
+    raise "Migration failed, abort" unless system("bundle", "exec", "rails", "db:migrate")
+    puts "    ✅ Migrations are all up"
+end

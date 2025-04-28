@@ -1,0 +1,3 @@
+#! /bin/bash -l
+set -e
+cd ~ && bundle exec rails decidim_participatory_processes:change_active_step

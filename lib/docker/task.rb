@@ -10,7 +10,40 @@ module Docker
 
     ## Task help message
     def self.help
-      puts "Usage: rake docker:build[dev|last|prev]"
+      puts "`rake docker:build[dev|last|prev]`"
+      puts "  Build the development, last or previous stable version of the Docker image"
+      puts "  Options:"
+      puts "    dev: Build the development version"
+      puts "    last: Build the last stable version"
+      puts "    prev: Build the previous stable version"
+      puts "  Environment variables:"
+      puts "    VERBOSE: `1` to print verbose output"
+      puts ""
+
+      puts "`rake docker:docs`"
+      puts "  Rebuild documentation templates for the current repository"
+      puts "  Environment variables:"
+      puts "    VERBOSE: `1` to print verbose output"
+      puts ""
+
+      puts "`rake docker:push[dev|last|prev]`"
+      puts "  Push the development, last or previous stable version to Docker Hub,"
+      puts "  You must be logged in to Docker Hub before running this task"
+      puts "  Options:"
+      puts "    dev: Push the development version"
+      puts "    last: Push the last stable version"
+      puts "    prev: Push the previous stableversion"
+      puts "  Environment variables:"
+      puts "    DOCKERHUB_REGISTRY: The Docker Hub registry"
+      puts "    DRY_RUN: `1` to not push the image to Docker Hub"
+      puts "    VERBOSE: `1` to print verbose output"
+      puts ""
+
+      puts "`rake docker:clean`"
+      puts "  Clean the Docker clone directory"
+      puts "  Environment variables:"
+      puts "    VERBOSE: `1` to print verbose output"
+      puts ""
     end
 
     ## Run a system call

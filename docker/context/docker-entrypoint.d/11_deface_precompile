@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'bundler'
+
+Dir.chdir("/home/decidim") do 
+	puts "#{__FILE__}:"
+  has_deface = Bundler.load.specs.find { |s| s.name == "deface" }
+
+  if has_deface
+    puts "    ✅ deface is installed"
+    deface_enabled = %x(bundle exec rails runner "print Rails.application.config.deface.enabled")
+    if deface_enabled == "true"
+      puts "    ⚠️ Rails.application.config.deface.enabled is true"
+      puts "    ⚠️ set config.deface.enabled = ENV.fetch('DEFACE_ENABLED', '0') == '1' in your production.rb file"
+      exit 0;
+    end
+    system({DEFACE_ENABLED: "1"}, "bundle exec rails deface:precompile", exception: true)
+  else
+    echo "    ➡️ skip deface precompile"
+    exit 0;
+  end
+
+end 

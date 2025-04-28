@@ -1,0 +1,17 @@
+#! /bin/bash -l
+set -e
+echo "[+] Container initializing."
+# Execute all the scripts in the docker-entrypoint.d
+# directory, in filename order. 
+# __run-parts__
+# The filenames needs to be in one of the following namespace:
+# > the LANANA-assigned namespace (^[a-z0-9]+$); 
+# > the LSB hierarchical and reserved namespaces (^_?([a-z0-9_.]+-)+[a-z0-9]+$); 
+# > the Debian cron script namespace (^[a-zA-Z0-9_-]+$).
+# > source: https://manpages.debian.org/jessie/debianutils/run-parts.8.en.html
+echo "  => [/bin/sh] Running ~/docker-entrypoint.d scripts"
+run-parts ~/docker-entrypoint.d
+
+cd ~
+echo "  => [/bin/sh] Executing $@"
+exec "$@"
