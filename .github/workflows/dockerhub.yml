@@ -1,5 +1,11 @@
 name: Build docker images
 
+env:
+  VERBOSE: 1
+  DOCKER_HUB_REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
 on:
   workflow_dispatch:
   schedule:
@@ -24,10 +30,6 @@ jobs:
           setup-rbenv: true
       - name: Build image
         run: |
-          export VERBOSE=1
-          export DOCKER_HUB_REGISTRY=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-          export DOCKER_HUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           bundle install
           bundle exec rake docker:build[dev]
       - name: Push image
@@ -35,7 +37,6 @@ jobs:
           bundle exec rake docker:push[dev]
       - name: Clean Docker clone directory
         run: |
-          export VERBOSE=1
           bundle exec rake docker:clean
           
   decidim-last:
@@ -55,10 +56,6 @@ jobs:
           setup-rbenv: true
       - name: Build image
         run: |
-          export VERBOSE=1
-          export DOCKER_HUB_REGISTRY=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-          export DOCKER_HUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           bundle install
           bundle exec rake docker:build[last]
       - name: Push image
@@ -66,7 +63,6 @@ jobs:
           bundle exec rake docker:push[last]
       - name: Clean Docker clone directory
         run: |
-          export VERBOSE=1
           bundle exec rake docker:clean
 
   decidim-prev:
@@ -86,10 +82,6 @@ jobs:
           setup-rbenv: true
       - name: Build image
         run: |
-          export VERBOSE=1
-          export DOCKER_HUB_REGISTRY=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-          export DOCKER_HUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           bundle install
           bundle exec rake docker:build[prev]
       - name: Push image
@@ -97,7 +89,6 @@ jobs:
           bundle exec rake docker:push[prev]
       - name: Clean Docker clone directory
         run: |
-          export VERBOSE=1
           bundle exec rake docker:clean
           
 
@@ -121,10 +112,6 @@ jobs:
           setup-rbenv: true
       - name: Update README
         run: |
-          export VERBOSE=1
-          export DOCKER_HUB_REGISTRY=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-          export DOCKER_HUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           bundle install
           bundle exec docker:docs
       - name: Push README to docker hub
