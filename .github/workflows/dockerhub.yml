@@ -25,6 +25,7 @@ jobs:
       - name: Build image
         run: |
           export VERBOSE=1
+          bundle install
           bundle exec rake docker:build[dev]
       - name: Push image
         run: |
@@ -54,6 +55,7 @@ jobs:
       - name: Build image
         run: |
           export VERBOSE=1
+          bundle install
           bundle exec rake docker:build[last]
       - name: Push image
         run: |
@@ -83,6 +85,7 @@ jobs:
       - name: Build image
         run: |
           export VERBOSE=1
+          bundle install
           bundle exec rake docker:build[prev]
       - name: Push image
         run: |
