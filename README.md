@@ -24,8 +24,8 @@ We publish daily three images, based on `ubuntu:25.04`.
 | Tag | Description |
 | ---  | ---|
 | `latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
-| `0.30.0.rc3` | Last version |
-| `0.29.2` | Stable version, security and bug fixes only |
+| `0.30.0` | Last version |
+| `0.29.3` | Stable version, security and bug fixes only |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -72,7 +72,7 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.29.2/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.29.3/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
