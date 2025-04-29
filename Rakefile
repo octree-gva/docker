@@ -34,12 +34,12 @@ task :"docker:clean", [] do
 end
 
 task :"docker:push", [:version] do |_, args|
-  if ENV["DOCKERHUB_REGISTRY"].nil?
-    Docker::Task.put("DOCKERHUB_REGISTRY is not set")
+  if ENV["DOCKER_HUB_REGISTRY"].nil?
+    Docker::Task.put("DOCKER_HUB_REGISTRY is not set")
     Docker::Task.help
     exit 1
   end
-  registry_username = ENV["DOCKERHUB_REGISTRY"]
+  registry_username = ENV["DOCKER_HUB_REGISTRY"]
   version = case args[:version]
     when "dev" then Decidim::Decidim.instance.versions[0]
     when "last" then Decidim::Decidim.instance.versions[1]

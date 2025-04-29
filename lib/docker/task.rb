@@ -34,7 +34,7 @@ module Docker
       puts "    last: Push the last stable version"
       puts "    prev: Push the previous stableversion"
       puts "  Environment variables:"
-      puts "    DOCKERHUB_REGISTRY: The Docker Hub registry"
+      puts "    DOCKER_HUB_REGISTRY: The Docker Hub registry"
       puts "    DRY_RUN: `1` to not push the image to Docker Hub"
       puts "    VERBOSE: `1` to print verbose output"
       puts ""
