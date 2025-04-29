@@ -17,7 +17,7 @@ Dir.chdir("/home/decidim") do
     end
     system({DEFACE_ENABLED: "1"}, "bundle exec rails deface:precompile", exception: true)
   else
-    echo "    ➡️ skip deface precompile"
+    puts "    ➡️ skip deface precompile"
     exit 0;
   end
 end 

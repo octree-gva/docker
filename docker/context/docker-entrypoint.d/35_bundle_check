@@ -1,12 +1,17 @@
 #!/usr/bin/env ruby
 puts "#{__FILE__}:"
-if ENV["RAILS_ENV"] != "production"
-    system("bundle config set without ''")
-    system("bundle config set frozen false")
-    system("bundle config set deployment false")
-    puts "    ✅ Ready for #{ENV["RAILS_ENV"]}"
-end
+
+
 Dir.chdir("/home/decidim") do 
+    # Prepare 
+    if ENV["RAILS_ENV"] != "production"
+        system("bundle config set without ''")
+        system("bundle config set frozen false")
+        system("bundle config set deployment false")
+        system("NODE_ENV=development npm install")
+        puts "    ✅ Setup for #{ENV["RAILS_ENV"]}"
+    end
+
     # Check all the gems are installed or fails.
     raise "Gems can not be installed, abort" unless system("bundle check || bundle install")
     puts "    ✅ Gems ready for #{ENV["RAILS_ENV"]}" 
