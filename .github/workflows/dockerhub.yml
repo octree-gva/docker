@@ -113,7 +113,7 @@ jobs:
       - name: Update README
         run: |
           bundle install
-          bundle exec docker:docs
+          bundle exec rake docker:docs
       - name: Push README to docker hub
         run: |
           docker run --rm -e DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }} \
