@@ -15,7 +15,7 @@ Dir.chdir("/home/decidim") do
       puts "    ⚠️ and set DEFACE_ENABLED=1 in your environment"
       exit 0;
     end
-    system({DEFACE_ENABLED: "1"}, "bundle exec rails deface:precompile", exception: true)
+    system({"DEFACE_ENABLED" => "1"}, "bundle exec rails deface:precompile", exception: true)
   else
     puts "    ➡️ skip deface precompile"
     exit 0;
