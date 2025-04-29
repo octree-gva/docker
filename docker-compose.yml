@@ -30,7 +30,7 @@ services:
         RUBY_VERSION: 3.3.4
         VCS_REF: d3ba111fc89db1d8e6e11c668d2843acb7b9c5fa
         VERSION: 0.31.0.dev
-        BUILD_DATE: 2025-04-28T10:40:27+01:00
+        BUILD_DATE: 2025-04-29T17:51:05+00:00
     ports:
       - "3001:3000"
     environment:
@@ -43,14 +43,14 @@ services:
     build:
       <<: *default-build
       args:
-        DECIDIM_VERSION: 0.30.0.rc3
+        DECIDIM_VERSION: 0.30.0
         DECIDIM_BRANCH: release/0.30-stable
         NODE_MAJOR_VERSION: 18
         BUNDLER_VERSION: 2.4.20
         RUBY_VERSION: 3.3.4
-        VCS_REF: 20152b577b9e21716b66007c01e36328772a7416
-        VERSION: 0.30.0.rc3
-        BUILD_DATE: 2025-04-28T10:40:27+01:00
+        VCS_REF: 14e8bd5deb100766d8afaad0ba98f12fc5802e61
+        VERSION: 0.30.0
+        BUILD_DATE: 2025-04-29T17:51:06+00:00
     ports:
       - "3002:3000"
     environment:
@@ -63,14 +63,14 @@ services:
     build:
       <<: *default-build
       args:
-        DECIDIM_VERSION: 0.29.2
+        DECIDIM_VERSION: 0.29.3
         DECIDIM_BRANCH: release/0.29-stable
         NODE_MAJOR_VERSION: 18
         BUNDLER_VERSION: 2.4.6
         RUBY_VERSION: 3.2.2
-        VCS_REF: 9f371e1e8b89345e2fdf55b1167c3cf7d2dc37aa
-        VERSION: 0.29.2
-        BUILD_DATE: 2025-04-28T10:40:28+01:00
+        VCS_REF: 98bb073cad6b26d63f04b56522c1c886c1f5d660
+        VERSION: 0.29.3
+        BUILD_DATE: 2025-04-29T17:51:07+00:00
     ports:
       - "3003:3000"
     environment:
