@@ -154,7 +154,7 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
   && cd $WORK_DIR \
   && mv rails_app/* . \
   && rm -rf generator rails_app \
-  && rm -rf vendor/** 
+  && rm -rf vendor/** config/master.key config/credentials.yml.enc
 
 COPY ./context .
 
