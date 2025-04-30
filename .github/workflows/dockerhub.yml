@@ -14,7 +14,7 @@ on:
 
 jobs:
   decidim-development:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
           bundle exec rake docker:clean
           
   decidim-last:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
           bundle exec rake docker:clean
 
   decidim-prev:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -93,7 +93,7 @@ jobs:
           
 
   repository-documentation:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     # Needs to run after images pushes, as we will update images
     # descriptions
     needs: [decidim-development, decidim-last, decidim-prev]
