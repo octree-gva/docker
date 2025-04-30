@@ -183,7 +183,7 @@ RUN bundle config set without "development:test" \
 # Assets
 # Precompiles the assets in public/decidim-packs
 FROM generator AS assets
-ENV SECRET_KEY_BASE_DUMMY=1 \
+ENV SECRET_KEY_BASE=assets \
     NODE_ENV=development \
     RAILS_ENV=production \
     CI=1 
