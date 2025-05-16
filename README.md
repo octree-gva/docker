@@ -20,7 +20,7 @@
 </p>
 
 # Dockerhub
-We publish daily three images, based on `ubuntu:24.04`. 
+We publish daily three images, based on `ubuntu:25.10`. 
 | Tag | Description |
 | ---  | ---|
 | `latest` | Unstable `development` version. (alias for `0.31.0.dev`) |

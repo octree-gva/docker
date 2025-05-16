@@ -30,7 +30,7 @@ services:
         RUBY_VERSION: 3.3.4
         VCS_REF: 50955888b22932ae220c019abd340a9b16950fbb
         VERSION: 0.31.0.dev
-        BUILD_DATE: 2025-05-15T17:51:23+00:00
+        BUILD_DATE: 2025-05-16T17:51:11+00:00
     ports:
       - "3001:3000"
     environment:
@@ -50,7 +50,7 @@ services:
         RUBY_VERSION: 3.3.4
         VCS_REF: 0174a1193e2fc66c56a3977a6522a9c60451af15
         VERSION: 0.30.0
-        BUILD_DATE: 2025-05-15T17:51:23+00:00
+        BUILD_DATE: 2025-05-16T17:51:11+00:00
     ports:
       - "3002:3000"
     environment:
@@ -70,7 +70,7 @@ services:
         RUBY_VERSION: 3.2.2
         VCS_REF: ab82fa84dc15db684ac82e3005acc04e0a027a28
         VERSION: 0.29.3
-        BUILD_DATE: 2025-05-15T17:51:24+00:00
+        BUILD_DATE: 2025-05-16T17:51:12+00:00
     ports:
       - "3003:3000"
     environment:
