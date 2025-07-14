@@ -1,71 +1,15 @@
 ARG UBUNTU_TAG
+ARG NODE_MAJOR_VERSION=20
 
-FROM ubuntu:${UBUNTU_TAG:-latest} AS rbenv
+# Single base with all dependencies
+FROM ubuntu:${UBUNTU_TAG:-latest} AS base
 ARG DECIDIM_VERSION
-ARG DECIDIM_BRANCH
+ARG DECIDIM_BRANCH  
 ARG NODE_MAJOR_VERSION
 ARG BUNDLER_VERSION
 ARG RUBY_VERSION
 
-ENV DECIDIM_VERSION=$DECIDIM_VERSION \
-    NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
-    BUNDLER_VERSION=$BUNDLER_VERSION \
-    DECIDIM_BRANCH=$DECIDIM_BRANCH \
-    RUBY_VERSION=$RUBY_VERSION \
-    WORK_DIR=/home/decidim \
-    HOME=/home/decidim  \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/.cargo/bin:${PATH}"
-
-WORKDIR $WORK_DIR
-
-RUN apt-get update \ 
-  && apt-get install -yq --no-install-recommends --no-upgrade \
-    build-essential \
-    curl \
-    git \
-    libssl-dev \
-    zlib1g-dev \
-    python3-pip \
-    python3-setuptools \
-    libicu-dev \
-    libpq-dev \
-    rustc \
-    git \
-    libjemalloc2 \
-    libxml2-dev \
-    libxslt1-dev \
-    libyaml-dev \
-    libffi-dev \
-    # Ruby through rbenv
-    && echo "Installing rbenv and ruby $RUBY_VERSION" \
-    && git clone https://github.com/rbenv/rbenv.git /home/decidim/.rbenv \
-    && git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build \
-    && echo 'export PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"' >> /home/decidim/.bashrc \
-    && echo 'eval "$(rbenv init -)"' >> /home/decidim/.bashrc \
-    && eval "$(rbenv init -)" \
-    && (type rbenv || exit 1) \
-    && CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" rbenv install "$RUBY_VERSION" \
-    && rbenv rehash  \
-    && rbenv global "$RUBY_VERSION" \
-    && rbenv shell "$RUBY_VERSION" \
-    && echo "ruby $RUBY_VERSION installed" \
-    && echo $(ruby -v) \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache /var/cache/apt/archives
-
-##
-# Ruby Base Image
-# Define all dependencies required for Decidim
-##
-FROM ubuntu:${UBUNTU_TAG:-latest} AS ruby_base
-ARG UBUNTU_TAG
-ARG DECIDIM_VERSION
-ARG DECIDIM_BRANCH
-ARG NODE_MAJOR_VERSION
-ARG BUNDLER_VERSION
-ARG RUBY_VERSION
-
-ENV UBUNTU_TAG=$UBUNTU_TAG \
-    DEBIAN_FRONTEND=noninteractive \
+ENV DEBIAN_FRONTEND=noninteractive \
     TZ=UTC \
     DECIDIM_VERSION=$DECIDIM_VERSION \
     NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
@@ -74,121 +18,108 @@ ENV UBUNTU_TAG=$UBUNTU_TAG \
     RUBY_VERSION=$RUBY_VERSION \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/.cargo/bin:/home/decidim/bin:${PATH}" \
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
+WORKDIR $WORK_DIR
+
+# Single comprehensive package installation
+RUN apt-get update -yq \
+  && apt-get install -yq --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    cron \
+    curl \
+    git \
+    gnupg \
+    libffi-dev \
+    libicu-dev \
+    libpq-dev \
+    libssl-dev \
+    libvips-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libyaml-dev \
+    libjemalloc2 \
+    python3-pip \
+    python3-setuptools \
+    rustc \
+    tzdata \
+    vim \
+    zlib1g-dev \
+  # Install Node.js from NodeSource
+  && curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  && apt-get install -yq nodejs \
+  # Install rbenv and Ruby
+  && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
+  && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
+  && echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc \
+  && echo 'eval "$(rbenv init -)"' >> ~/.bashrc \
+  && CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" ~/.rbenv/bin/rbenv install "$RUBY_VERSION" \
+  && ~/.rbenv/bin/rbenv global "$RUBY_VERSION" \
+  && ~/.rbenv/bin/rbenv rehash \
+  # Configure gems and bundler
+  && echo "gem: --no-document" >> /etc/gemrc \
+  && ~/.rbenv/shims/gem install bundler -v $BUNDLER_VERSION \
+  && ~/.rbenv/shims/bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
+  # Install Yarn
+  && npm install -g yarn \
+  # Cleanup
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache
+
+##
+# Generator Image - NOW USES base INSTEAD OF DUPLICATING
+##
+FROM base AS generator
+ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
     BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLE_PATH="/home/decidim/vendor" \
-    BUNDLE_CACHE_ALL=false \
-    BUNDLE_CLEAN=true \
     BUNDLE_DISABLE_SHARED_GEMS=true \
     DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
-    DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
+    DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
+    RAILS_ENV=development
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
-WORKDIR $WORK_DIR
-COPY --from=rbenv $WORK_DIR/.rbenv $WORK_DIR/.rbenv
-COPY --from=rbenv $WORK_DIR/.bashrc $WORK_DIR/.bashrc
-
-RUN apt-get update -yq \
-  # Setup NodeJS and NPM
-    && apt-get install -yq --no-install-recommends ca-certificates curl gnupg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
-    && apt-get update -yq \
-    && apt-get purge -y nodejs npm \
-  # Decidim Native Dependencies
-    && apt-get install -yq --no-install-recommends --no-upgrade \
-      build-essential \
-      vim  \
-      curl \
-      git \
-      cron \
-      libssl-dev \
-      zlib1g-dev \
-      libvips-dev \
-      nodejs \
-      tzdata \
-      libicu-dev \
-      libpq-dev \
-      libjemalloc2 \
-      libyaml-dev \
-    && (type rbenv || exit 1) \
-    # Configure bundler
-    && echo "gem: --no-document" >> /etc/gemrc \
-    && gem install bundler -v $BUNDLER_VERSION \
-    # Remove CX flags on charlock_holmes, see https://github.com/brianmario/charlock_holmes/issues/173 
-    && bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
-    # Ensure NPM and Yarn are installed
-    && if command -v npm >/dev/null 2>&1; then \
-      echo "npm is already installed."; \
-    else \
-      echo "npm not found, installing npm..."; \
-      apt-get install -yq --no-install-recommends npm; \
-    fi \
-    && rm -rf /var/lib/apt/lists /var/cache/apt/archives \
-    && npm -g install yarn --force \
-    # Clean installation clutters
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache /var/cache/apt/archives .npm .local .bundle/cache
-##
-# Generator Image
-# Generates a new Decidim Application at the right decidim branch
-FROM ruby_base AS generator
-ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
-  MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
-  DECIDIM_VERSION=$DECIDIM_VERSION \
-  NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
-  BUNDLER_VERSION=$BUNDLER_VERSION  \
-  EDITOR=vim \
-  RAILS_ENV=development
-
-# Instead of using published generator, we clone the repo and run an updated generator
-# This way we are sure we run a working generator for the pinned DECIDIM_VERSION
+# Generate Decidim app
 RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/decidim/generator
 WORKDIR /home/decidim/generator/decidim-generators
-  # Setup bundle path while generating decidim, to avoid polluting the final vendor
+
 RUN bundle config set path "vendor" --global \
-  # install generator deps on ./vendor
   && bundle install \
-  # generate the app, and install deps in rails_app/vendor
   && bundle exec exe/decidim --branch $DECIDIM_BRANCH $WORK_DIR/rails_app \
   && bundle config unset path --global
 
 WORKDIR $WORK_DIR
 
-# Clean up files to keep final generated app only
-RUN rm -rf  \
-    rails_app/.git \
-    rails_app/node_modules \
-    rails_app/.npm \
-    rails_app/tmp \
-    rails_app/config/master.key \
-    rails_app/config/credentials.yml.enc \
+# Clean up and move app
+RUN rm -rf rails_app/.git rails_app/node_modules rails_app/.npm rails_app/tmp \
+    rails_app/config/master.key rails_app/config/credentials.yml.enc \
   && mv rails_app/* . \
   && mkdir -p tmp/pids \
   && rm -rf generator rails_app
 
 COPY ./context .
 
-# Add a Gemfile.modules file and install aditional modules
-# Keep only the Gemfile.lock
-RUN  bundle config set without "development:test" \
+# Install app dependencies
+RUN bundle config set without "development:test" \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
   && bundle config set deployment true \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  && rm -rf tmp/cache /tmp/* /var/tmp/* /.root/cache .local \
-  # Make vendor slimmer
+  && rm -rf tmp/cache /tmp/* /var/tmp/* .local \
   && rm -rf $BUNDLE_PATH/ruby*/cache $BUNDLE_PATH/ruby*/bundler/gems/*/.git
-  
+
 ##
 # Assets
-# Precompiles the assets in public/decidim-packs
+##
 FROM generator AS assets
 ENV SECRET_KEY_BASE=assets \
     NODE_ENV=development \
-    RAILS_ENV=development \ 
+    RAILS_ENV=development \
     DISABLE_SPRING=1 \
     CI=1 
 
@@ -201,11 +132,11 @@ RUN bundle config unset frozen \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
-# Decidim
-# Final image for Decidim
-FROM ruby_base AS decidim
+# Final Decidim Image
+##
+FROM base AS decidim
 ARG BUILD_DATE
-ARG VCS_REF
+ARG VCS_REF  
 ARG VERSION
 ARG UBUNTU_TAG
 
@@ -249,7 +180,8 @@ ENV RAILS_ENV=production \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=false \
     PORT=3000 \
-    EDITOR=vim
+    EDITOR=vim \
+    PATH="/home/decidim/bin:${PATH}"
 # Decidim Core Configuration
 ENV DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_MAILER_SENDER="change-me@example.org" \
@@ -263,21 +195,10 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
 
-# Create non-root user
-RUN rm -rf /home/* \
-  && groupadd -g 1001 decidim \
-  && useradd -u 1001 -g decidim -m decidim \
-  && touch /etc/motd \
-  && mkdir -p /home/decidim/tmp/pids \
-  && chown -R decidim:decidim /etc/motd 
-
-ENV RAILS_ENV=production \
-    NODE_ENV=production
-
 USER decidim:decidim
 COPY --from=generator --chown=decidim:decidim $WORK_DIR $WORK_DIR
 COPY --from=assets --chown=decidim:decidim $WORK_DIR/public/decidim-packs $WORK_DIR/public/decidim-packs
-
+  
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
