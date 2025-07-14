@@ -1,5 +1,6 @@
 require 'dotenv/load'
 require 'erb'
+require 'active_support/core_ext/string'
 require_relative './lib/docker'
 
 
@@ -54,16 +55,16 @@ task :"docker:push:ubuntu", [:version] do |_, args|
   Docker::Ubuntu.instance.versionned_tag_names.first(3).each_with_index do |tag, index|
     tag_version = tag.first
     tag_codename = tag.last
-    source_tag = "#{tag_codename}-#{version.decidim_version}"
-
+    
     version = case args[:version]
-      when "dev" then Decidim::Decidim.instance.versions[0]
-      when "last" then Decidim::Decidim.instance.versions[1]
-      when "prev" then Decidim::Decidim.instance.versions[2]
-      else
-        Docker::Task.help
-        exit 1
+    when "dev" then Decidim::Decidim.instance.versions[0]
+    when "last" then Decidim::Decidim.instance.versions[1]
+    when "prev" then Decidim::Decidim.instance.versions[2]
+    else
+      Docker::Task.help
+      exit 1
     end
+    source_tag = "#{tag_codename}-#{version.decidim_version}"
     Docker::Task.put("Prepare #{version.decidim_version}")
     # 0.29.2 will push tags for `0.29` and `0.29.2`
     version.parsed_version[1..].each do |dest_version|
@@ -90,7 +91,8 @@ task :"docker:docs", [] do
     develop_version: versions[0],
     last_version: versions[1],
     prev_version: versions[2],
-    base_image_tag: base_image_tag
+    base_image_tag: base_image_tag.first,
+    base_image_alternatives: Docker::Ubuntu.instance.versionned_tag_names.first(3)
   }
   # Foreach templates/**/* files, read the file, replace the variables and write the result
   Dir.glob(File.join(__dir__, "templates", "**", "*.erb")).each do |file|

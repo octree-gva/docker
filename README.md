@@ -23,10 +23,17 @@
 We publish daily three images, based on `ubuntu:25.10`. 
 | Tag | Description |
 | ---  | ---|
-| `latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
-| `0.30.0` | Last version |
-| `0.29.3` | Stable version, security and bug fixes only |
+| `:latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
+| `:0.30.1` | Last version |
+| `:0.29.4` | Stable version, security and bug fixes only |
 
+For older distributions, we also publish these images: 
+
+**Oracular (ubuntu 24.10)**  
+* `:oracular-0.31.0.dev`, `:oracular-0.30.1`, `:oracular-0.29.4`
+
+**Jammy (ubuntu 22.04)**  
+* `:jammy-0.31.0.dev`, `:jammy-0.30.1`, `:jammy-0.29.4`
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
@@ -72,7 +79,7 @@ Once ejected, you will have a Dockerfile and docker-compose ready to use on your
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.29.3/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.29.4/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations

@@ -23,11 +23,25 @@
 We publish daily three images, based on `ubuntu:<%= base_image_tag %>`. 
 | Tag | Description |
 | ---  | ---|
-| `latest` | Unstable `development` version. (alias for `<%= develop_version.decidim_version %>`) |
-| `<%= last_version.decidim_version %>` | Last version |
-| `<%= prev_version.decidim_version %>` | Stable version, security and bug fixes only |
+| `:latest` | Unstable `development` version. (alias for `<%= develop_version.decidim_version %>`) |
+| `:<%= last_version.decidim_version %>` | Last version |
+| `:<%= prev_version.decidim_version %>` | Stable version, security and bug fixes only |
 
-
+For older distributions, we also publish these images: 
+<% base_image_alternatives[1..].map do |tag|
+  distrib_name = tag.last
+  {
+    title: distrib_name.titleize + " (ubuntu #{tag.first})", 
+    tags: [
+      "`:#{distrib_name}-#{develop_version.decidim_version}`",
+      "`:#{distrib_name}-#{last_version.decidim_version}`",
+      "`:#{distrib_name}-#{prev_version.decidim_version}`"
+    ]
+  }
+end.each do |info| %>
+**<%= info[:title] %>**  
+* <%= info[:tags].join(", ") %>
+<% end %>
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.

@@ -3,7 +3,7 @@
 require "net/http"
 require "uri"
 require "json"
-require "byebug" if ENV.fetch("RAILS_ENV", "development") == "development"
+require "byebug" if ENV.fetch("RAILS_ENV", "production") == "development"
 require "docker_hub_client"
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/module/concerning'

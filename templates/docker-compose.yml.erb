@@ -36,7 +36,7 @@ services:
     build:
       <<: *default-build
       args:
-        <%= last_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+        <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
     environment:
