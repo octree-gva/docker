@@ -81,7 +81,7 @@ module Decidim
     end
 
     def as_json
-      return {updated_at: updated_at, decidim_version: decidim_version, args: docker_args} unless valid_node_engines?
+      return { updated_at: updated_at, decidim_version: decidim_version, args: docker_args } unless valid_node_engines?
       {
         updated_at: updated_at,
         decidim_version: decidim_version,
@@ -99,10 +99,10 @@ module Decidim
     private 
 
 
-    def package_json
-      @package_json ||= decidim.on_cloned_repository(branch) do 
-        JSON.parse(File.read("package.json")) 
+      def package_json
+        @package_json ||= decidim.on_cloned_repository(branch) do 
+          JSON.parse(File.read("package.json")) 
+        end
       end
-    end
   end
 end

@@ -10,8 +10,8 @@ module Docker
 
     ## Task help message
     def self.help
-      puts "`rake docker:build[dev|last|prev]`"
-      puts "  Build the development, last or previous stable version of the Docker image"
+      puts "`rake docker:build:ubuntu[dev|last|prev]`"
+      puts "  Build the development, last or previous stable version of the Docker image over the last three ubuntu versions"
       puts "  Options:"
       puts "    dev: Build the development version"
       puts "    last: Build the last stable version"
@@ -26,8 +26,8 @@ module Docker
       puts "    VERBOSE: `1` to print verbose output"
       puts ""
 
-      puts "`rake docker:push[dev|last|prev]`"
-      puts "  Push the development, last or previous stable version to Docker Hub,"
+      puts "`rake docker:push:ubuntu[dev|last|prev]`"
+      puts "  Push the development, last or previous stable version to Docker Hub over the last three ubuntu versions,"
       puts "  You must be logged in to Docker Hub before running this task"
       puts "  Options:"
       puts "    dev: Push the development version"

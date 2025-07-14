@@ -6,4 +6,3 @@ DockerHubClient.configure do |config|
   config.username = ENV.fetch('DOCKER_HUB_USERNAME')
   config.password = ENV.fetch('DOCKER_HUB_ACCESS_TOKEN')
 end
-

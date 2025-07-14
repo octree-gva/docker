@@ -9,4 +9,5 @@ gem 'activesupport'
 
 group :development do
   gem 'dotenv'
+  gem "byebug"
 end

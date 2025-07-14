@@ -20,27 +20,27 @@ module Decidim
 
     private
 
-    def clone_destination
-      @clone_destination ||= "decidim-clone"
-    end
+      def clone_destination
+        @clone_destination ||= "decidim-clone"
+      end
 
-    def clone_repository
-      @clone_repository ||= Docker::Task.system!(
-        "git", 
-        "clone", 
-        "--branch", "develop", 
-        "--no-single-branch", "https://github.com/decidim/decidim.git", 
-        clone_destination
-      )
-    end
+      def clone_repository
+        @clone_repository ||= Docker::Task.system!(
+          "git", 
+          "clone", 
+          "--branch", "develop", 
+          "--no-single-branch", "https://github.com/decidim/decidim.git", 
+          clone_destination
+        )
+      end
 
-    def stable_branches
-      on_cloned_repository do
-        branches = %x(git branch -r | grep "origin/release/.*-stable")
-        branches.split("\n").map do |branch|
-          DecidimVersion.new(self, branch.strip.gsub('origin/', ''))
-        end
-      end.sort_by(&:updated_at).reverse
-    end
+      def stable_branches
+        on_cloned_repository do
+          branches = %x(git branch -r | grep "origin/release/.*-stable")
+          branches.split("\n").map do |branch|
+            DecidimVersion.new(self, branch.strip.gsub('origin/', ''))
+          end
+        end.sort_by(&:updated_at).reverse
+      end
   end
 end
