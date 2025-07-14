@@ -31,10 +31,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build[dev]
+          bundle exec rake docker:build:ubuntu[dev]
       - name: Push image
         run: |
-          bundle exec rake docker:push[dev]
+          bundle exec rake docker:push:ubuntu[dev]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean
@@ -57,10 +57,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build[last]
+          bundle exec rake docker:build:ubuntu[last]
       - name: Push image
         run: |
-          bundle exec rake docker:push[last]
+          bundle exec rake docker:push:ubuntu[last]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean
@@ -83,10 +83,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build[prev]
+          bundle exec rake docker:build:ubuntu[prev]
       - name: Push image
         run: |
-          bundle exec rake docker:push[prev]
+          bundle exec rake docker:push:ubuntu[prev]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean
