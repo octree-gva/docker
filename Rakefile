@@ -7,7 +7,7 @@ task :"docker:build:ubuntu", [:version] do |_, args|
   Docker::Ubuntu.instance.versionned_tag_names.first(3).each do |tag|
     tag_version = tag.first
     tag_codename = tag.last
-    Docker::Task.put "Building ubuntu:#{tag_version} (#{tag_codename}) #{tag.inspect}"
+    Docker::Task.put "Building ubuntu:#{tag_version} (#{tag_codename})"
 
     version = case args[:version]
       when "dev" then Decidim::Decidim.instance.versions[0]
