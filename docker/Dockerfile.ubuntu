@@ -155,14 +155,13 @@ WORKDIR $WORK_DIR
 # Clean up files to keep final generated app only
 RUN rm -rf  \
     rails_app/.git \
-    rails_app/vendor \
     rails_app/node_modules \
     rails_app/.npm \
     rails_app/tmp \
     rails_app/config/master.key \
     rails_app/config/credentials.yml.enc \
   && mv rails_app/* . \
-  && mkdir -p vendor tmp/pids \
+  && mkdir -p tmp/pids \
   && rm -rf generator rails_app
 
 COPY ./context .
@@ -177,9 +176,7 @@ RUN  bundle config set without "development:test" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   && rm -rf tmp/cache /tmp/* /var/tmp/* /.root/cache .local \
   # Make vendor slimmer
-  && rm -rf $BUNDLE_PATH/ruby*/cache $BUNDLE_PATH/ruby*/bundler/gems/*/.git \
-  && find $BUNDLE_PATH -name "*.c" -delete \
-  && find $BUNDLE_PATH -name "*.o" -delete
+  && rm -rf $BUNDLE_PATH/ruby*/cache $BUNDLE_PATH/ruby*/bundler/gems/*/.git
   
 ##
 # Assets
@@ -187,10 +184,14 @@ RUN  bundle config set without "development:test" \
 FROM generator AS assets
 ENV SECRET_KEY_BASE=assets \
     NODE_ENV=development \
-    RAILS_ENV=development \
+    RAILS_ENV=development \ 
+    DISABLE_SPRING=1 \
     CI=1 
 
-RUN bundle check || bundle install \
+RUN bundle config unset frozen \
+  && bundle config unset deployment \
+  && bundle config unset without \
+  && bundle install \
   && npm ci \
   && bundle exec rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
