@@ -50,8 +50,7 @@ RUN apt-get update \
     && rbenv shell "$RUBY_VERSION" \
     && echo "ruby $RUBY_VERSION installed" \
     && echo $(ruby -v) \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache /var/cache/apt/archives 
-
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /.root/cache /var/cache/apt/archives
 
 ##
 # Ruby Base Image
@@ -136,49 +135,52 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
   DECIDIM_VERSION=$DECIDIM_VERSION \
   NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
   BUNDLER_VERSION=$BUNDLER_VERSION  \
-  EDITOR=vim
+  EDITOR=vim \
+  RAILS_ENV=development
 
 # Instead of using published generator, we clone the repo and run an updated generator
 # This way we are sure we run a working generator for the pinned DECIDIM_VERSION
-RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/decidim/generator \
-  && cd /home/decidim/generator/decidim-generators \
+RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/decidim/generator
+WORKDIR /home/decidim/generator/decidim-generators
   # Setup bundle path while generating decidim, to avoid polluting the final vendor
-  && bundle config set path "/home/decidim/generator/decidim-generators/vendor" --global \
+RUN bundle config set path "vendor" --global \
+  # install generator deps on ./vendor
   && bundle install \
-  &&  if $DECIDIM_BRANCH == "develop"; then  \
-        bundle exec exe/decidim --edge --skip_bundle $WORK_DIR/rails_app; \
-      else \
-        bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip_bundle $WORK_DIR/rails_app; \
-      fi \
-  && bundle config unset path --global \
-  && cd $WORK_DIR \
+  # generate the app, and install deps in rails_app/vendor
+  && bundle exec exe/decidim --branch $DECIDIM_BRANCH $WORK_DIR/rails_app \
+  && bundle config unset path --global
+
+WORKDIR $WORK_DIR
+
+# Clean up files to keep final generated app only
+RUN rm -rf  \
+    rails_app/.git \
+    rails_app/vendor \
+    rails_app/node_modules \
+    rails_app/.npm \
+    rails_app/tmp \
+    rails_app/config/master.key \
+    rails_app/config/credentials.yml.enc \
   && mv rails_app/* . \
-  && rm -rf generator rails_app \
-  && rm -rf vendor/** config/master.key config/credentials.yml.enc
+  && mkdir -p vendor tmp/pids \
+  && rm -rf generator rails_app
 
 COPY ./context .
 
+# Add a Gemfile.modules file and install aditional modules
+# Keep only the Gemfile.lock
 RUN  bundle config set without "development:test" \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
   && bundle config set deployment true \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  && rm -rf vendor .npm node_modules tmp/cache /tmp/* /var/tmp/* /.root/cache .npm .local
-  
-##
-# Gems
-# Install required GEMS
-FROM generator AS gems
-RUN bundle config set without "development:test" \
-  && bundle config set frozen true \
-  && bundle config set deployment true \
-  && bundle install \
+  && rm -rf tmp/cache /tmp/* /var/tmp/* /.root/cache .local \
   # Make vendor slimmer
   && rm -rf $BUNDLE_PATH/ruby*/cache $BUNDLE_PATH/ruby*/bundler/gems/*/.git \
   && find $BUNDLE_PATH -name "*.c" -delete \
   && find $BUNDLE_PATH -name "*.o" -delete
-
+  
 ##
 # Assets
 # Precompiles the assets in public/decidim-packs
@@ -187,7 +189,6 @@ ENV SECRET_KEY_BASE=assets \
     NODE_ENV=development \
     RAILS_ENV=production \
     CI=1 
-COPY --from=gems $WORK_DIR/vendor $WORK_DIR/vendor
 RUN npm ci \
   && bundle exec rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
@@ -202,7 +203,7 @@ ARG VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
-      org.label-schema.description="Decidim base image" \
+      org.label-schema.description="Decidim application on Ubuntu ${UBUNTU_TAG:-latest}" \
       org.label-schema.url="https://github.com/decidim/docker" \
       org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.vcs-url="https://github.com/decidim/decidim" \
@@ -211,7 +212,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.schema-version="1.0.0-rc.1" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.title="decidim" \
-      org.opencontainers.image.description="Decidim base image" \
+      org.opencontainers.image.description="Decidim application on Ubuntu ${UBUNTU_TAG:-latest}" \
       org.opencontainers.image.url="https://github.com/decidim/decidim" \
       org.opencontainers.image.revision=${VCS_REF} \
       org.opencontainers.image.source="https://github.com/decidim/decidim" \
@@ -268,7 +269,6 @@ ENV RAILS_ENV=production \
 USER decidim:decidim
 COPY --from=generator --chown=decidim:decidim $WORK_DIR $WORK_DIR
 COPY --from=assets --chown=decidim:decidim $WORK_DIR/public/decidim-packs $WORK_DIR/public/decidim-packs
-COPY --from=gems --chown=decidim:decidim $WORK_DIR/vendor $WORK_DIR/vendor
 
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
