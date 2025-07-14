@@ -46,11 +46,6 @@ task :"docker:push:ubuntu", [:version] do |_, args|
     exit 1
   end
   registry_username = ENV["DOCKER_HUB_REGISTRY"]
-  if registry_username.nil?
-    Docker::Task.put("DOCKER_HUB_REGISTRY is not set")
-    Docker::Task.help
-    exit 1
-  end
 
   Docker::Ubuntu.instance.versionned_tag_names.first(3).each_with_index do |tag, index|
     tag_version = tag.first
@@ -66,13 +61,28 @@ task :"docker:push:ubuntu", [:version] do |_, args|
     end
     source_tag = "#{tag_codename}-#{version.decidim_version}"
     Docker::Task.put("Prepare #{version.decidim_version}")
+    if index == 0
+      version.parsed_version[1..].each do |dest_version|
+        dest_version = "#{dest_version}"
+        destination_tag = "#{registry_username}/decidim:#{dest_version}"
+        Docker::Task.put("tagging #{destination_tag}")
+        
+        Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
+        if ENV["DRY_RUN"] == "1"
+          Docker::Task.put("DRY_RUN: skip push")
+        else
+          Docker::Task.system!("docker", "push", destination_tag)
+          Docker::Task.put("pushed #{destination_tag}")
+        end
+      end
+    end
     # 0.29.2 will push tags for `0.29` and `0.29.2`
     version.parsed_version[1..].each do |dest_version|
-      dest_version = "#{tag_version}-#{dest_version}" if index > 0
+      dest_version = "#{tag_codename}-#{dest_version}"
       destination_tag = "#{registry_username}/decidim:#{dest_version}"
       Docker::Task.put("tagging #{destination_tag}")
       
-      Docker::Task.system!("docker", "tag", "decidim:#{version.decidim_version}", destination_tag)
+      Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
       if ENV["DRY_RUN"] == "1"
         Docker::Task.put("DRY_RUN: skip push")
       else

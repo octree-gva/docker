@@ -15,7 +15,7 @@ x-default-environment: &default-environment
 
 x-default-build: &default-build
   context: ./docker
-  dockerfile: ./Dockerfile
+  dockerfile: ./Dockerfile.ubuntu
 
 services:
   decidim-development:
@@ -23,7 +23,8 @@ services:
     build:
       <<: *default-build
       args:
-        <%= develop_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+        UBUNTU_TAG: "<%= base_image_tag %>"
+        <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
     environment:
@@ -36,6 +37,7 @@ services:
     build:
       <<: *default-build
       args:
+        UBUNTU_TAG: "<%= base_image_tag %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -49,7 +51,8 @@ services:
     build:
       <<: *default-build
       args:
-        <%= prev_version.docker_args.map { |k,v| "#{k}: #{v}" }.join("\n        ") %>
+        UBUNTU_TAG: "<%= base_image_tag %>"
+        <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"
     environment:

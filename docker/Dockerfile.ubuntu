@@ -195,7 +195,13 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
 
-USER decidim:decidim
+RUN groupadd -g 1001 decidim \
+  && useradd -u 1001 -g decidim -m decidim \
+  && touch /etc/motd \
+  && chown -R decidim:decidim /etc/motd \
+  && mkdir -p /home/decidim/tmp/pids
+
+USER decidim
 COPY --from=generator --chown=decidim:decidim $WORK_DIR $WORK_DIR
 COPY --from=assets --chown=decidim:decidim $WORK_DIR/public/decidim-packs $WORK_DIR/public/decidim-packs
   

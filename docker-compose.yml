@@ -15,7 +15,7 @@ x-default-environment: &default-environment
 
 x-default-build: &default-build
   context: ./docker
-  dockerfile: ./Dockerfile
+  dockerfile: ./Dockerfile.ubuntu
 
 services:
   decidim-development:
@@ -23,14 +23,15 @@ services:
     build:
       <<: *default-build
       args:
-        DECIDIM_VERSION: 0.31.0.dev
-        DECIDIM_BRANCH: develop
-        NODE_MAJOR_VERSION: 22
-        BUNDLER_VERSION: 2.4.20
-        RUBY_VERSION: 3.3.4
-        VCS_REF: 407c9ee4ffb33a544c2e3d504a51f54da4d08aeb
-        VERSION: 0.31.0.dev
-        BUILD_DATE: 2025-07-14T12:08:26+01:00
+        UBUNTU_TAG: "25.10"
+        DECIDIM_VERSION: "0.31.0.dev"
+        DECIDIM_BRANCH: "develop"
+        NODE_MAJOR_VERSION: "22"
+        BUNDLER_VERSION: "2.4.20"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "407c9ee4ffb33a544c2e3d504a51f54da4d08aeb"
+        VERSION: "0.31.0.dev"
+        BUILD_DATE: "2025-07-14T12:18:27+01:00"
     ports:
       - "3001:3000"
     environment:
@@ -43,6 +44,7 @@ services:
     build:
       <<: *default-build
       args:
+        UBUNTU_TAG: "25.10"
         DECIDIM_VERSION: "0.30.1"
         DECIDIM_BRANCH: "release/0.30-stable"
         NODE_MAJOR_VERSION: "18"
@@ -50,7 +52,7 @@ services:
         RUBY_VERSION: "3.3.4"
         VCS_REF: "42b1e6d001b5c6f75cadc9c42c5e886168833d25"
         VERSION: "0.30.1"
-        BUILD_DATE: "2025-07-14T12:08:27+01:00"
+        BUILD_DATE: "2025-07-14T12:18:27+01:00"
     ports:
       - "3002:3000"
     environment:
@@ -63,14 +65,15 @@ services:
     build:
       <<: *default-build
       args:
-        DECIDIM_VERSION: 0.29.4
-        DECIDIM_BRANCH: release/0.29-stable
-        NODE_MAJOR_VERSION: 18
-        BUNDLER_VERSION: 2.4.6
-        RUBY_VERSION: 3.2.2
-        VCS_REF: 63eef3ca9d33c661c47d32ede4a3ac7b53bfa714
-        VERSION: 0.29.4
-        BUILD_DATE: 2025-07-14T12:08:27+01:00
+        UBUNTU_TAG: "25.10"
+        DECIDIM_VERSION: "0.29.4"
+        DECIDIM_BRANCH: "release/0.29-stable"
+        NODE_MAJOR_VERSION: "18"
+        BUNDLER_VERSION: "2.4.6"
+        RUBY_VERSION: "3.2.2"
+        VCS_REF: "63eef3ca9d33c661c47d32ede4a3ac7b53bfa714"
+        VERSION: "0.29.4"
+        BUILD_DATE: "2025-07-14T12:18:27+01:00"
     ports:
       - "3003:3000"
     environment:

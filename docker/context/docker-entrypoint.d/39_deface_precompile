@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler'
+require 'fileutils'
 
 Dir.chdir("/home/decidim") do 
 	puts "#{__FILE__}:"
@@ -18,7 +19,7 @@ Dir.chdir("/home/decidim") do
     system({"DEFACE_ENABLED" => "1"}, "bundle exec rails deface:precompile", exception: true)
   else
     puts "    ➡️ skip deface precompile, remove compiled_views"
-    File.rm_rf("app/compiled_views")
+    FileUtils.rm_rf("app/compiled_views")
     exit 0;
   end
 end 
