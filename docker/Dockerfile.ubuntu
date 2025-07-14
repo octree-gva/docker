@@ -98,7 +98,7 @@ WORKDIR $WORK_DIR
 RUN rm -rf rails_app/.git rails_app/node_modules rails_app/.npm rails_app/tmp \
     rails_app/config/master.key rails_app/config/credentials.yml.enc \
   && mv rails_app/* . \
-  && mkdir -p tmp/pids \
+  && mkdir -p tmp/pids tmp/sockets \
   && rm -rf generator rails_app
 
 COPY ./context .
