@@ -14,12 +14,13 @@ Dir.chdir("/home/decidim") do
       puts "    ⚠️ Rails.application.config.deface.enabled is true"
       puts "    ⚠️ set config.deface.enabled = ENV.fetch('DEFACE_ENABLED', '0') == '1' in your production.rb file"
       puts "    ⚠️ and set DEFACE_ENABLED=1 in your environment"
+      puts "    ➡️ app/compiled_views will be removed"
+      FileUtils.rm_rf("app/compiled_views")
       exit 0;
     end
     system({"DEFACE_ENABLED" => "1"}, "bundle exec rails deface:precompile", exception: true)
   else
-    puts "    ➡️ skip deface precompile, remove compiled_views"
-    FileUtils.rm_rf("app/compiled_views")
+    puts "    ➡️ skip deface precompile"
     exit 0;
   end
 end 
