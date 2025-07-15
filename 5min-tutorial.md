@@ -27,12 +27,12 @@ In an empty directory, download the [docker-compose quickstart](https://raw.gith
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/decidim/docker/master/quickstart.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/decidim/docker/refs/heads/master/quickstart.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ## Create your first organization
