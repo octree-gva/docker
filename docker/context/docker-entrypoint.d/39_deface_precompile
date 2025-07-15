@@ -5,9 +5,9 @@ require 'fileutils'
 
 Dir.chdir("/home/decidim") do 
 	puts "#{__FILE__}:"
-  has_deface = Bundler.load.specs.find { |s| s.name == "deface" }
+  installed_deface = Bundler.load.specs.find { |s| s.name == "deface" }
 
-  if has_deface
+  if installed_deface
     puts "    ✅ deface is installed"
     deface_enabled = %x(bundle exec rails runner "print Rails.application.config.deface.enabled")
     if deface_enabled == "true"
