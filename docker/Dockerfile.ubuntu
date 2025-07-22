@@ -108,7 +108,9 @@ RUN bundle config set without "development:test" \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
-  && bundle config set deployment true 
+  && bundle config set deployment true \
+  && rm bin/* \
+  && bundle binstubs railties bootsnap
 
 ##
 # Assets
@@ -218,16 +220,15 @@ RUN apt-get update -yq \
     ca-certificates \
     wget \
     cron \
-    git \
-    libpq-dev \
-    libvips-dev \
+    libpq5 \
+    libvips42 \
     libyaml-0-2 \ 
     libjemalloc2 \
     tzdata \
-    vim \
-    zlib1g-dev \
+    zlib1g \
   && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash -  \
   && apt-get install -yq --no-install-recommends nodejs \
+  && apt-get purge -y --auto-remove wget \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache \
 ## Set up user and working directory

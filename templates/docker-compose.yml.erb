@@ -10,8 +10,10 @@ x-default: &default
     - redis
 
 x-default-environment: &default-environment
-  RAILS_ENV: development
-  NODE_ENV: development
+  RAILS_ENV: production
+  NODE_ENV: production
+  DECIDIM_FORCE_SSL: false
+  SECRET_KEY_BASE: insecure_key_base
 
 x-default-build: &default-build
   context: ./docker

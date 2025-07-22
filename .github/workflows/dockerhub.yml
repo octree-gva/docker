@@ -14,7 +14,6 @@ on:
 
 jobs:
   ubuntu-decidim-development:
-    needs: [ubuntu-decidim-last]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,7 +40,6 @@ jobs:
           bundle exec rake docker:clean
           
   ubuntu-decidim-last:
-    needs: [ubuntu-decidim-prev]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

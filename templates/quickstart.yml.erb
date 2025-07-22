@@ -27,13 +27,14 @@ services:
       - DECIDIM_DATABASE_HOST=db
       - DECIDIM_DATABASE_USER=postgres
       - DECIDIM_DATABASE_PASSWORD=postgres
-      - DECIDIM_DATABASE_NAME=decidim_development
+      - DECIDIM_DATABASE_NAME=decidim_production
       - DECIDIM_REDIS_URL=redis://redis:6379/0
       - SECRET_KEY_BASE=insecure_key_base
       - RAILS_ENV=production
       - NODE_ENV=production
       - DECIDIM_MAILER_SENDER=changeme@example.org
       - QUEUE_ADAPTER=async
+      - RAILS_FORCE_SSL=false
     volumes:  
       - decidim_public:/home/decidim/public
     networks:
@@ -46,6 +47,8 @@ services:
     image: postgres:17
     environment:
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=decidim_production
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
