@@ -28,8 +28,7 @@ RUN apt-get update -yq \
   && apt-get install -yq --no-install-recommends \
     build-essential \
     ca-certificates \
-    cron \
-    curl \
+    wget \
     git \
     gnupg \
     libffi-dev \
@@ -48,8 +47,8 @@ RUN apt-get update -yq \
     vim \
     zlib1g-dev \
   # Install Node.js from NodeSource
-  && curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
-  && apt-get install -yq nodejs \
+  && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+  && apt-get install -yq --no-install-recommends nodejs \
   # Install rbenv and Ruby
   && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
@@ -105,14 +104,11 @@ COPY ./context .
 
 # Install app dependencies
 RUN bundle config set without "development:test" \
+  && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
-  && bundle config set deployment true \
-  && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  && rm -rf tmp/cache /tmp/* /var/tmp/* .local \
-  && rm -rf $BUNDLE_PATH/ruby*/cache $BUNDLE_PATH/ruby*/bundler/gems/*/.git \
-  && rm -rf .npm .yarn .bundle/cache .bash_history log/* test node_modules
+  && bundle config set deployment true 
 
 ##
 # Assets
@@ -135,11 +131,16 @@ RUN bundle config unset frozen \
 ##
 # Final Decidim Image
 ##
-FROM base AS decidim
+FROM ubuntu:${UBUNTU_TAG:-latest} AS decidim
 ARG BUILD_DATE
 ARG VCS_REF  
 ARG VERSION
 ARG UBUNTU_TAG
+ARG NODE_MAJOR_VERSION
+ARG RUBY_VERSION
+ARG BUNDLER_VERSION
+ARG DECIDIM_BRANCH
+ARG DECIDIM_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
@@ -161,6 +162,21 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.opencontainers.image.licenses="GPL-3.0" \
       maintainer="Decidim Product Team <https://meta.decidim.org/profiles/product/members>"
 
+ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
+    BUNDLE_PATH="/home/decidim/vendor" \
+    BUNDLE_DISABLE_SHARED_GEMS=true \
+    NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
+    RUBY_VERSION=$RUBY_VERSION \
+    BUNDLER_VERSION=$BUNDLER_VERSION \
+    DECIDIM_BRANCH=$DECIDIM_BRANCH \
+    DECIDIM_VERSION=$DECIDIM_VERSION \
+    DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
+    DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
+    RAILS_ENV=production \
+    WORK_DIR=/home/decidim \
+    HOME=/home/decidim \
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+  
 # SMTP Configuration
 ENV SMTP_ADDRESS="" \
     SMTP_DOMAIN="" \
@@ -196,16 +212,40 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
 
-RUN groupadd -g 1001 decidim \
+# Install Node.js from NodeSource
+RUN apt-get update -yq \
+  && apt-get install -yq --no-install-recommends \
+    ca-certificates \
+    wget \
+    cron \
+    git \
+    libpq-dev \
+    libvips-dev \
+    libyaml-0-2 \ 
+    libjemalloc2 \
+    tzdata \
+    vim \
+    zlib1g-dev \
+  && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash -  \
+  && apt-get install -yq --no-install-recommends nodejs \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache \
+## Set up user and working directory
+  && groupadd -g 1001 decidim \
   && useradd -u 1001 -g decidim -m decidim \
   && touch /etc/motd \
-  && chown -R decidim:decidim /etc/motd \
-  && mkdir -p /home/decidim/tmp/pids
+  && chown decidim:decidim /etc/motd  \
+  && npm install -g yarn \
+  && rm -rf /home/ubuntu
 
+ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" 
 USER decidim
-COPY --from=generator --chown=decidim:decidim $WORK_DIR $WORK_DIR
+WORKDIR $WORK_DIR
+COPY --from=generator --chown=decidim:decidim /home/decidim /home/decidim
 COPY --from=assets --chown=decidim:decidim $WORK_DIR/public/decidim-packs $WORK_DIR/public/decidim-packs
-  
+RUN bundle config set path /home/decidim/vendor \
+    && (bundle check || exit 1)
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
