@@ -98,6 +98,8 @@ task :"docker:docs", [] do
   versions = Decidim::Decidim.instance.versions
 
   template_vars = {
+    github_repository: ENV.fetch("GITHUB_REPOSITORY", "decidim/docker"),
+    github_ref_name: ENV.fetch("GITHUB_REF_NAME", "master"),
     develop_version: versions[0],
     last_version: versions[1],
     prev_version: versions[2],
