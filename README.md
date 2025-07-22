@@ -20,7 +20,7 @@
 </p>
 
 # Dockerhub
-We publish daily three images, based on `ubuntu:25.10`. 
+We publish daily three images, based on `ubuntu:25.04`. 
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
@@ -29,8 +29,8 @@ We publish daily three images, based on `ubuntu:25.10`.
 
 For older distributions, we also publish these images: 
 
-**Oracular (ubuntu 24.10)**  
-* `:oracular-0.31.0.dev`, `:oracular-0.30.1`, `:oracular-0.29.4`
+**Noble (ubuntu 24.04)**  
+* `:noble-0.31.0.dev`, `:noble-0.30.1`, `:noble-0.29.4`
 
 **Jammy (ubuntu 22.04)**  
 * `:jammy-0.31.0.dev`, `:jammy-0.30.1`, `:jammy-0.29.4`
