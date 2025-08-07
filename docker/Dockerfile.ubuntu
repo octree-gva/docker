@@ -78,7 +78,8 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
     DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
-    RAILS_ENV=development
+    RAILS_ENV=development \
+    PATH="/home/decidim/bin:${PATH}" 
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
@@ -104,31 +105,15 @@ COPY ./context .
 
 # Install app dependencies
 RUN bundle config set without "development:test" \
+  && bundle config set path "vendor" --global \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle install \
   && bundle config set frozen true \
   && bundle config set deployment true \
   && rm bin/* \
-  && bundle binstubs railties bootsnap
-
-##
-# Assets
-##
-FROM generator AS assets
-ENV SECRET_KEY_BASE=assets \
-    NODE_ENV=development \
-    RAILS_ENV=development \
-    DISABLE_SPRING=1 \
-    CI=1 
-
-RUN bundle config unset frozen \
-  && bundle config unset deployment \
-  && bundle config unset without \
-  && bundle install \
-  && npm ci \
-  && bundle exec rails assets:precompile \
-  && rm -rf node_modules .npmrc .yarnrc .yarn
+  && bundle binstubs --all \
+  && rails app:update:bin
 
 ##
 # Final Decidim Image
@@ -244,7 +229,6 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
 USER decidim
 WORKDIR $WORK_DIR
 COPY --from=generator --chown=decidim:decidim /home/decidim /home/decidim
-COPY --from=assets --chown=decidim:decidim $WORK_DIR/public/decidim-packs $WORK_DIR/public/decidim-packs
 RUN bundle config set path /home/decidim/vendor \
     && (bundle check || exit 1)
 EXPOSE 3000
