@@ -77,7 +77,7 @@ task :"docker:build:redhat", [:version] do |_, args|
     end
     docker_args_h = {
       REDHAT_REPO: tag_codename, 
-      REDHAT_MAJOR_VERSION: tag_version,
+      REDHAT_MAJOR_VERSION: tag_version.split(".").first,
       REDHAT_TAG: tag_version
     }.merge(version.docker_args)
     decidim_tag = "#{tag_codename}-#{version.decidim_version}"

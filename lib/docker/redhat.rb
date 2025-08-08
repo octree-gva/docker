@@ -5,6 +5,10 @@ module Docker
     include Singleton
     include Docker::Concern::DockerHubImage
 
+    def name
+      "Redhat"
+    end
+    
     def discover_ubi_repositories
       @discovered_ubi_repositories ||= begin
       # discover UBI repositories dynamically

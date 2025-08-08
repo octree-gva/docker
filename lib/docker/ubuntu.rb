@@ -4,7 +4,10 @@ module Docker
   class Ubuntu
     include Singleton
     include Docker::Concern::DockerHubImage
-
+    def name
+      "ubuntu"
+    end
+    
     def repository
       "library/ubuntu"
     end

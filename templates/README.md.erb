@@ -30,37 +30,34 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | `:<%= last_version.decidim_version %>` | Last version |
 | `:<%= prev_version.decidim_version %>` | Stable version, security and bug fixes only |
 
-To use older ubuntu distributions, these are available: 
-<% ubuntu_alternatives[1..].map do |tag|
-  distrib_name = tag.last
-  {
-    title: distrib_name.titleize + " (ubuntu #{tag.first})", 
-    tags: [
-      "`:#{distrib_name}-#{develop_version.decidim_version}`",
-      "`:#{distrib_name}-#{last_version.decidim_version}`",
-      "`:#{distrib_name}-#{prev_version.decidim_version}`"
-    ]
-  }
-end.each do |info| %>
-**<%= info[:title] %>**  
-* <%= info[:tags].join(", ") %>
-<% end %>
+To use other distributions, these are available: 
 
-And to use Redhat, you can use these: 
-<% redhat_alternatives.map do |tag|
+| Distribution | <%= develop_version.decidim_version %> | <%= last_version.decidim_version %> | <%= prev_version.decidim_version %> |
+| --- | --- | --- | --- |
+<% 
+alternatives = ubuntu_alternatives[1..].map do |tag|
   distrib_name = tag.last
   {
-    title: distrib_name.titleize + " (Entreprise Linux #{tag.first})", 
+    title: "Ubuntu " + distrib_name.titleize + " v#{tag.first}", 
     tags: [
       "`:#{distrib_name}-#{develop_version.decidim_version}`",
       "`:#{distrib_name}-#{last_version.decidim_version}`",
       "`:#{distrib_name}-#{prev_version.decidim_version}`"
     ]
   }
-end.each do |info| %>
-**<%= info[:title] %>**  
-* <%= info[:tags].join(", ") %>
-<% end %>
+end + redhat_alternatives.map do |tag|
+  distrib_name = tag.last
+  {
+    title: "Redhat " + distrib_name.titleize + " v#{tag.first}", 
+    tags: [
+      "`:#{distrib_name}-#{develop_version.decidim_version}`",
+      "`:#{distrib_name}-#{last_version.decidim_version}`",
+      "`:#{distrib_name}-#{prev_version.decidim_version}`"
+    ]
+  }
+end
+alternatives.each do |info| %>| <%= info[:title] %> | <%= info[:tags][0]%> | <%= info[:tags][1]%> | <%= info[:tags][2]%> |<% end %>
+
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
