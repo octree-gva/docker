@@ -74,51 +74,73 @@ FROM base AS generator
 ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
     MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
     BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
-    BUNDLE_PATH="/home/decidim/vendor" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
     DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
     RAILS_ENV=development \
-    PATH="/home/decidim/bin:${PATH}" 
+    PATH="/home/decidim/bin:${PATH}" \
+    WORKDIR=/home/decidim
+    
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
-# Generate Decidim app
-RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/decidim/generator
-WORKDIR /home/decidim/generator/decidim-generators
+# Clone decidim to run generator from the good branch
+RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/generator
+WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && bundle install \
-  && bundle exec exe/decidim --branch $DECIDIM_BRANCH $WORK_DIR/rails_app \
-  && bundle config unset path --global
+  && bundle check || bundle install \
+  && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
+  && cp Gemfile Gemfile.lock rails_app/ \
+  && cp -r rails_app/. $WORK_DIR  \
+  && bundle config unset path --global \
+  && rm -rf /home/generator
 
 WORKDIR $WORK_DIR
-
-# Clean up and move app
-RUN rm -rf rails_app/.git rails_app/node_modules rails_app/.npm rails_app/tmp \
-    rails_app/config/master.key rails_app/config/credentials.yml.enc \
-  && mv rails_app/* . \
+ENV BUNDLE_PATH="/home/decidim/vendor"
+# Clean up generated app
+RUN rm -rf .git node_modules .npm  .npmrc .yarnrc .yarn tmp \
+    config/master.key config/credentials.yml.enc \
   && mkdir -p tmp/pids tmp/sockets \
-  && rm -rf generator rails_app
+  && npm cache clean --force \
+  && yarn cache clean --force 
 
 COPY ./context .
 
 # Install app dependencies
 RUN bundle config set without "development:test" \
-  && bundle config set path "vendor" --global \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
+  # Remove decidim-conferences, decidim-initiatives, decidim-templates gems from Gemfile
+  && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
+  && bundle remove decidim-design \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
-  && bundle install \
+  && bundle update \
   && bundle config set frozen true \
-  && bundle config set deployment true \
-  && rm bin/* \
-  && bundle binstubs --all \
-  && rails app:update:bin
+  && bundle config set deployment true
+
+##
+# Assets
+##
+FROM generator AS assets
+ENV SECRET_KEY_BASE=assets \
+    NODE_ENV=development \
+    RAILS_ENV=development \
+    DISABLE_SPRING=1 \
+    DECIDIM_SERVICE_WORKER_ENABLED=true
+
+RUN bundle config set frozen false \
+  && bundle config set deployment false \
+  && bundle config set without '' \
+  && bundle check || bundle install \
+  && npm install \
+  # Precompile assets
+  && bin/rails assets:precompile | grep  "webpack.*compiled" || exit 1  \
+  && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
 # Final Decidim Image
 ##
-FROM ubuntu:${UBUNTU_TAG:-latest} AS decidim
+FROM base AS decidim
 ARG BUILD_DATE
 ARG VCS_REF  
 ARG VERSION
@@ -198,39 +220,10 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 # Decidim Spam Detection
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
-
-# Install Node.js from NodeSource
-RUN apt-get update -yq \
-  && apt-get install -yq --no-install-recommends \
-    ca-certificates \
-    wget \
-    cron \
-    libpq5 \
-    libvips42 \
-    libyaml-0-2 \ 
-    libjemalloc2 \
-    tzdata \
-    zlib1g \
-  && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash -  \
-  && apt-get install -yq --no-install-recommends nodejs \
-  && apt-get purge -y --auto-remove wget \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache \
-## Set up user and working directory
-  && groupadd -g 1001 decidim \
-  && useradd -u 1001 -g decidim -m decidim \
-  && touch /etc/motd \
-  && chown decidim:decidim /etc/motd  \
-  && npm install -g yarn \
-  && rm -rf /home/ubuntu
-
-ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
-    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" 
-USER decidim
+    
 WORKDIR $WORK_DIR
-COPY --from=generator --chown=decidim:decidim /home/decidim /home/decidim
-RUN bundle config set path /home/decidim/vendor \
-    && (bundle check || exit 1)
+COPY --from=generator /home/decidim /home/decidim
+COPY --from=assets /home/decidim/public/decidim-packs /home/decidim/public/decidim-packs
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]

@@ -32,6 +32,9 @@ task :"docker:build:ubuntu", [:version] do |_, args|
       docker_cmd
     )
   end
+ensure
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
 end
 
 task :"docker:clean", [] do
@@ -91,6 +94,9 @@ task :"docker:push:ubuntu", [:version] do |_, args|
       end
     end
   end
+ensure
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
 end
 
 task :"docker:docs", [] do 
@@ -114,4 +120,7 @@ task :"docker:docs", [] do
     Docker::Task.put("Generating #{destination}")
     File.write(destination, ERB.new(template).result_with_hash(template_vars))
   end
+ensure
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
 end
