@@ -20,7 +20,7 @@ services:
       - decidim_public:/usr/share/nginx/html:ro
 
   decidim:
-    image: decidim/decidim:<%= prev_version.decidim_version %>
+    image: <%= registry_username %>/decidim:<%= prev_version.decidim_version %>
     ports:
       - "3000:3000"
     environment:

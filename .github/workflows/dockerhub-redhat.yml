@@ -13,7 +13,7 @@ on:
     - cron:  '0 19 * * *'
 
 jobs:
-  ubuntu-decidim-development:
+  redhat-decidim-development:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,7 +39,7 @@ jobs:
         run: |
           bundle exec rake docker:clean
           
-  ubuntu-decidim-last:
+  redhat-decidim-last:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -65,7 +65,7 @@ jobs:
         run: |
           bundle exec rake docker:clean
 
-  ubuntu-decidim-prev:
+  redhat-decidim-prev:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     # Needs to run after images pushes, as we will update images
     # descriptions
-    needs: [ubuntu-decidim-development, ubuntu-decidim-last, ubuntu-decidim-prev]
+    needs: [redhat-decidim-development, redhat-decidim-last, redhat-decidim-prev]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
