@@ -4,7 +4,7 @@ require 'active_support/core_ext/string'
 require_relative './lib/docker'
 require "byebug"
 
-def push_docker_images(distribution_singleton, args, push_default: false)
+def push_docker_images(distribution_singleton, args, version_limit: 3, push_default: false)
   if ENV["DOCKER_HUB_REGISTRY"].nil?
     Docker::Task.put("DOCKER_HUB_REGISTRY is not set")
     Docker::Task.help
@@ -12,7 +12,7 @@ def push_docker_images(distribution_singleton, args, push_default: false)
   end
   registry_username = ENV["DOCKER_HUB_REGISTRY"]
 
-  distribution_singleton.versionned_tag_names.first(3).each_with_index do |tag, index|
+  distribution_singleton.versionned_tag_names.first(version_limit).each_with_index do |tag, index|
     tag_version = tag.first
     tag_codename = tag.last
     
@@ -63,7 +63,7 @@ ensure
 end
 task :"docker:build:redhat", [:version] do |_, args|
   redhat = Docker::Redhat.instance
-  redhat.versionned_tag_names.first(3).each do |tag|
+  redhat.versionned_tag_names.first(2).each do |tag|
     tag_version = tag.first
     tag_codename = tag.last
     Docker::Task.put "Building redhat/#{tag_codename}:#{tag_version}"
@@ -98,7 +98,7 @@ ensure
 end
 
 task :"docker:push:redhat", [:version] do |_, args|
-  push_docker_images(Docker::Redhat.instance, args, push_default: true)
+  push_docker_images(Docker::Redhat.instance, args, version_limit: 2, push_default: true)
 end
 
 task :"docker:build:ubuntu", [:version] do |_, args|
@@ -158,7 +158,7 @@ task :"docker:docs", [] do
     redhat_tag: redhat_tag.first,
     redhat_repo: redhat_tag.last,
     ubuntu_alternatives: Docker::Ubuntu.instance.versionned_tag_names.first(3),
-    redhat_alternatives: Docker::Redhat.instance.versionned_tag_names.first(3)
+    redhat_alternatives: Docker::Redhat.instance.versionned_tag_names.first(2)
   }
   # Foreach templates/**/* files, read the file, replace the variables and write the result
   Dir.glob(File.join(__dir__, "templates", "**", "*.erb")).each do |file|

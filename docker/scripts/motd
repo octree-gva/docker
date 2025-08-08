@@ -19,7 +19,7 @@ v<%= decidim_version %>
 rails env:\t<%= rails_env %>
 home:\t\t/home/decidim
 user:\t\t<%= whoami %>
-ruby#<%= ruby_version %>,bundler#<%= bundler_version %>,node#<%= node_version %>,ubuntu#<%= os_version %>
+ruby#<%= ruby_version %>,bundler#<%= bundler_version %>,node#<%= node_version %>,os#<%= os_version %>
 MOTD
 	template_motd = ERB.new(motd_content)
 	  

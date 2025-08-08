@@ -21,15 +21,18 @@ ENV TZ=UTC \
     RUBY_VERSION=$RUBY_VERSION \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/usr/bin:${PATH}"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
 # Single comprehensive package installation
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${REDHAT_MAJOR_VERSION}.noarch.rpm \
-&& dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${REDHAT_MAJOR_VERSION}.rpm \
-&& dnf install -y \
+RUN dnf config-manager --set-enabled crb || dnf config-manager --set-enabled powertools || true \
+  && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${REDHAT_MAJOR_VERSION}.noarch.rpm \
+  && /usr/bin/crb enable \
+  && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${REDHAT_MAJOR_VERSION}.rpm \
+  && dnf config-manager --set-enabled remi \
+  && dnf install -y \
     gcc \
     gcc-c++ \
     make \
@@ -41,7 +44,6 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${R
     libicu-devel \
     postgresql-devel \
     openssl-devel \
-    vips \
     libxml2-devel \
     libxslt-devel \
     libyaml-devel \
@@ -51,6 +53,8 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${R
     tzdata \
     vim \
     zlib-devel \
+    orc \
+    vips vips-tools \
   # Install Node.js from NodeSource
   && curl -fsSL https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && dnf install -y nodejs \
@@ -112,6 +116,7 @@ COPY ./context .
 
 # Install app dependencies
 RUN bundle config set without "development:test" \
+  && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   # Remove decidim-conferences, decidim-initiatives, decidim-templates gems from Gemfile
   && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
@@ -225,8 +230,12 @@ ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
     
 WORKDIR $WORK_DIR
-COPY --from=generator /home/decidim /home/decidim
-COPY --from=assets /home/decidim/public/decidim-packs /home/decidim/public/decidim-packs
+
+COPY --from=generator /home/decidim .
+COPY --from=assets /home/decidim/public/decidim-packs public/decidim-packs
+COPY ./scripts/motd bin/write_motd
+RUN bundle check || bundle install \
+  && bundle exec bin/write_motd && rm bin/write_motd
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]

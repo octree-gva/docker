@@ -109,6 +109,7 @@ COPY ./context .
 
 # Install app dependencies
 RUN bundle config set without "development:test" \
+  && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   # Remove decidim-conferences, decidim-initiatives, decidim-templates gems from Gemfile
   && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
@@ -222,8 +223,12 @@ ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
     
 WORKDIR $WORK_DIR
-COPY --from=generator /home/decidim /home/decidim
-COPY --from=assets /home/decidim/public/decidim-packs /home/decidim/public/decidim-packs
+
+COPY --from=generator /home/decidim .
+COPY --from=assets /home/decidim/public/decidim-packs public/decidim-packs
+COPY ./scripts/motd bin/write_motd
+RUN bundle check || bundle install \
+  && bundle exec bin/write_motd && rm bin/write_motd
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
