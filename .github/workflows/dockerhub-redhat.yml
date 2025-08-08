@@ -1,4 +1,4 @@
-name: Build docker images
+name: Build Decidim Docker images (Redhat)
 
 env:
   VERBOSE: 1
@@ -9,8 +9,8 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    # Every day at 17:30, we udpdate images
-    - cron:  '30 17 * * *'
+    # Every day at 19:00, we udpdate images
+    - cron:  '0 19 * * *'
 
 jobs:
   ubuntu-decidim-development:
@@ -31,10 +31,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build:ubuntu[dev]
+          bundle exec rake docker:build:redhat[dev]
       - name: Push image
         run: |
-          bundle exec rake docker:push:ubuntu[dev]
+          bundle exec rake docker:push:redhat[dev]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean
@@ -57,10 +57,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build:ubuntu[last]
+          bundle exec rake docker:build:redhat[last]
       - name: Push image
         run: |
-          bundle exec rake docker:push:ubuntu[last]
+          bundle exec rake docker:push:redhat[last]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean
@@ -83,10 +83,10 @@ jobs:
       - name: Build image
         run: |
           bundle install
-          bundle exec rake docker:build:ubuntu[prev]
+          bundle exec rake docker:build:redhat[prev]
       - name: Push image
         run: |
-          bundle exec rake docker:push:ubuntu[prev]
+          bundle exec rake docker:push:redhat[prev]
       - name: Clean Docker clone directory
         run: |
           bundle exec rake docker:clean

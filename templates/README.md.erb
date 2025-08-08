@@ -19,16 +19,19 @@
     <a href="https://github.com/decidim/decidim">Decidim main repository</a></p>
 </p>
 
-# Dockerhub
-We publish daily three images, based on `ubuntu:<%= base_image_tag %>`. 
+# Decidim on Docker
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:<%= ubuntu_tag %>`).
+To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
+
+## Available tags
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `<%= develop_version.decidim_version %>`) |
 | `:<%= last_version.decidim_version %>` | Last version |
 | `:<%= prev_version.decidim_version %>` | Stable version, security and bug fixes only |
 
-For older distributions, we also publish these images: 
-<% base_image_alternatives[1..].map do |tag|
+To use older ubuntu distributions, these are available: 
+<% ubuntu_alternatives[1..].map do |tag|
   distrib_name = tag.last
   {
     title: distrib_name.titleize + " (ubuntu #{tag.first})", 
@@ -42,6 +45,23 @@ end.each do |info| %>
 **<%= info[:title] %>**  
 * <%= info[:tags].join(", ") %>
 <% end %>
+
+And to use Redhat, you can use these: 
+<% redhat_alternatives.map do |tag|
+  distrib_name = tag.last
+  {
+    title: distrib_name.titleize + " (Entreprise Linux #{tag.first})", 
+    tags: [
+      "`:#{distrib_name}-#{develop_version.decidim_version}`",
+      "`:#{distrib_name}-#{last_version.decidim_version}`",
+      "`:#{distrib_name}-#{prev_version.decidim_version}`"
+    ]
+  }
+end.each do |info| %>
+**<%= info[:title] %>**  
+* <%= info[:tags].join(", ") %>
+<% end %>
+
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.

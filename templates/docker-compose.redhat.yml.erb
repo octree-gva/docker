@@ -1,9 +1,9 @@
 # NOTICE
 # [`rake docker:docs`] This file is generated from a template
-#   @see ./templates/docker-compose.yml.erb
+#   @see ./templates/docker-compose.redhat.yml.erb
 
 
-# Docker compose file to test locally builds for ubuntu
+# Docker compose file to test locally builds for redhat
 x-default: &default
   depends_on:
     - db
@@ -17,15 +17,16 @@ x-default-environment: &default-environment
 
 x-default-build: &default-build
   context: ./docker
-  dockerfile: ./ubuntu/Dockerfile
+  dockerfile: ./redhat/Dockerfile
 
 services:
-  decidim-development:
+  redhat-decidim-development:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        REDHAT_TAG: "<%= redhat_tag %>"
+        REDHAT_REPO: "<%= redhat_repo %>"
         <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
@@ -34,12 +35,13 @@ services:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
-  decidim-last-stable:
+  redhat-decidim-last-stable:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        REDHAT_TAG: "<%= redhat_tag %>"
+        REDHAT_REPO: "<%= redhat_repo %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -48,12 +50,13 @@ services:
       REDIS_URL: redis://redis:6379/1
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
 
-  decidim-prev-stable:
+  redhat-decidim-prev-stable:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        REDHAT_TAG: "<%= redhat_tag %>"
+        REDHAT_REPO: "<%= redhat_repo %>"
         <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"

@@ -2,47 +2,9 @@ require 'dotenv/load'
 require 'erb'
 require 'active_support/core_ext/string'
 require_relative './lib/docker'
+require "byebug"
 
-
-task :"docker:build:ubuntu", [:version] do |_, args|
-  Docker::Ubuntu.instance.versionned_tag_names.first(3).each do |tag|
-    tag_version = tag.first
-    tag_codename = tag.last
-    Docker::Task.put "Building ubuntu:#{tag_version} (#{tag_codename})"
-
-    version = case args[:version]
-      when "dev" then Decidim::Decidim.instance.versions[0]
-      when "last" then Decidim::Decidim.instance.versions[1]
-      when "prev" then Decidim::Decidim.instance.versions[2]
-      else
-        Docker::Task.help
-        exit 1
-    end
-
-    docker_args_h = {UBUNTU_TAG: tag_version}.merge(version.docker_args)
-    decidim_tag = "#{tag_codename}-#{version.decidim_version}"
-    docker_args = docker_args_h.map do |key, value|
-      "--build-arg='#{key}=#{value}'"
-    end.join(" ")
-    docker_cmd = ["docker", "build", "--file=docker/Dockerfile.ubuntu", "--tag=decidim:#{decidim_tag}", *docker_args].join(" ")
-    docker_cmd += " ./docker"
-
-    Docker::Task.put("Build Arguments\n#{docker_args_h.map { |key, value| "  * #{key}: #{value}" }.join("\n")}")
-    Docker::Task.system!(
-      docker_cmd
-    )
-  end
-ensure
-  Decidim::Decidim.instance.clean_clone
-  Docker::Task.put("decidim-clone directory removed")
-end
-
-task :"docker:clean", [] do
-  Decidim::Decidim.instance.clean_clone
-  Docker::Task.put("decidim-clone directory removed")
-end
-
-task :"docker:push:ubuntu", [:version] do |_, args|
+def push_docker_images(distribution_singleton, args, push_default: false)
   if ENV["DOCKER_HUB_REGISTRY"].nil?
     Docker::Task.put("DOCKER_HUB_REGISTRY is not set")
     Docker::Task.help
@@ -50,7 +12,7 @@ task :"docker:push:ubuntu", [:version] do |_, args|
   end
   registry_username = ENV["DOCKER_HUB_REGISTRY"]
 
-  Docker::Ubuntu.instance.versionned_tag_names.first(3).each_with_index do |tag, index|
+  distribution_singleton.versionned_tag_names.first(3).each_with_index do |tag, index|
     tag_version = tag.first
     tag_codename = tag.last
     
@@ -64,7 +26,7 @@ task :"docker:push:ubuntu", [:version] do |_, args|
     end
     source_tag = "#{tag_codename}-#{version.decidim_version}"
     Docker::Task.put("Prepare #{version.decidim_version}")
-    if index == 0
+    if index == 0 && push_default
       version.parsed_version[1..].each do |dest_version|
         dest_version = "#{dest_version}"
         destination_tag = "#{registry_username}/decidim:#{dest_version}"
@@ -97,10 +59,93 @@ task :"docker:push:ubuntu", [:version] do |_, args|
 ensure
   Decidim::Decidim.instance.clean_clone
   Docker::Task.put("decidim-clone directory removed")
+
+end
+task :"docker:build:redhat", [:version] do |_, args|
+  redhat = Docker::Redhat.instance
+  redhat.versionned_tag_names.first(3).each do |tag|
+    tag_version = tag.first
+    tag_codename = tag.last
+    Docker::Task.put "Building redhat/#{tag_codename}:#{tag_version}"
+    version = case args[:version]
+    when "dev" then Decidim::Decidim.instance.versions[0]
+    when "last" then Decidim::Decidim.instance.versions[1]
+    when "prev" then Decidim::Decidim.instance.versions[2]
+    else
+      Docker::Task.help
+      exit 1
+    end
+    docker_args_h = {
+      REDHAT_REPO: tag_codename, 
+      REDHAT_MAJOR_VERSION: tag_version,
+      REDHAT_TAG: tag_version
+    }.merge(version.docker_args)
+    decidim_tag = "#{tag_codename}-#{version.decidim_version}"
+    docker_args = docker_args_h.map do |key, value|
+      "--build-arg='#{key}=#{value}'"
+    end.join(" ")
+    docker_cmd = ["docker", "build", "--file=docker/redhat/Dockerfile", "--tag=decidim:#{decidim_tag}", *docker_args].join(" ")
+    docker_cmd += " ./docker"
+
+    Docker::Task.put("Build Arguments\n#{docker_args_h.map { |key, value| "  * #{key}: #{value}" }.join("\n")}")
+    Docker::Task.system!(
+      docker_cmd
+    )
+  end
+ensure
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
+end
+
+task :"docker:push:redhat", [:version] do |_, args|
+  push_docker_images(Docker::Redhat.instance, args, push_default: true)
+end
+
+task :"docker:build:ubuntu", [:version] do |_, args|
+  Docker::Ubuntu.instance.versionned_tag_names.first(3).each do |tag|
+    tag_version = tag.first
+    tag_codename = tag.last
+    Docker::Task.put "Building ubuntu:#{tag_version} (#{tag_codename})"
+
+    version = case args[:version]
+      when "dev" then Decidim::Decidim.instance.versions[0]
+      when "last" then Decidim::Decidim.instance.versions[1]
+      when "prev" then Decidim::Decidim.instance.versions[2]
+      else
+        Docker::Task.help
+        exit 1
+    end
+
+    docker_args_h = {UBUNTU_TAG: tag_version}.merge(version.docker_args)
+    decidim_tag = "#{tag_codename}-#{version.decidim_version}"
+    docker_args = docker_args_h.map do |key, value|
+      "--build-arg='#{key}=#{value}'"
+    end.join(" ")
+    docker_cmd = ["docker", "build", "--file=docker/ubuntu/Dockerfile", "--tag=decidim:#{decidim_tag}", *docker_args].join(" ")
+    docker_cmd += " ./docker"
+
+    Docker::Task.put("Build Arguments\n#{docker_args_h.map { |key, value| "  * #{key}: #{value}" }.join("\n")}")
+    Docker::Task.system!(
+      docker_cmd
+    )
+  end
+ensure
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
+end
+
+task :"docker:push:ubuntu", [:version] do |_, args|
+  push_docker_images(Docker::Ubuntu.instance, args, push_default: true)
+end
+
+task :"docker:clean", [] do
+  Decidim::Decidim.instance.clean_clone
+  Docker::Task.put("decidim-clone directory removed")
 end
 
 task :"docker:docs", [] do 
-  base_image_tag = Docker::Ubuntu.instance.latest
+  ubuntu_tag = Docker::Ubuntu.instance.latest
+  redhat_tag = Docker::Redhat.instance.latest
   versions = Decidim::Decidim.instance.versions
 
   template_vars = {
@@ -109,8 +154,11 @@ task :"docker:docs", [] do
     develop_version: versions[0],
     last_version: versions[1],
     prev_version: versions[2],
-    base_image_tag: base_image_tag.first,
-    base_image_alternatives: Docker::Ubuntu.instance.versionned_tag_names.first(3)
+    ubuntu_tag: ubuntu_tag.first,
+    redhat_tag: redhat_tag.first,
+    redhat_repo: redhat_tag.last,
+    ubuntu_alternatives: Docker::Ubuntu.instance.versionned_tag_names.first(3),
+    redhat_alternatives: Docker::Redhat.instance.versionned_tag_names.first(3)
   }
   # Foreach templates/**/* files, read the file, replace the variables and write the result
   Dir.glob(File.join(__dir__, "templates", "**", "*.erb")).each do |file|
