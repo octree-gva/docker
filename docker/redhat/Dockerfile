@@ -27,11 +27,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
 # Single comprehensive package installation
-RUN dnf update -y \
-&& dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${REDHAT_MAJOR_VERSION}.noarch.rpm \
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${REDHAT_MAJOR_VERSION}.noarch.rpm \
 && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${REDHAT_MAJOR_VERSION}.rpm \
-&& dnf upgrade -y \
-  && dnf install -y \
+&& dnf install -y \
     gcc \
     gcc-c++ \
     make \
