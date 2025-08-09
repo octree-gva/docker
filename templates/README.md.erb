@@ -63,18 +63,6 @@ alternatives.each do |info| %>| <%= info[:title] %> | <%= info[:tags][0]%> | <%=
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.
 
-## Eject you decidim instance
-You want to publish your instance on a git? 
-You can copy all files of your decidim container in your local environment with `docker cp`
-
-```bash
-docker-compose up -d
-docker cp decidim:/home/decidim ready-to-publish # Wait the command finishes!
-cd ready-to-publish && git init
-# Follow your git client instructions to upload this repo to github
-```
-
-Once ejected, you will have a Dockerfile and docker-compose ready to use on your ejected application.
 
 ## Environments configurations
 >  🔐: be sure to read the [good practices](#good-practices) ;)

@@ -5,7 +5,7 @@ module Docker
     include Singleton
     include Docker::Concern::DockerHubImage
     def name
-      "ubuntu"
+      "Ubuntu"
     end
     
     def repository

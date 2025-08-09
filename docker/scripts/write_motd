@@ -8,6 +8,7 @@ def find_version(gem_name)
 	match.version
 end
 
+system("bundle check || bundle install", exception: true)
 Dir.chdir("/home/decidim") do 
 	puts "#{__FILE__}:"
 	motd_content = <<~MOTD
@@ -18,8 +19,9 @@ v<%= decidim_version %>
 
 rails env:\t<%= rails_env %>
 home:\t\t/home/decidim
-user:\t\t<%= whoami %>
-ruby#<%= ruby_version %>,bundler#<%= bundler_version %>,node#<%= node_version %>,os#<%= os_version %>
+build:\t\t#<%= os_version %>, <%= build_date %>
+
+ruby#<%= ruby_version %>,bundler#<%= bundler_version %>,node#<%= node_version %>
 MOTD
 	template_motd = ERB.new(motd_content)
 	  
@@ -30,8 +32,10 @@ MOTD
 		ruby_version: ENV.fetch("RUBY_VERSION"),
 		bundler_version: ENV.fetch("BUNDLER_VERSION"),
 		whoami: %x(whoami).strip,
+		build_date: Time.now.strftime("%Y-%m-%d %H:%M:%S"),
 		os_version: File.read("/etc/os-release").match(/VERSION_ID="([^"]+)"/)[1]
 	))
 	puts "    ✅ /etc/motd updated"
-	exit 0
 end
+
+exit 0

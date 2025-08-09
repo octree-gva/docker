@@ -46,6 +46,7 @@ RUN apt-get update -yq \
     tzdata \
     vim \
     zlib1g-dev \
+    cron \
   # Install Node.js from NodeSource
   && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends nodejs \
@@ -133,9 +134,9 @@ RUN bundle config set frozen false \
   && bundle config set deployment false \
   && bundle config set without '' \
   && bundle check || bundle install \
-  && npm install \
-  # Precompile assets
-  && bin/rails assets:precompile \
+  && npm install
+
+RUN bundle execrails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
@@ -221,14 +222,23 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 # Decidim Spam Detection
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
+
+RUN rm -rf $WORK_DIR \
+    && groupadd -g 1000 decidim \
+    && useradd -m -u 1000 -g decidim -d $WORK_DIR -s /bin/bash decidim
     
 WORKDIR $WORK_DIR
 
 COPY --from=generator /home/decidim .
 COPY --from=assets /home/decidim/public/decidim-packs public/decidim-packs
-COPY ./scripts/motd bin/write_motd
-RUN bundle check || bundle install \
-  && bundle exec bin/write_motd && rm bin/write_motd
+COPY ./scripts/write_motd bin/write_motd
+
+RUN bundle exec bin/write_motd && rm bin/write_motd \
+    && crontab -u decidim /home/decidim/crontab.d/crontab
+
+USER decidim
+RUN bundle check || bundle install 
+
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]

@@ -157,6 +157,7 @@ task :"docker:docs", [] do
     ubuntu_tag: ubuntu_tag.first,
     redhat_tag: redhat_tag.first,
     redhat_repo: redhat_tag.last,
+    registry_username: ENV.fetch("DOCKER_HUB_REGISTRY", "decidim"),
     ubuntu_alternatives: Docker::Ubuntu.instance.versionned_tag_names.first(3),
     redhat_alternatives: Docker::Redhat.instance.versionned_tag_names.first(2)
   }
