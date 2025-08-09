@@ -1,9 +1,9 @@
 # NOTICE
 # [`rake docker:docs`] This file is generated from a template
-#   @see ./templates/docker-compose.yml.erb
+#   @see ./templates/docker-compose.redhat.yml.erb
 
 
-# Docker compose file to test locally builds for ubuntu
+# Docker compose file to test locally builds for redhat
 x-default: &default
   depends_on:
     - db
@@ -17,15 +17,16 @@ x-default-environment: &default-environment
 
 x-default-build: &default-build
   context: ./docker
-  dockerfile: ./ubuntu/Dockerfile
+  dockerfile: ./redhat/Dockerfile
 
 services:
-  decidim-development:
+  redhat-decidim-development:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        REDHAT_TAG: "10.0"
+        REDHAT_REPO: "ubi10"
         DECIDIM_VERSION: "0.31.0.dev"
         DECIDIM_BRANCH: "develop"
         NODE_MAJOR_VERSION: "22"
@@ -33,7 +34,7 @@ services:
         RUBY_VERSION: "3.3.4"
         VCS_REF: "4b6c35635ba04e2d08ec650f8354e1733a1cf560"
         VERSION: "0.31.0.dev"
-        BUILD_DATE: "2025-08-09T10:37:03+00:00"
+        BUILD_DATE: "2025-08-09T10:37:01+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -41,12 +42,13 @@ services:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
-  decidim-last-stable:
+  redhat-decidim-last-stable:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        REDHAT_TAG: "10.0"
+        REDHAT_REPO: "ubi10"
         DECIDIM_VERSION: "0.30.1"
         DECIDIM_BRANCH: "release/0.30-stable"
         NODE_MAJOR_VERSION: "18"
@@ -54,7 +56,7 @@ services:
         RUBY_VERSION: "3.3.4"
         VCS_REF: "07e137214f04a0dfdcdbb03edc79560ca4cd3953"
         VERSION: "0.30.1"
-        BUILD_DATE: "2025-08-09T10:37:03+00:00"
+        BUILD_DATE: "2025-08-09T10:37:02+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -62,12 +64,13 @@ services:
       REDIS_URL: redis://redis:6379/1
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
 
-  decidim-prev-stable:
+  redhat-decidim-prev-stable:
     <<: *default
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        REDHAT_TAG: "10.0"
+        REDHAT_REPO: "ubi10"
         DECIDIM_VERSION: "0.29.4"
         DECIDIM_BRANCH: "release/0.29-stable"
         NODE_MAJOR_VERSION: "18"
