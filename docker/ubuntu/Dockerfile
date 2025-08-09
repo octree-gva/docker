@@ -135,7 +135,7 @@ RUN bundle config set frozen false \
   && bundle check || bundle install \
   && npm install \
   # Precompile assets
-  && bin/rails assets:precompile | grep  "webpack.*compiled" || exit 1  \
+  && bin/rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
