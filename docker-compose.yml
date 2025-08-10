@@ -33,7 +33,7 @@ services:
         RUBY_VERSION: "3.3.4"
         VCS_REF: "4b6c35635ba04e2d08ec650f8354e1733a1cf560"
         VERSION: "0.31.0.dev"
-        BUILD_DATE: "2025-08-09T19:41:04+00:00"
+        BUILD_DATE: "2025-08-10T19:42:40+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -54,7 +54,7 @@ services:
         RUBY_VERSION: "3.3.4"
         VCS_REF: "07e137214f04a0dfdcdbb03edc79560ca4cd3953"
         VERSION: "0.30.1"
-        BUILD_DATE: "2025-08-09T19:41:04+00:00"
+        BUILD_DATE: "2025-08-10T19:42:40+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -75,7 +75,7 @@ services:
         RUBY_VERSION: "3.2.2"
         VCS_REF: "d6d17c566caa98f91112ff786e7af67cb0c4faa3"
         VERSION: "0.29.4"
-        BUILD_DATE: "2025-08-09T19:41:04+00:00"
+        BUILD_DATE: "2025-08-10T19:42:40+00:00"
     ports:
       - "3003:3000"
     environment:
