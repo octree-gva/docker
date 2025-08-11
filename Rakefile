@@ -71,9 +71,9 @@ def push_docker_images(distribution_singleton, args, push_default: false)
         dest_version = "#{dest_version}"
         destination_tag = "#{registry_username}/decidim:#{dest_version}"
         Docker::Task.put("tagging #{destination_tag}")
-        
         Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
         if ENV["DRY_RUN"] == "1"
+          Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
           Docker::Task.put("DRY_RUN: skip push")
         else
           Docker::Task.system!("docker", "push", destination_tag)
@@ -83,14 +83,15 @@ def push_docker_images(distribution_singleton, args, push_default: false)
     end
     # 0.29.2 will push tags for `0.29` and `0.29.2`
     version.version_aliases[1..].each do |dest_version|
-      dest_version = "#{tag_codename}-#{dest_version}"
+      dest_version = tag.docker_tag(dest_version)
       destination_tag = "#{registry_username}/decidim:#{dest_version}"
       Docker::Task.put("tagging #{destination_tag}")
       
-      Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
       if ENV["DRY_RUN"] == "1"
-        Docker::Task.put("DRY_RUN: skip push")
+        Docker::Task.put("DRY_RUN: docker tag decidim:#{source_tag} #{destination_tag}")
+        Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
       else
+        Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
         Docker::Task.system!("docker", "push", destination_tag)
         Docker::Task.put("pushed #{destination_tag}")
       end
@@ -106,7 +107,7 @@ task :"docker:build:redhat", [:version] do |_, args|
 end
 
 task :"docker:push:redhat", [:version] do |_, args|
-  push_docker_images(Docker::Redhat.instance, args, push_default: true)
+  push_docker_images(Docker::Redhat.instance, args, push_default: false)
 end
 
 task :"docker:build:ubuntu", [:version] do |_, args|
