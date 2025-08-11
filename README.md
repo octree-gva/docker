@@ -19,38 +19,28 @@
     <a href="https://github.com/decidim/decidim">Decidim main repository</a></p>
 </p>
 
-# Dockerhub
-We publish daily three images, based on `ubuntu:25.04`. 
+# Decidim on Docker
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:25.04`).
+To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
+
+## Available tags
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
 | `:0.30.1` | Last version |
 | `:0.29.4` | Stable version, security and bug fixes only |
 
-For older distributions, we also publish these images: 
+To use other distributions, these are available: 
 
-**Noble (ubuntu 24.04)**  
-* `:noble-0.31.0.dev`, `:noble-0.30.1`, `:noble-0.29.4`
+| Distribution | 0.31.0.dev | 0.30.1 | 0.29.4 |
+| --- | --- | --- | --- |
+| Ubuntu Noble v24.04 | `:noble-0.31.0.dev` | `:noble-0.30.1` | `:noble-0.29.4` || Ubuntu Jammy v22.04 | `:jammy-0.31.0.dev` | `:jammy-0.30.1` | `:jammy-0.29.4` || Redhat Ubi10 v10.0 | `:ubi10-0.31.0.dev` | `:ubi10-0.30.1` | `:ubi10-0.29.4` || Redhat Ubi9 v9.6 | `:ubi9-0.31.0.dev` | `:ubi9-0.30.1` | `:ubi9-0.29.4` |
 
-**Jammy (ubuntu 22.04)**  
-* `:jammy-0.31.0.dev`, `:jammy-0.30.1`, `:jammy-0.29.4`
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.
 
-## Eject you decidim instance
-You want to publish your instance on a git? 
-You can copy all files of your decidim container in your local environment with `docker cp`
-
-```bash
-docker-compose up -d
-docker cp decidim:/home/decidim ready-to-publish # Wait the command finishes!
-cd ready-to-publish && git init
-# Follow your git client instructions to upload this repo to github
-```
-
-Once ejected, you will have a Dockerfile and docker-compose ready to use on your ejected application.
 
 ## Environments configurations
 >  🔐: be sure to read the [good practices](#good-practices) ;)
