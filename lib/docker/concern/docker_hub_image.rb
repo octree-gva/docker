@@ -4,6 +4,12 @@ module Docker
       extend ActiveSupport::Concern
 
       included do    
+        def name
+          "Unknown"
+        end
+        def version_count
+          3
+        end
         def latest
           @latest ||= versionned_tag_names.first
         end
@@ -14,20 +20,12 @@ module Docker
         # of [tag_name, codename]
         # Example: [["1.0.0", "questing"], ["1.0.1", "questing"]]
         def versionned_tag_names
-          @versionned_tag_names ||= begin
-            picked_major_versions = []
-            tag_names = tags do |tag|
-              next unless tag.name.match?(/^\d+\.\d+$/) || !tag.name || "#{tag.name}".empty?
-              major_version = "#{tag.name}".split(".").first
-              next if picked_major_versions.include?(major_version)
-              picked_major_versions << major_version
-              tag.name
-            end.select { |tag| !tag.nil? }
-            tag_names.map { |tag_name| [tag_name, codename_for(tag_name)] }
-          end
+          versionned_tags.first(version_count)
         end
 
+        
         private 
+        
           ##
           # Iterate over available tags of the repository to execute a block.
           def tags(&block)

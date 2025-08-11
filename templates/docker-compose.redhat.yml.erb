@@ -1,8 +1,7 @@
 # NOTICE
 # [`rake docker:docs`] This file is generated from a template
-#   @see ./templates/docker-compose.redhat.yml.erb
-
-
+#   @see ./templates/docker-compose.redhat.yml.erb for contributing
+<% latest_redhat = redhat.latest %>
 # Docker compose file to test locally builds for redhat
 x-default: &default
   depends_on:
@@ -25,8 +24,8 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= redhat_tag %>"
-        REDHAT_REPO: "<%= redhat_repo %>"
+        REDHAT_TAG: "<%= latest_redhat.os_version %>"
+        REDHAT_REPO: "<%= latest_redhat.os_name %>"
         <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
@@ -40,8 +39,8 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= redhat_tag %>"
-        REDHAT_REPO: "<%= redhat_repo %>"
+        REDHAT_TAG: "<%= latest_redhat.os_version %>"
+        REDHAT_REPO: "<%= latest_redhat.os_name %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -55,8 +54,8 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= redhat_tag %>"
-        REDHAT_REPO: "<%= redhat_repo %>"
+        REDHAT_TAG: "<%= latest_redhat.os_version %>"
+        REDHAT_REPO: "<%= latest_redhat.os_name %>"
         <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"

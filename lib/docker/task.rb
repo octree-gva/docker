@@ -1,7 +1,7 @@
 module Docker
   module Task
     def self.verbose?
-      ENV["VERBOSE"] && ENV["VERBOSE"] == "1"
+      !ENV["VERBOSE"] || ENV["VERBOSE"] == "0"
     end
     ## Print a message if VERBOSE is set
     def self.put(message)

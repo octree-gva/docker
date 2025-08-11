@@ -1,4 +1,5 @@
 # Configure crontab to run scripts in the related crontab.d directory
+# To disable cron, set DECIDIM_CRON_ENABLED=false
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
@@ -10,7 +11,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 # *  *  *  *  * user-name command to be executed
-0 0 * * * decidim cd ~ && run-parts --report ./crontab.d/daily
-0 * * * * decidim cd ~ && run-parts --report ./crontab.d/hourly
-0 0 * * 0 decidim cd ~ && run-parts --report ./crontab.d/weekly
-0 0 1 * * decidim cd ~ && run-parts --report ./crontab.d/monthly
+0 0 * * * decidim cd ~ && [ "$DECIDIM_CRON_ENABLED" = "true" ] && run-parts --report ./crontab.d/daily
+0 * * * * decidim cd ~ && [ "$DECIDIM_CRON_ENABLED" = "true" ] && run-parts --report ./crontab.d/hourly
+0 0 * * 0 decidim cd ~ && [ "$DECIDIM_CRON_ENABLED" = "true" ] && run-parts --report ./crontab.d/weekly
+0 0 1 * * decidim cd ~ && [ "$DECIDIM_CRON_ENABLED" = "true" ] && run-parts --report ./crontab.d/monthly

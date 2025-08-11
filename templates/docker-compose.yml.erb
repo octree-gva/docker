@@ -1,8 +1,7 @@
 # NOTICE
 # [`rake docker:docs`] This file is generated from a template
-#   @see ./templates/docker-compose.yml.erb
-
-
+#   @see ./templates/docker-compose.yml.erb for contributing
+<% latest_ubuntu = ubuntu.latest %>
 # Docker compose file to test locally builds for ubuntu
 x-default: &default
   depends_on:
@@ -25,7 +24,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
         <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
@@ -39,7 +38,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -53,7 +52,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= ubuntu_tag %>"
+        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
         <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"

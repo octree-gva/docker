@@ -1,7 +1,7 @@
 <!--
  NOTICE
  [`rake docker:docs`] This file is generated from a template
-    @see ./templates/README.md.erb
+    @see ./templates/README.md.erb for contributing
 -->
 
 [![Docker Hub](https://img.shields.io/docker/cloud/build/eaudeweb/scratch?label=Docker%20Hub&style=flat)](https://hub.docker.com/u/decidim)
@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:<%= ubuntu_tag %>`).
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:<%= ubuntu.latest.os_name %>`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -32,31 +32,18 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 
 To use other distributions, these are available: 
 
-| Distribution | <%= develop_version.decidim_version %> | <%= last_version.decidim_version %> | <%= prev_version.decidim_version %> |
+| Operating System | Decidim v<%= develop_version.decidim_version %> | Decidim v<%= last_version.decidim_version %> | Decidim v<%= prev_version.decidim_version %> |
 | --- | --- | --- | --- |
-<% 
-alternatives = ubuntu_alternatives[1..].map do |tag|
-  distrib_name = tag.last
-  {
-    title: "Ubuntu " + distrib_name.titleize + " v#{tag.first}", 
-    tags: [
-      "`:#{distrib_name}-#{develop_version.decidim_version}`",
-      "`:#{distrib_name}-#{last_version.decidim_version}`",
-      "`:#{distrib_name}-#{prev_version.decidim_version}`"
-    ]
-  }
-end + redhat_alternatives.map do |tag|
-  distrib_name = tag.last
-  {
-    title: "Redhat " + distrib_name.titleize + " v#{tag.first}", 
-    tags: [
-      "`:#{distrib_name}-#{develop_version.decidim_version}`",
-      "`:#{distrib_name}-#{last_version.decidim_version}`",
-      "`:#{distrib_name}-#{prev_version.decidim_version}`"
-    ]
-  }
-end
-alternatives.each do |info| %>| <%= info[:title] %> | <%= info[:tags][0]%> | <%= info[:tags][1]%> | <%= info[:tags][2]%> |<% end %>
+<%= (ubuntu.versionned_tag_names + redhat.versionned_tag_names).map do |tag|
+  line = [
+    tag.os_human_name,
+    "`:#{tag.docker_tag(develop_version.decidim_version)}`",
+    "`:#{tag.docker_tag(last_version.decidim_version)}`",
+    "`:#{tag.docker_tag(prev_version.decidim_version)}`"
+  ]
+  "| #{line.join(" | ")} |"
+end.join("\n") 
+%>
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -71,6 +58,7 @@ Ready to mount a Decidim installation locally in 5min?
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
 | DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `my_insecure_password` |
+| DECIDIM_CRON_ENABLED | If cron should be enabled | `true` |
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `my_insecure_password` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `my_insecure_password` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
@@ -146,7 +134,6 @@ Theses commands will run on each container restart:
 * **15_wait_for_it**: Run a [wait-for-it](./docker/bin/wait-for-it) for dependancies: `REDIS_URL`, `DATABASE_URL` and `MEMCACHE_SERVERS` are supported.
 * **35_bundle_check**: Check if all your gems are installed.
 * **36_db_check**: Check if your database is up, and if not, try to migrate it.
-* **45_template**: Set the motd file to have a welcome message that display current setup.
 * **50_upsert-sysadmin**: From environment variables `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD`, update the first /system administrator.
 
 ### Command
@@ -175,7 +162,8 @@ This repository automates publishing Decidim versions as Docker containers and g
 
 **Docker Image Automation**
 
-* `bundle exec rake docker:build[version]`: Builds Decidim Docker images for a given version (`dev`, `last`, or `prev`), using the Rake task.
+* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, or `prev`).
+* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, or `prev`).
 
 **Documentation Generation**
 
@@ -188,7 +176,7 @@ This repository automates publishing Decidim versions as Docker containers and g
 ###  Repository Structure
 * `contrib/`: Supporting files for nginx and docker-hub apis.
 * `docker/`: Docker context files, old aditional scripts like cron and entrypoints
-* `docker/Dockerfile`: Main dockerfile
+* `docker/{ubuntu,redhat}/Dockerfile`: Dockerfile for each distribution
 * `lib/`: Contains core classes and modules for version management and Docker image creation.
 * `templates/`: Holds ERB templates for Docker configurations and documentation.
 * `Rakefile`: Define the rake tasks of this repo.

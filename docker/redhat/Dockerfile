@@ -1,11 +1,11 @@
-ARG REDHAT_REPO
-ARG REDHAT_MAJOR_VERSION=10
-ARG REDHAT_TAG
-ARG NODE_MAJOR_VERSION=20
+ARG OS_NAME=ubi10
+ARG OS_MAJOR_VERSION=10
+ARG OS_VERSION=10.0
+ARG NODE_MAJOR_VERSION
 
 # Single base with all dependencies
-FROM redhat/${REDHAT_REPO}:${REDHAT_TAG:-latest} AS base
-ARG REDHAT_MAJOR_VERSION
+FROM redhat/${OS_NAME}:${OS_VERSION} AS base
+ARG OS_MAJOR_VERSION
 ARG DECIDIM_VERSION
 ARG DECIDIM_BRANCH  
 ARG NODE_MAJOR_VERSION
@@ -15,7 +15,7 @@ ARG RUBY_VERSION
 ENV TZ=UTC \
     DECIDIM_VERSION=$DECIDIM_VERSION \
     NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
-    REDHAT_MAJOR_VERSION=$REDHAT_MAJOR_VERSION \
+    OS_MAJOR_VERSION=$OS_MAJOR_VERSION \
     BUNDLER_VERSION=$BUNDLER_VERSION \
     DECIDIM_BRANCH=$DECIDIM_BRANCH \
     RUBY_VERSION=$RUBY_VERSION \
@@ -27,10 +27,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
 # Single comprehensive package installation
-RUN dnf config-manager --set-enabled crb || dnf config-manager --set-enabled powertools || true \
-  && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${REDHAT_MAJOR_VERSION}.noarch.rpm \
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
   && /usr/bin/crb enable \
-  && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${REDHAT_MAJOR_VERSION}.rpm \
+  && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${OS_MAJOR_VERSION}.rpm \
   && dnf config-manager --set-enabled remi \
   && dnf install -y \
     gcc \
@@ -65,9 +64,9 @@ RUN dnf config-manager --set-enabled crb || dnf config-manager --set-enabled pow
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
   && echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc \
   && echo 'eval "$(rbenv init -)"' >> ~/.bashrc \
-  && CONFIGURE_OPTS="--disable-install-rdoc --enable-shared" ~/.rbenv/bin/rbenv install "$RUBY_VERSION" \
-  && ~/.rbenv/bin/rbenv global "$RUBY_VERSION" \
-  && ~/.rbenv/bin/rbenv rehash \
+  && RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared" rbenv install "$RUBY_VERSION" \
+  && rbenv global "$RUBY_VERSION" \
+  && rbenv rehash \
   # Configure gems and bundler
   && echo "gem: --no-document" >> /etc/gemrc \
   && ~/.rbenv/shims/gem install bundler -v $BUNDLER_VERSION \
@@ -154,7 +153,7 @@ FROM base AS decidim
 ARG BUILD_DATE
 ARG VCS_REF  
 ARG VERSION
-ARG REDHAT_REPO
+ARG OS_NAME
 ARG NODE_MAJOR_VERSION
 ARG RUBY_VERSION
 ARG BUNDLER_VERSION
@@ -163,7 +162,7 @@ ARG DECIDIM_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
-      org.label-schema.description="Decidim application on Redhat ${REDHAT_REPO}" \
+      org.label-schema.description="Decidim application on Redhat ${OS_NAME}" \
       org.label-schema.url="https://github.com/decidim/docker" \
       org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.vcs-url="https://github.com/decidim/decidim" \
@@ -172,7 +171,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.schema-version="1.0.0-rc.1" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.title="decidim" \
-      org.opencontainers.image.description="Decidim application on Redhat ${REDHAT_REPO}" \
+      org.opencontainers.image.description="Decidim application on Redhat ${OS_NAME}" \
       org.opencontainers.image.url="https://github.com/decidim/decidim" \
       org.opencontainers.image.revision=${VCS_REF} \
       org.opencontainers.image.source="https://github.com/decidim/decidim" \
@@ -230,7 +229,12 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
 # Decidim Spam Detection
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
-    
+
+# Decidim custom configuration 
+ENV DECIDIM_CRON_ENABLED=true \
+    DECIDIM_SYSTEM_EMAIL=system@example.org \
+    DECIDIM_SYSTEM_PASSWORD=my_insecure_password
+
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1000 decidim \
     && useradd -m -u 1000 -g decidim -d $WORK_DIR -s /bin/bash decidim

@@ -1,8 +1,13 @@
-ARG UBUNTU_TAG
-ARG NODE_MAJOR_VERSION=20
+ARG OS_NAME=plucky
+ARG OS_VERSION=25.04
+ARG DECIDIM_VERSION
+ARG DECIDIM_BRANCH
+ARG NODE_MAJOR_VERSION
+ARG BUNDLER_VERSION
+ARG RUBY_VERSION
 
 # Single base with all dependencies
-FROM ubuntu:${UBUNTU_TAG:-latest} AS base
+FROM ubuntu:${OS_NAME} AS base
 ARG DECIDIM_VERSION
 ARG DECIDIM_BRANCH  
 ARG NODE_MAJOR_VERSION
@@ -46,23 +51,22 @@ RUN apt-get update -yq \
     tzdata \
     vim \
     zlib1g-dev \
-    cron \
+    cron 
   # Install Node.js from NodeSource
-  && wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends nodejs \
   # Install rbenv and Ruby
   && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
-  && echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc \
-  && echo 'eval "$(rbenv init -)"' >> ~/.bashrc \
-  && CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" ~/.rbenv/bin/rbenv install "$RUBY_VERSION" \
-  && ~/.rbenv/bin/rbenv global "$RUBY_VERSION" \
-  && ~/.rbenv/bin/rbenv rehash \
+  && echo 'eval "$(rbenv init -)"' >> ~/.bashrc 
+RUN  RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" rbenv install "${RUBY_VERSION}" \
+  && rbenv global "${RUBY_VERSION}" \
+  && rbenv rehash \
   # Configure gems and bundler
   && echo "gem: --no-document" >> /etc/gemrc \
-  && ~/.rbenv/shims/gem install bundler -v $BUNDLER_VERSION \
-  && ~/.rbenv/shims/bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
-  # Install Yarn
+  && gem install bundler -v $BUNDLER_VERSION \
+  && bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
+  # Install Yarn 
   && npm install -g yarn \
   # Cleanup
   && apt-get clean \
@@ -81,7 +85,6 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
     RAILS_ENV=development \
     PATH="/home/decidim/bin:${PATH}" \
     WORKDIR=/home/decidim
-    
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
@@ -136,7 +139,7 @@ RUN bundle config set frozen false \
   && bundle check || bundle install \
   && npm install
 
-RUN bundle execrails assets:precompile \
+RUN bundle exec rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
@@ -146,7 +149,7 @@ FROM base AS decidim
 ARG BUILD_DATE
 ARG VCS_REF  
 ARG VERSION
-ARG UBUNTU_TAG
+ARG OS_NAME
 ARG NODE_MAJOR_VERSION
 ARG RUBY_VERSION
 ARG BUNDLER_VERSION
@@ -155,7 +158,7 @@ ARG DECIDIM_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="decidim" \
-      org.label-schema.description="Decidim application on Ubuntu ${UBUNTU_TAG:-latest}" \
+      org.label-schema.description="Decidim application on Ubuntu ${OS_NAME} v${OS_VERSION}" \
       org.label-schema.url="https://github.com/decidim/docker" \
       org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.vcs-url="https://github.com/decidim/decidim" \
@@ -164,7 +167,7 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.schema-version="1.0.0-rc.1" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.title="decidim" \
-      org.opencontainers.image.description="Decidim application on Ubuntu ${UBUNTU_TAG:-latest}" \
+      org.opencontainers.image.description="Decidim application on Ubuntu ${OS_NAME} v${OS_VERSION}" \
       org.opencontainers.image.url="https://github.com/decidim/decidim" \
       org.opencontainers.image.revision=${VCS_REF} \
       org.opencontainers.image.source="https://github.com/decidim/decidim" \
@@ -212,20 +215,26 @@ ENV RAILS_ENV=production \
     PATH="/home/decidim/bin:${PATH}"
 # Decidim Core Configuration
 ENV DECIDIM_APPLICATION_NAME="My Application Name" \
-    DECIDIM_MAILER_SENDER="change-me@example.org" \
+    DECIDIM_MAILER_SENDER="hello@example.org" \
     DECIDIM_AVAILABLE_LOCALES="en" \
     DECIDIM_DEFAULT_LOCALE=en \
     DECIDIM_FORCE_SSL=auto \
-    DECIDIM_TRACK_NEWSLETTER_LINKS=true \
+    DECIDIM_TRACK_NEWSLETTER_LINKS=false \
     DECIDIM_ADMIN_PASSWORD_STRONG=true \
     DECIDIM_SERVICE_WORKER_ENABLED=false 
+  
 # Decidim Spam Detection
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
 
+# Decidim custom configuration 
+ENV DECIDIM_CRON_ENABLED=true \
+    DECIDIM_SYSTEM_EMAIL=system@example.org \
+    DECIDIM_SYSTEM_PASSWORD=my_insecure_password
+
 RUN rm -rf $WORK_DIR \
-    && groupadd -g 1000 decidim \
-    && useradd -m -u 1000 -g decidim -d $WORK_DIR -s /bin/bash decidim
+    && groupadd -g 1001 decidim \
+    && useradd -m -u 1001 -g decidim -d $WORK_DIR -s /bin/bash decidim
     
 WORKDIR $WORK_DIR
 
