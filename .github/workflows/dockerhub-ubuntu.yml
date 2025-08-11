@@ -9,8 +9,8 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    # Every day at 17:30, we udpdate images
-    - cron:  '30 17 * * *'
+    # Every day at 17:00, we udpdate images
+    - cron:  '00 17 * * *'
 
 jobs:
   ubuntu-decidim-development:
