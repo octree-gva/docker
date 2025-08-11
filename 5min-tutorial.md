@@ -1,7 +1,7 @@
 <!--
  NOTICE
  [`rake docker:docs`] This file is generated from a template
-    @see ./templates/docs/5min-tutorial.md.erb
+    @see ./templates/docs/5min-tutorial.md.erb for contributing
 -->
 
 # 5min tutorial

@@ -1,7 +1,7 @@
 <!--
  NOTICE
  [`rake docker:docs`] This file is generated from a template
-    @see ./templates/README.md.erb
+    @see ./templates/README.md.erb for contributing
 -->
 
 [![Docker Hub](https://img.shields.io/docker/cloud/build/eaudeweb/scratch?label=Docker%20Hub&style=flat)](https://hub.docker.com/u/decidim)
@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:25.04`).
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:plucky`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -32,9 +32,13 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 
 To use other distributions, these are available: 
 
-| Distribution | 0.31.0.dev | 0.30.1 | 0.29.4 |
+| Operating System | Decidim v0.31.0.dev | Decidim v0.30.1 | Decidim v0.29.4 |
 | --- | --- | --- | --- |
-| Ubuntu Noble v24.04 | `:noble-0.31.0.dev` | `:noble-0.30.1` | `:noble-0.29.4` || Ubuntu Jammy v22.04 | `:jammy-0.31.0.dev` | `:jammy-0.30.1` | `:jammy-0.29.4` || Redhat Ubi10 v10.0 | `:ubi10-0.31.0.dev` | `:ubi10-0.30.1` | `:ubi10-0.29.4` || Redhat Ubi9 v9.6 | `:ubi9-0.31.0.dev` | `:ubi9-0.30.1` | `:ubi9-0.29.4` |
+| Ubuntu plucky (25.04) | `:plucky-0.31.0.dev` | `:plucky-0.30.1` | `:plucky-0.29.4` |
+| Ubuntu noble (24.04) | `:noble-0.31.0.dev` | `:noble-0.30.1` | `:noble-0.29.4` |
+| Ubuntu jammy (22.04) | `:jammy-0.31.0.dev` | `:jammy-0.30.1` | `:jammy-0.29.4` |
+| Redhat ubi10 (10.0) | `:ubi10-0.31.0.dev` | `:ubi10-0.30.1` | `:ubi10-0.29.4` |
+| Redhat ubi9 (9.6) | `:ubi9-0.31.0.dev` | `:ubi9-0.30.1` | `:ubi9-0.29.4` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -49,6 +53,7 @@ Ready to mount a Decidim installation locally in 5min?
 |---|---|---|
 | DECIDIM_SYSTEM_EMAIL | Email use to access /system | `hello@myorg.com` |
 | DECIDIM_SYSTEM_PASSWORD | Password use to access /system | `my_insecure_password` |
+| DECIDIM_CRON_ENABLED | If cron should be enabled | `true` |
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `my_insecure_password` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `my_insecure_password` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
@@ -124,7 +129,6 @@ Theses commands will run on each container restart:
 * **15_wait_for_it**: Run a [wait-for-it](./docker/bin/wait-for-it) for dependancies: `REDIS_URL`, `DATABASE_URL` and `MEMCACHE_SERVERS` are supported.
 * **35_bundle_check**: Check if all your gems are installed.
 * **36_db_check**: Check if your database is up, and if not, try to migrate it.
-* **45_template**: Set the motd file to have a welcome message that display current setup.
 * **50_upsert-sysadmin**: From environment variables `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD`, update the first /system administrator.
 
 ### Command
@@ -153,7 +157,8 @@ This repository automates publishing Decidim versions as Docker containers and g
 
 **Docker Image Automation**
 
-* `bundle exec rake docker:build[version]`: Builds Decidim Docker images for a given version (`dev`, `last`, or `prev`), using the Rake task.
+* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, or `prev`).
+* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, or `prev`).
 
 **Documentation Generation**
 
@@ -166,7 +171,7 @@ This repository automates publishing Decidim versions as Docker containers and g
 ###  Repository Structure
 * `contrib/`: Supporting files for nginx and docker-hub apis.
 * `docker/`: Docker context files, old aditional scripts like cron and entrypoints
-* `docker/Dockerfile`: Main dockerfile
+* `docker/{ubuntu,redhat}/Dockerfile`: Dockerfile for each distribution
 * `lib/`: Contains core classes and modules for version management and Docker image creation.
 * `templates/`: Holds ERB templates for Docker configurations and documentation.
 * `Rakefile`: Define the rake tasks of this repo.
