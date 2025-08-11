@@ -15,9 +15,6 @@ on:
 jobs:
   repository-documentation:
     runs-on: ubuntu-latest
-    # Needs to run after images pushes, as we will update images
-    # descriptions
-    needs: [redhat-decidim-development, redhat-decidim-last, redhat-decidim-prev]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
