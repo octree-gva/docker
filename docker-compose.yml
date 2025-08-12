@@ -24,7 +24,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        UBUNTU_TAG: "25.10"
         DECIDIM_VERSION: "0.31.0.dev"
         DECIDIM_BRANCH: "develop"
         NODE_MAJOR_VERSION: "22"
@@ -34,7 +34,7 @@ services:
         VCS_REF_SHORT: "7afb241d"
         VCS_REF_DATE: "2025-08-11"
         VERSION: "0.31.0.dev"
-        BUILD_DATE: "2025-08-11T23:17:51+00:00"
+        BUILD_DATE: "2025-08-12T23:18:21+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -47,17 +47,17 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        UBUNTU_TAG: "25.10"
         DECIDIM_VERSION: "0.30.1"
         DECIDIM_BRANCH: "release/0.30-stable"
         NODE_MAJOR_VERSION: "18"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "07e137214f04a0dfdcdbb03edc79560ca4cd3953"
-        VCS_REF_SHORT: "07e13721"
-        VCS_REF_DATE: "2025-08-04"
+        VCS_REF: "d5b54d0fc74edd618e36001cb8a705f2a476a72e"
+        VCS_REF_SHORT: "d5b54d0f"
+        VCS_REF_DATE: "2025-08-12"
         VERSION: "0.30.1"
-        BUILD_DATE: "2025-08-11T23:17:51+00:00"
+        BUILD_DATE: "2025-08-12T23:18:21+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -70,17 +70,17 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "25.04"
+        UBUNTU_TAG: "25.10"
         DECIDIM_VERSION: "0.29.4"
         DECIDIM_BRANCH: "release/0.29-stable"
         NODE_MAJOR_VERSION: "18"
         BUNDLER_VERSION: "2.4.6"
         RUBY_VERSION: "3.2.2"
-        VCS_REF: "d6d17c566caa98f91112ff786e7af67cb0c4faa3"
-        VCS_REF_SHORT: "d6d17c56"
-        VCS_REF_DATE: "2025-08-04"
+        VCS_REF: "10c775df6abe244a5f1de067131826720bd03c11"
+        VCS_REF_SHORT: "10c775df"
+        VCS_REF_DATE: "2025-08-12"
         VERSION: "0.29.4"
-        BUILD_DATE: "2025-08-11T23:17:51+00:00"
+        BUILD_DATE: "2025-08-12T23:18:21+00:00"
     ports:
       - "3003:3000"
     environment:

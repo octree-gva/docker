@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:plucky`).
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:devel`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -34,7 +34,7 @@ To use other distributions, these are available:
 
 | Operating System | Decidim v0.31.0.dev | Decidim v0.30.1 | Decidim v0.29.4 |
 | --- | --- | --- | --- |
-| Ubuntu plucky (25.04) | `:plucky-0.31.0.dev` | `:plucky-0.30.1` | `:plucky-0.29.4` |
+| Ubuntu devel (25.10) | `:devel-0.31.0.dev` | `:devel-0.30.1` | `:devel-0.29.4` |
 | Ubuntu noble (24.04) | `:noble-0.31.0.dev` | `:noble-0.30.1` | `:noble-0.29.4` |
 | Ubuntu jammy (22.04) | `:jammy-0.31.0.dev` | `:jammy-0.30.1` | `:jammy-0.29.4` |
 | Redhat ubi10 (10.0) | `:ubi10-0.31.0.dev` | `:ubi10-0.30.1` | `:ubi10-0.29.4` |
