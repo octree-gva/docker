@@ -103,7 +103,7 @@ RUN bundle config set path "vendor" --global \
 WORKDIR $WORK_DIR
 ENV BUNDLE_PATH="/home/decidim/vendor"
 # Clean up generated app
-RUN rm -rf .git node_modules .npm  .npmrc .yarnrc .yarn tmp \
+RUN rm -rf .git node_modules .npm  .npmrc .yarnrc .yarn \
     config/master.key config/credentials.yml.enc \
   && mkdir -p tmp/pids tmp/sockets \
   && npm cache clean --force \
