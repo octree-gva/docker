@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'open3'
 
 Dir.chdir("/home/decidim") do 
   exit 0 unless ENV["DECIDIM_SYSTEM_EMAIL"] && ENV["DECIDIM_SYSTEM_PASSWORD"]
@@ -10,7 +11,10 @@ Dir.chdir("/home/decidim") do
       admin.password_confirmation = admin.password = ENV["DECIDIM_SYSTEM_PASSWORD"]
       admin.save!
 RB
-  system("bundle exec rails c", in: console_script, exception: true)
+  Open3.popen3("bundle exec rails c") do |stdin, stdout, stderr, wait_thr|
+    stdin.puts console_script
+    stdin.close
+  end
   puts "    ✅ /system DECIDIM_SYSTEM_EMAIL account updated."
   exit 0
 end
