@@ -8,7 +8,7 @@ module Docker
           "Unknown"
         end
         def version_count
-          3
+          4
         end
         def latest
           @latest ||= versionned_tag_names.first
