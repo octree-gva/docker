@@ -20,25 +20,25 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:devel`).
+On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:questing`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
 | Tag | Description |
 | ---  | ---|
-| `:latest` | Unstable `development` version. (alias for `0.31.0.dev`) |
-| `:0.30.1` | Last version |
-| `:0.29.4` | Stable version, security and bug fixes only |
+| `:latest` | Unstable `development` version. (alias for `0.32.0.dev`) |
+| `:0.31.0` | Last version |
+| `:0.30.4` | Stable version, security and bug fixes only |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.31.0.dev | Decidim v0.30.1 | Decidim v0.29.4 |
+| Operating System | Decidim v0.32.0.dev | Decidim v0.31.0 | Decidim v0.30.4 |
 | --- | --- | --- | --- |
-| Ubuntu devel (25.10) | `:devel-0.31.0.dev` | `:devel-0.30.1` | `:devel-0.29.4` |
-| Ubuntu noble (24.04) | `:noble-0.31.0.dev` | `:noble-0.30.1` | `:noble-0.29.4` |
-| Ubuntu jammy (22.04) | `:jammy-0.31.0.dev` | `:jammy-0.30.1` | `:jammy-0.29.4` |
-| Redhat ubi10 (10.0) | `:ubi10-0.31.0.dev` | `:ubi10-0.30.1` | `:ubi10-0.29.4` |
-| Redhat ubi9 (9.6) | `:ubi9-0.31.0.dev` | `:ubi9-0.30.1` | `:ubi9-0.29.4` |
+| Ubuntu questing (25.10) | `:questing-0.32.0.dev` | `:questing-0.31.0` | `:questing-0.30.4` |
+| Ubuntu devel (26.04) | `:devel-0.32.0.dev` | `:devel-0.31.0` | `:devel-0.30.4` |
+| Ubuntu noble (24.04) | `:noble-0.32.0.dev` | `:noble-0.31.0` | `:noble-0.30.4` |
+| Redhat ubi10 (10.1) | `:ubi10-0.32.0.dev` | `:ubi10-0.31.0` | `:ubi10-0.30.4` |
+| Redhat ubi9 (9.7) | `:ubi9-0.32.0.dev` | `:ubi9-0.31.0` | `:ubi9-0.30.4` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -74,7 +74,7 @@ Ready to mount a Decidim installation locally in 5min?
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.29.4/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.30.4/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
