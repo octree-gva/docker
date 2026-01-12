@@ -73,7 +73,7 @@ RUN  RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" 
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache
 
 ##
-# Generator Image - NOW USES base INSTEAD OF DUPLICATING
+# Generator Image 
 ##
 FROM base AS generator
 ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
@@ -93,7 +93,8 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && bundle check || bundle install \
+  && echo "gem 'commonmarker'" >> Gemfile \
+  && (bundle update commonmarker || bundle install) \
   && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
@@ -150,6 +151,7 @@ ARG BUILD_DATE
 ARG VCS_REF  
 ARG VERSION
 ARG OS_NAME
+ARG OS_VERSION
 ARG NODE_MAJOR_VERSION
 ARG RUBY_VERSION
 ARG BUNDLER_VERSION
