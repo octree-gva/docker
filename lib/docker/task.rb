@@ -1,3 +1,5 @@
+require 'open3'
+
 module Docker
   module Task
     def self.verbose?
@@ -53,7 +55,12 @@ module Docker
         puts " => [system] # #{command.join(" ")}"
         system(*command, exception: true)
       else
-        system(*command, err: File::NULL, out: File::NULL, exception: true)
+        output, status = Open3.capture2e(*command)
+        unless status.success?
+          $stderr.puts "Error running: #{command.join(" ")}"
+          $stderr.puts output
+          raise "Command failed with exit #{status.exitstatus}: #{command.first}"
+        end
       end
     end
   end
