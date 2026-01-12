@@ -20,7 +20,7 @@ services:
       - decidim_public:/usr/share/nginx/html:ro
 
   decidim:
-    image: hfroger/decidim:0.29.4
+    image: hfroger/decidim:0.30.4
     ports:
       - "3000:3000"
     environment:
