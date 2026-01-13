@@ -29,6 +29,7 @@ WORKDIR $WORK_DIR
 # Single comprehensive package installation
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
   && /usr/bin/crb enable \
+  && dnf config-manager --set-enabled epel-testing \
   && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${OS_MAJOR_VERSION}.rpm \
   && dnf config-manager --set-enabled remi \
   && dnf install -y \
@@ -53,9 +54,12 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
     vim \
     zlib-devel \
     orc \
+    cronie \
+  # Ubi9 does not have LibRaw-devel, and ubi10 requires it.
+  && (dnf install -y LibRaw-devel || true) \
+  && dnf install -y \
     vips \
     vips-tools \
-    cronie \
   # Install Node.js from NodeSource
   && curl -fsSL https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && dnf install -y nodejs \
@@ -88,7 +92,6 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     RAILS_ENV=development \
     PATH="/home/decidim/bin:${PATH}" \
     WORKDIR=/home/decidim
-    
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
@@ -97,7 +100,8 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && bundle check || bundle install \
+  && echo "gem 'commonmarker'" >> Gemfile \
+  && (bundle update commonmarker || bundle install) \
   && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
