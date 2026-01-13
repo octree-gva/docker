@@ -55,8 +55,13 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
     zlib-devel \
     orc \
     cronie \
-  # Ubi9 does not have LibRaw-devel, and ubi10 requires it.
-  && (dnf install -y LibRaw-devel || true) \
+  # Ubi9 does not have LibRaw, and ubi10 requires it.
+  && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
+        dnf install -y libraw || dnf install -y LibRaw || \
+        dnf install -y https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-1.el9.x86_64.rpm ; \
+    else \
+        dnf install -y LibRaw 2>/dev/null || true ; \
+    fi \ 
   && dnf install -y \
     vips \
     vips-tools \
