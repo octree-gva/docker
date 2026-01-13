@@ -64,9 +64,7 @@ RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - 
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
   && echo 'eval "$(rbenv init -)"' >> ~/.bashrc 
 RUN  eval "$(rbenv init -)" \
-  && RUBY_MAKE_OPTS="-j2" \
-      RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" \
-      rbenv install "${RUBY_VERSION}" \
+  && rbenv install "${RUBY_VERSION}" \
   && rbenv global "${RUBY_VERSION}" \
   && rbenv rehash \
   # Configure gems and bundler

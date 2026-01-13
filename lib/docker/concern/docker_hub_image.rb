@@ -8,7 +8,7 @@ module Docker
           "Unknown"
         end
         def version_count
-          4
+          3
         end
         def latest
           @latest ||= versionned_tag_names.first
@@ -20,7 +20,7 @@ module Docker
         # of [tag_name, codename]
         # Example: [["1.0.0", "questing"], ["1.0.1", "questing"]]
         def versionned_tag_names
-          versionned_tags.first(version_count)
+          versionned_tags[1..].first(version_count)
         end
 
         
