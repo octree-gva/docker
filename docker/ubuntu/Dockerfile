@@ -37,8 +37,11 @@ RUN apt-get update -yq \
     git \
     gnupg \
     libffi-dev \
+    libgdbm-dev \
     libicu-dev \
+    libncurses-dev \
     libpq-dev \
+    libreadline-dev \
     libssl-dev \
     libvips-dev \
     libxml2-dev \
@@ -59,7 +62,10 @@ RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - 
   && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
   && echo 'eval "$(rbenv init -)"' >> ~/.bashrc 
-RUN  RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" rbenv install "${RUBY_VERSION}" \
+RUN  eval "$(rbenv init -)" \
+  && MAKEFLAGS="-j$(nproc)" \
+      RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared --enable-yjit" \
+      rbenv install "${RUBY_VERSION}" \
   && rbenv global "${RUBY_VERSION}" \
   && rbenv rehash \
   # Configure gems and bundler
