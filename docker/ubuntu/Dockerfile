@@ -136,15 +136,15 @@ RUN bundle config set without "development:test" \
   && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
   && bundle remove decidim decidim-conferences decidim-initiatives decidim-templates decidim-design decidim-dev \
+  && if [ "$(printf '%s\n' "0.30" "$DECIDIM_VERSION" | sort -V | head -n1)" = "0.30" ]; then \
+       bundle remove decidim-ai; \
+       bundle add decidim-ai --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git; \
+     fi \
   && bundle add decidim --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
   && bundle add decidim-conferences --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
   && bundle add decidim-initiatives --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
   && bundle add decidim-templates --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
   && bundle add decidim-dev --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
-  && if [ "$(printf '%s\n' "0.30" "$DECIDIM_VERSION" | sort -V | head -n1)" = "0.30" ]; then \
-       bundle remove decidim-ai; \
-       bundle add decidim-ai --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git; \
-     fi \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle update \
   && bundle config set frozen true \

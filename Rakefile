@@ -85,11 +85,11 @@ def push_docker_images(distribution_singleton, args, push_default: false)
   end
   registry_username = ENV["DOCKER_HUB_REGISTRY"]
 
+  messages = []
   distribution_singleton.versionned_tag_names.each_with_index do |tag, index|
     version = decidim_from_args(args)
     source_tag = tag.docker_tag(version.decidim_version)
     Docker::Task.put("Prepare #{version.decidim_version}")
-    messages = []
     if index == 0 && push_default
       messages += version.version_aliases[1..].map do |dest_version|
         dest_version = "#{dest_version}"
@@ -129,8 +129,8 @@ def push_docker_images(distribution_singleton, args, push_default: false)
         "❌ ERROR: #{destination_tag} - #{e.message}"
       end
     end
-    messages
   end
+  messages
 ensure
   Decidim::Decidim.instance.clean_clone
   Docker::Task.put("decidim-clone directory removed")
