@@ -6,8 +6,9 @@ same variables for all the templates:
 - `develop_version`: The `Decidim::DecidimVersion` for the `develop` branch
 - `last_version`: The `Decidim::DecidimVersion` for the last `release/*-stable` branch
 - `prev_version`: The `Decidim::DecidimVersion` for the previous `release/*-stable` branch
+- `legacy_version`: The `Decidim::DecidimVersion` for the legacy `release/*-stable` branch
 - `ubuntu`: A helper to get ubuntu base images in different versions (latest 3)
 - `redhat`: A helper to get redhat base images in different versions (lastest 2)
 
 As `last_version` receives features requests, and `prev_version` receives only bugs and security fixes, 
-it is adviced to promote the use of the `prev_version` when new users comes in. 
+it is adviced to promote the use of the `prev_version` when new users comes in. `legacy` versions are for last stable, that is most probably unsupported Decidim's side.

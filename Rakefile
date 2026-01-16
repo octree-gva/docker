@@ -13,10 +13,20 @@ def decidim_from_args(args)
   when "dev" then Decidim::Decidim.instance.versions[0]
   when "last" then Decidim::Decidim.instance.versions[1]
   when "prev" then Decidim::Decidim.instance.versions[2]
+  when "legacy" then Decidim::Decidim.instance.versions[3]
   else
     Docker::Task.help
     exit 1
   end
+end
+
+def print_results(messages)
+  Docker::Task.put("*" * 80)
+  Docker::Task.put("Results:")
+  messages.each do |message|
+    Docker::Task.put("* " + message)
+  end
+  Docker::Task.put("*" * 80)
 end
 #
 ##
@@ -25,7 +35,8 @@ end
 # @param version [Decidim::DecidimVersion]
 # @return [void]
 def build_docker_image(distribution_singleton, version, dockerfile_path)
-  distribution_singleton.versionned_tag_names.each do |tag|
+  last_command = nil
+  distribution_singleton.versionned_tag_names.map do |tag|
     docker_args = {
       OS_VERSION: tag.os_version,
       OS_NAME: tag.os_name,
@@ -34,18 +45,30 @@ def build_docker_image(distribution_singleton, version, dockerfile_path)
     docker_args = docker_args.map do |key, value|
       "--build-arg=#{key}=#{value}"
     end
-    Docker::Task.system!(
+    last_command = [
       "docker", 
       "build", 
       "--file=#{dockerfile_path}", 
       "--tag=decidim:#{tag.docker_tag(version.decidim_version)}", 
       *docker_args,
       "./docker"
-    )
+    ]
+    begin
+      Docker::Task.system!(
+        *last_command
+      )
+    rescue => e
+      Docker::Task.put("Error: Failed to build #{tag.docker_tag(version.decidim_version)}")
+      Docker::Task.put("Error: #{e.message}")
+      next "❌ ERROR: decidim:#{tag.docker_tag(version.decidim_version)}"
+    end
+    last_command = nil
+    "✅ BUILT: decidim:#{tag.docker_tag(version.decidim_version)}"
   end
 ensure
   Decidim::Decidim.instance.clean_clone
   Docker::Task.put("decidim-clone directory removed")
+  Docker::Task.put("last command: #{last_command.join(" ")}") if last_command
 end
 
 ##
@@ -66,36 +89,47 @@ def push_docker_images(distribution_singleton, args, push_default: false)
     version = decidim_from_args(args)
     source_tag = tag.docker_tag(version.decidim_version)
     Docker::Task.put("Prepare #{version.decidim_version}")
+    messages = []
     if index == 0 && push_default
-      version.version_aliases[1..].each do |dest_version|
+      messages += version.version_aliases[1..].map do |dest_version|
         dest_version = "#{dest_version}"
         destination_tag = "#{registry_username}/decidim:#{dest_version}"
-        Docker::Task.put("tagging #{destination_tag}")
-        Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
-        if ENV["DRY_RUN"] == "1"
-          Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
-          Docker::Task.put("DRY_RUN: skip push")
-        else
-          Docker::Task.system!("docker", "push", destination_tag)
-          Docker::Task.put("pushed #{destination_tag}")
+        begin
+          Docker::Task.put("tagging #{destination_tag}")
+          Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
+          if ENV["DRY_RUN"] == "1"
+            Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
+            Docker::Task.put("DRY_RUN: skip push")
+          else
+            Docker::Task.system!("docker", "push", destination_tag)
+            Docker::Task.put("pushed #{destination_tag}")
+          end
+          "✅ PUSHED: #{destination_tag}"
+        rescue => e
+          "❌ ERROR: #{destination_tag} - #{e.message}"
         end
       end
     end
     # 0.29.2 will push tags for `0.29` and `0.29.2`
-    version.version_aliases[1..].each do |dest_version|
+    messages += version.version_aliases[1..].map do |dest_version|
       dest_version = tag.docker_tag(dest_version)
       destination_tag = "#{registry_username}/decidim:#{dest_version}"
       Docker::Task.put("tagging #{destination_tag}")
-      
-      if ENV["DRY_RUN"] == "1"
-        Docker::Task.put("DRY_RUN: docker tag decidim:#{source_tag} #{destination_tag}")
-        Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
-      else
-        Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
-        Docker::Task.system!("docker", "push", destination_tag)
-        Docker::Task.put("pushed #{destination_tag}")
+      begin
+        if ENV["DRY_RUN"] == "1"
+          Docker::Task.put("DRY_RUN: docker tag decidim:#{source_tag} #{destination_tag}")
+          Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
+        else
+          Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
+          Docker::Task.system!("docker", "push", destination_tag)
+          Docker::Task.put("pushed #{destination_tag}")
+        end
+        "✅ PUSHED: #{destination_tag}"
+      rescue => e
+        "❌ ERROR: #{destination_tag} - #{e.message}"
       end
     end
+    messages
   end
 ensure
   Decidim::Decidim.instance.clean_clone
@@ -103,19 +137,29 @@ ensure
 end
 
 task :"docker:build:redhat", [:version] do |_, args|
-  build_docker_image(Docker::Redhat.instance, decidim_from_args(args), "docker/redhat/Dockerfile")
+  messages = build_docker_image(Docker::Redhat.instance, decidim_from_args(args), "docker/redhat/Dockerfile")
+  print_results(messages)
 end
 
 task :"docker:push:redhat", [:version] do |_, args|
-  push_docker_images(Docker::Redhat.instance, args, push_default: false)
+  messages = push_docker_images(Docker::Redhat.instance, args, push_default: false)
+  print_results(messages)
+  if messages.any? { |message| message.include?("ERROR:") }
+    exit 1
+  end
 end
 
 task :"docker:build:ubuntu", [:version] do |_, args|
-  build_docker_image(Docker::Ubuntu.instance, decidim_from_args(args), "docker/ubuntu/Dockerfile")
+  messages = build_docker_image(Docker::Ubuntu.instance, decidim_from_args(args), "docker/ubuntu/Dockerfile")
+  print_results(messages)
 end
 
 task :"docker:push:ubuntu", [:version] do |_, args|
-  push_docker_images(Docker::Ubuntu.instance, args, push_default: true)
+  messages = push_docker_images(Docker::Ubuntu.instance, args, push_default: true)
+  print_results(messages)
+  if messages.any? { |message| message.include?("ERROR:") }
+    exit 1
+  end
 end
 
 task :"docker:clean", [] do
@@ -131,6 +175,7 @@ task :"docker:docs", [] do
     develop_version: versions[0],
     last_version: versions[1],
     prev_version: versions[2],
+    legacy_version: versions[3],
     ubuntu: Docker::Ubuntu.instance,
     redhat: Docker::Redhat.instance,
     registry_username: ENV.fetch("DOCKER_HUB_REGISTRY", "decidim"),

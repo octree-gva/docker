@@ -23,7 +23,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     RUBY_VERSION=$RUBY_VERSION \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}" \
+    CFLAGS="-std=gnu11 -include stdbool.h"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
@@ -47,6 +48,9 @@ RUN apt-get update -yq \
     libxml2-dev \
     libxslt1-dev \
     libyaml-dev \
+    libsqlite3-dev \
+    sqlite3 \
+    libcurl4-openssl-dev \
     libjemalloc2 \
     python3-pip \
     python3-setuptools \
@@ -62,8 +66,10 @@ RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - 
   # Install rbenv and Ruby
   && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
-  && echo 'eval "$(rbenv init -)"' >> ~/.bashrc 
-RUN  eval "$(rbenv init -)" \
+  && echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+RUN export PATH="/home/decidim/.rbenv/bin:$PATH" \
+  && eval "$(rbenv init -)" \
+  && rm -rf ~/.rbenv/versions/${RUBY_VERSION} \
   && rbenv install "${RUBY_VERSION}" \
   && rbenv global "${RUBY_VERSION}" \
   && rbenv rehash \
@@ -71,6 +77,12 @@ RUN  eval "$(rbenv init -)" \
   && echo "gem: --no-document" >> /etc/gemrc \
   && gem install bundler -v $BUNDLER_VERSION \
   && bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
+  && bundle config set build.bootsnap -- --with-cflags='-std=gnu11 -include stdbool.h' --global \
+  && LIBTIFF_SO5=$(find /usr/lib -name 'libtiff.so.5' -type f 2>/dev/null | head -1) \
+  && if [ -n "$LIBTIFF_SO5" ] && [ ! -e "${LIBTIFF_SO5%/*}/libtiff.so.6" ]; then \
+       ln -sf "$LIBTIFF_SO5" "${LIBTIFF_SO5%/*}/libtiff.so.6"; \
+     fi \
+  && ldconfig \
   # Install Yarn 
   && npm install -g yarn \
   # Cleanup
@@ -89,7 +101,9 @@ ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
     RAILS_ENV=development \
     PATH="/home/decidim/bin:${PATH}" \
-    WORKDIR=/home/decidim
+    WORKDIR=/home/decidim \
+    CFLAGS="-std=gnu11 -include stdbool.h" \
+    CPPFLAGS="-std=gnu11" 
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
@@ -100,7 +114,7 @@ WORKDIR /home/generator/decidim-generators
 RUN bundle config set path "vendor" --global \
   && echo "gem 'commonmarker'" >> Gemfile \
   && (bundle update commonmarker || bundle install) \
-  && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
+  && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
   && bundle config unset path --global \
@@ -121,9 +135,16 @@ COPY ./context .
 RUN bundle config set without "development:test" \
   && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  # Remove decidim-conferences, decidim-initiatives, decidim-templates gems from Gemfile
-  && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
-  && bundle remove decidim-design \
+  && bundle remove decidim decidim-conferences decidim-initiatives decidim-templates decidim-design decidim-dev \
+  && bundle add decidim --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
+  && bundle add decidim-conferences --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
+  && bundle add decidim-initiatives --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
+  && bundle add decidim-templates --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
+  && bundle add decidim-dev --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git \
+  && if [ "$(printf '%s\n' "0.30" "$DECIDIM_VERSION" | sort -V | head -n1)" = "0.30" ]; then \
+       bundle remove decidim-ai; \
+       bundle add decidim-ai --branch $DECIDIM_BRANCH --git https://github.com/decidim/decidim.git; \
+     fi \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
   && bundle update \
   && bundle config set frozen true \
@@ -196,7 +217,8 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     RAILS_ENV=production \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}" \
+    DISABLE_BOOTSNAP=1
   
 # SMTP Configuration
 ENV SMTP_ADDRESS="" \
