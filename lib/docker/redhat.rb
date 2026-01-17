@@ -36,7 +36,7 @@ module Docker
       # discover UBI repositories dynamically
       discovered = []
 
-      # Method 2: If no common patterns found, try sequential discovery
+      # Try sequential discovery
         (8..).each do |version|
           repo_name = "ubi#{version}"
           break unless repository_exists?("redhat/#{repo_name}")

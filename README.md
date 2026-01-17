@@ -45,7 +45,6 @@ To use other distributions, these are available:
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.
 
-
 ## Environments configurations
 >  🔐: be sure to read the [good practices](#good-practices) ;)
 

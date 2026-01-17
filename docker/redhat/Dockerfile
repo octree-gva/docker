@@ -53,15 +53,18 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
     tzdata \
     vim \
     zlib-devel \
-    orc \
     cronie \
+  # UBI8: Install orc, libraw (required by vips) and xz (required for Nokogiri compilation)
+  && if [ "${OS_MAJOR_VERSION}" = "8" ]; then \
+        dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/o/orc-0.4.28-3.el8.x86_64.rpm && \
+         dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/LibRaw-0.19.5-4.el8.x86_64.rpm && \
+         dnf install -y xz ; \
+    fi \
   # Ubi9 does not have LibRaw, and ubi10 requires it.
   && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
         dnf install -y libraw || dnf install -y LibRaw || \
         dnf install -y https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-1.el9.x86_64.rpm ; \
-    else \
-        dnf install -y LibRaw 2>/dev/null || true ; \
-    fi \ 
+    fi \
   && dnf install -y \
     vips \
     vips-tools \
@@ -78,6 +81,7 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
   && rbenv rehash \
   # Configure gems and bundler
   && echo "gem: --no-document" >> /etc/gemrc \
+  && if [ "${OS_MAJOR_VERSION}" = "8" ]; then bundle config set force_ruby_platform true; fi \
   && ~/.rbenv/shims/gem install bundler -v $BUNDLER_VERSION \
   && ~/.rbenv/shims/bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
   # Install Yarn
@@ -128,7 +132,6 @@ COPY ./context .
 RUN bundle config set without "development:test" \
   && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
-  # Remove decidim-conferences, decidim-initiatives, decidim-templates gems from Gemfile
   && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
   && bundle remove decidim-design \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
