@@ -50,3 +50,44 @@ Note that sidekiq has specific requirements for the redis server:
 Do not use a postgres root user for the application. Use a dedicated user instead.
 You can use CI/CD pipelines, sidecar, or whatever is available to run database migrations.
 Once migrations are done, no Decidim operations require root access to the database.
+
+## Use an object storage compatible with aws-s3
+Configure Active Storage to use an object storage system, ideally with a cdn and a public host. 
+This will off-load your server, and increase your performances. Public host will allow you to do a more 
+aggressive cache on your instances
+
+
+# Use a proxy (Nginx, HAProxy, etc.)
+Use a proxy to handle the public traffic to your Decidim instance.
+
+This will allow you to:
+- Handle SSL termination
+- Distribute `/public` assets to your users
+- Add a HSTS and Strict-Transport-Security headers to responses
+- Protect your instance from direct access to the web
+
+# Production Checklist
+
+- [ ] Create a `decidim-<your organization>` public repository
+- [ ] Add pipelines to deploy in your environments
+- [ ] Connect to an object storage service compatible with aws-s3
+- [ ] For small installation (< 2000 participants)
+  - [ ] Use good_job in `async_server` mode
+- [ ] For large installation (> 2000 participants)
+  - [ ] Use sidekiq in `external` mode
+  - [ ] Setup a redis server in Append Only mode
+- [ ] Use a dedicated database user with no DROP/CREATE permissions
+- [ ] Monitor puma and background job processes
+- [ ] Monitor error reporting
+- [ ] Rotate your logs
+- [ ] Check your services security: 
+  - [ ] proxy accessible to the web, everything else is private
+  - [ ] redis (background process or cache) password is at least 128 chars
+  - [ ] postgres (database) password is at least 64 chars
+- [ ] Check your services security: no direct access to the web, only through the proxy
+- [ ] Fine tune `WEB_CONCURRENCY` and `RAILS_MAX_THREADS` together with your database max pool size.
+- [ ] Define a backup routine for your database and your assets.
+- [ ] Test how to redeploy your instance without losing data.
+- [ ] Plan regular maintenance windows for minor upgrades
+- [ ] Join Decidim Community on matrix, present yourself, and join the dev chat room (will need this to get help when you need it).
+

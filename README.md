@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for three decidim versions, based on various distributions (default is `ubuntu:questing`).
+On a daily basis, we publish images for four decidim versions, based on various distributions (default is `ubuntu:noble`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -29,21 +29,23 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | `:latest` | Unstable `development` version. (alias for `0.32.0.dev`) |
 | `:0.31.0` | Last version |
 | `:0.30.4` | Stable version, security and bug fixes only |
+| `:0.29.7` | Legacy version, previous stable release |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.32.0.dev | Decidim v0.31.0 | Decidim v0.30.4 |
-| --- | --- | --- | --- |
-| Ubuntu questing (25.10) | `:questing-0.32.0.dev` | `:questing-0.31.0` | `:questing-0.30.4` |
-| Ubuntu devel (26.04) | `:devel-0.32.0.dev` | `:devel-0.31.0` | `:devel-0.30.4` |
-| Ubuntu noble (24.04) | `:noble-0.32.0.dev` | `:noble-0.31.0` | `:noble-0.30.4` |
-| Redhat ubi10 (10.1) | `:ubi10-0.32.0.dev` | `:ubi10-0.31.0` | `:ubi10-0.30.4` |
-| Redhat ubi9 (9.7) | `:ubi9-0.32.0.dev` | `:ubi9-0.31.0` | `:ubi9-0.30.4` |
+| Operating System | Decidim v0.32.0.dev | Decidim v0.31.0 | Decidim v0.30.4 | Decidim v0.29.7 |
+| --- | --- | --- | --- | --- |
+| Ubuntu noble (24.04) | `:noble-0.32.0.dev` | `:noble-0.31.0` | `:noble-0.30.4` | `:noble-0.29.7` |
+| Ubuntu jammy (22.04) | `:jammy-0.32.0.dev` | `:jammy-0.31.0` | `:jammy-0.30.4` | `:jammy-0.29.7` |
+| Ubuntu questing (25.10) | `:questing-0.32.0.dev` | `:questing-0.31.0` | `:questing-0.30.4` | `:questing-0.29.7` |
+| Redhat ubi9 (9.7) | `:ubi9-0.32.0.dev` | `:ubi9-0.31.0` | `:ubi9-0.30.4` | `:ubi9-0.29.7` |
+| Redhat ubi8 (8.10) | `:ubi8-0.32.0.dev` | `:ubi8-0.31.0` | `:ubi8-0.30.4` | `:ubi8-0.29.7` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
 Ready to mount a Decidim installation locally in 5min?
 [Follow our 5min tutorial](./5min-tutorial.md) to setup Decidim with Docker locally.
+
 
 ## Environments configurations
 >  🔐: be sure to read the [good practices](#good-practices) ;)
@@ -156,8 +158,8 @@ This repository automates publishing Decidim versions as Docker containers and g
 
 **Docker Image Automation**
 
-* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, or `prev`).
-* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, or `prev`).
+* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, `prev`, or `legacy`).
+* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, `prev`, or `legacy`).
 
 **Documentation Generation**
 
