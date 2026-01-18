@@ -105,6 +105,23 @@ def push_docker_images(distribution_singleton, args, push_default: false)
             Docker::Task.put("pushed #{destination_tag}")
           end
           "✅ PUSHED: #{destination_tag}"
+
+          # push latest tag
+          if args[:version] == "dev" 
+            destination_tag = "#{registry_username}/decidim:latest"
+            begin
+              Docker::Task.put("tagging #{destination_tag}")
+              Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
+              if ENV["DRY_RUN"] == "1"
+                Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
+                Docker::Task.put("DRY_RUN: skip push")
+              else
+                Docker::Task.system!("docker", "push", destination_tag)
+                Docker::Task.put("pushed #{destination_tag}")
+              end
+            end
+            "✅ PUSHED: #{destination_tag}"
+          end
         rescue => e
           "❌ ERROR: #{destination_tag} - #{e.message}"
         end
