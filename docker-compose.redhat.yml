@@ -35,7 +35,7 @@ services:
         VCS_REF_SHORT: "cfff6af2"
         VCS_REF_DATE: "2026-01-19"
         VERSION: "0.32.0.dev"
-        BUILD_DATE: "2026-01-19T23:19:52+00:00"
+        BUILD_DATE: "2026-01-20T23:21:22+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -44,6 +44,30 @@ services:
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
   redhat-decidim-last-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        REDHAT_TAG: "9.7"
+        REDHAT_REPO: "ubi9"
+        DECIDIM_VERSION: "0.30.4"
+        DECIDIM_BRANCH: "release/0.30-stable"
+        NODE_MAJOR_VERSION: "18"
+        BUNDLER_VERSION: "2.4.20"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "af1b318534a4b086f08a0cb49d9d95f0678d7b82"
+        VCS_REF_SHORT: "af1b3185"
+        VCS_REF_DATE: "2026-01-20"
+        VERSION: "0.30.4"
+        BUILD_DATE: "2026-01-20T23:21:22+00:00"
+    ports:
+      - "3002:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/1
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
+
+  redhat-decidim-prev-stable:
     <<: *default
     build:
       <<: *default-build
@@ -59,31 +83,7 @@ services:
         VCS_REF_SHORT: "f6da517e"
         VCS_REF_DATE: "2026-01-19"
         VERSION: "0.31.0"
-        BUILD_DATE: "2026-01-19T23:19:52+00:00"
-    ports:
-      - "3002:3000"
-    environment:
-      <<: *default-environment
-      REDIS_URL: redis://redis:6379/1
-      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
-
-  redhat-decidim-prev-stable:
-    <<: *default
-    build:
-      <<: *default-build
-      args:
-        REDHAT_TAG: "9.7"
-        REDHAT_REPO: "ubi9"
-        DECIDIM_VERSION: "0.30.4"
-        DECIDIM_BRANCH: "release/0.30-stable"
-        NODE_MAJOR_VERSION: "18"
-        BUNDLER_VERSION: "2.4.20"
-        RUBY_VERSION: "3.3.4"
-        VCS_REF: "03e76e0f5790fc6351f943701bb59b694290ad74"
-        VCS_REF_SHORT: "03e76e0f"
-        VCS_REF_DATE: "2026-01-19"
-        VERSION: "0.30.4"
-        BUILD_DATE: "2026-01-19T23:19:53+00:00"
+        BUILD_DATE: "2026-01-20T23:21:23+00:00"
     ports:
       - "3003:3000"
     environment:
