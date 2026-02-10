@@ -26,7 +26,7 @@ def print_results(messages)
   Docker::Task.put("*" * 80)
   Docker::Task.put("Results:")
   non_nil_messages.each do |message|
-    Docker::Task.put("* " + message)
+    Docker::Task.put("* #{message}")
   end
   Docker::Task.put("*" * 80)
 end
