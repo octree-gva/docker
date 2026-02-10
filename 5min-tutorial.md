@@ -75,7 +75,7 @@ docker cp decidim:/home/decidim/db/migrate db/migrate
 And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
-    image: decidim/decidim:0.30.4
+    image: decidim/decidim:0.30.5
     volumes:
       - storage:/home/decidim/storage
 +     - ./db/migrate:/home/decidim/migrate
