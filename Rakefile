@@ -21,9 +21,11 @@ def decidim_from_args(args)
 end
 
 def print_results(messages)
+  non_nil_messages = messages.reject { |message| message.nil? }
+  return if non_nil_messages.empty?
   Docker::Task.put("*" * 80)
   Docker::Task.put("Results:")
-  messages.each do |message|
+  non_nil_messages.each do |message|
     Docker::Task.put("* " + message)
   end
   Docker::Task.put("*" * 80)
@@ -75,7 +77,7 @@ end
 # Push docker images to docker hub
 # @param distribution_singleton [Docker::Redhat | Docker::Ubuntu]
 # @param args [Hash]
-# @param push_default [Boolean] If first version should be pushed without Distro name
+# @param push_default [Boolean] If first version should be pushed without Distro name. if "dev" version, also push latest tag.
 # @return [void]
 def push_docker_images(distribution_singleton, args, push_default: false)
   if ENV["DOCKER_HUB_REGISTRY"].nil?
@@ -109,16 +111,14 @@ def push_docker_images(distribution_singleton, args, push_default: false)
           # push latest tag
           if args[:version] == "dev" 
             destination_tag = "#{registry_username}/decidim:latest"
-            begin
-              Docker::Task.put("tagging #{destination_tag}")
-              Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
-              if ENV["DRY_RUN"] == "1"
-                Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
-                Docker::Task.put("DRY_RUN: skip push")
-              else
-                Docker::Task.system!("docker", "push", destination_tag)
-                Docker::Task.put("pushed #{destination_tag}")
-              end
+            Docker::Task.put("tagging #{destination_tag}")
+            Docker::Task.system!("docker", "tag", "decidim:#{source_tag}", destination_tag)
+            if ENV["DRY_RUN"] == "1"
+              Docker::Task.put("DRY_RUN: docker push #{destination_tag}")
+              Docker::Task.put("DRY_RUN: skip push")
+            else
+              Docker::Task.system!("docker", "push", destination_tag)
+              Docker::Task.put("pushed #{destination_tag}")
             end
             "✅ PUSHED: #{destination_tag}"
           end
