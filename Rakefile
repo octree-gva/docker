@@ -161,7 +161,7 @@ end
 task :"docker:push:redhat", [:version] do |_, args|
   messages = push_docker_images(Docker::Redhat.instance, args, push_default: false)
   print_results(messages)
-  if messages.any? { |message| message.include?("ERROR:") }
+  if messages.any? { |message| message&.include?("ERROR:") }
     exit 1
   end
 end
@@ -174,7 +174,7 @@ end
 task :"docker:push:ubuntu", [:version] do |_, args|
   messages = push_docker_images(Docker::Ubuntu.instance, args, push_default: true)
   print_results(messages)
-  if messages.any? { |message| message.include?("ERROR:") }
+  if messages.any? { |message| message&.include?("ERROR:") }
     exit 1
   end
 end
