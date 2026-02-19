@@ -30,11 +30,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "2121eb798ee02c57105826366823b7ead6c64cbf"
-        VCS_REF_SHORT: "2121eb79"
-        VCS_REF_DATE: "2026-02-18"
+        VCS_REF: "9edcad1108943124c8d459a5da6bee4a66108387"
+        VCS_REF_SHORT: "9edcad11"
+        VCS_REF_DATE: "2026-02-19"
         VERSION: "0.32.0.dev"
-        BUILD_DATE: "2026-02-18T23:28:58+00:00"
+        BUILD_DATE: "2026-02-19T23:29:15+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -48,16 +48,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.30.5"
-        DECIDIM_BRANCH: "release/0.30-stable"
-        NODE_MAJOR_VERSION: "18"
+        DECIDIM_VERSION: "0.31.1"
+        DECIDIM_BRANCH: "release/0.31-stable"
+        NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "e43cb54044f7aed2fe06d0b0fe19113002fd5ec9"
-        VCS_REF_SHORT: "e43cb540"
-        VCS_REF_DATE: "2026-02-17"
-        VERSION: "0.30.5"
-        BUILD_DATE: "2026-02-18T23:28:58+00:00"
+        VCS_REF: "592ab77a37c9005594f6ef0106b7073464e8de34"
+        VCS_REF_SHORT: "592ab77a"
+        VCS_REF_DATE: "2026-02-19"
+        VERSION: "0.31.1"
+        BUILD_DATE: "2026-02-19T23:29:15+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -71,16 +71,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.31.1"
-        DECIDIM_BRANCH: "release/0.31-stable"
-        NODE_MAJOR_VERSION: "22"
+        DECIDIM_VERSION: "0.30.5"
+        DECIDIM_BRANCH: "release/0.30-stable"
+        NODE_MAJOR_VERSION: "18"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "8561cdab72bb246192afa2928d81b0ecc879a953"
-        VCS_REF_SHORT: "8561cdab"
-        VCS_REF_DATE: "2026-02-16"
-        VERSION: "0.31.1"
-        BUILD_DATE: "2026-02-18T23:28:58+00:00"
+        VCS_REF: "fbf542293cbc26f480a6eb556c8cc98c79674345"
+        VCS_REF_SHORT: "fbf54229"
+        VCS_REF_DATE: "2026-02-19"
+        VERSION: "0.30.5"
+        BUILD_DATE: "2026-02-19T23:29:15+00:00"
     ports:
       - "3003:3000"
     environment:
