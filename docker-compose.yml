@@ -30,11 +30,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "d654affb14966ebe56d1f9c1756a11141e618296"
-        VCS_REF_SHORT: "d654affb"
-        VCS_REF_DATE: "2026-03-25"
+        VCS_REF: "a5ba7964f6f6771e7e591a3f0fbafc0eede192e1"
+        VCS_REF_SHORT: "a5ba7964"
+        VCS_REF_DATE: "2026-03-26"
         VERSION: "0.32.0.dev"
-        BUILD_DATE: "2026-03-25T23:33:42+00:00"
+        BUILD_DATE: "2026-03-26T23:31:26+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -48,16 +48,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.31.2"
+        DECIDIM_VERSION: "0.31.3"
         DECIDIM_BRANCH: "release/0.31-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "9dd3e70b23f4d8b0139b43b3c4ffeec542525a45"
-        VCS_REF_SHORT: "9dd3e70b"
-        VCS_REF_DATE: "2026-03-25"
-        VERSION: "0.31.2"
-        BUILD_DATE: "2026-03-25T23:33:42+00:00"
+        VCS_REF: "1b144742ac020f7bc47606828de4ef588bafaa06"
+        VCS_REF_SHORT: "1b144742"
+        VCS_REF_DATE: "2026-03-26"
+        VERSION: "0.31.3"
+        BUILD_DATE: "2026-03-26T23:31:26+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -71,16 +71,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.30.6"
+        DECIDIM_VERSION: "0.30.7"
         DECIDIM_BRANCH: "release/0.30-stable"
         NODE_MAJOR_VERSION: "18"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "13627af3fcf5826c73491bdfe574887240d12265"
-        VCS_REF_SHORT: "13627af3"
-        VCS_REF_DATE: "2026-03-25"
-        VERSION: "0.30.6"
-        BUILD_DATE: "2026-03-25T23:33:42+00:00"
+        VCS_REF: "715bf5200ddf1287541b201bb118fc12424ac1bf"
+        VCS_REF_SHORT: "715bf520"
+        VCS_REF_DATE: "2026-03-26"
+        VERSION: "0.30.7"
+        BUILD_DATE: "2026-03-26T23:31:26+00:00"
     ports:
       - "3003:3000"
     environment:
