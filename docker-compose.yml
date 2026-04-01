@@ -24,7 +24,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
+        UBUNTU_TAG: "22.04"
         DECIDIM_VERSION: "0.32.0.dev"
         DECIDIM_BRANCH: "develop"
         NODE_MAJOR_VERSION: "22"
@@ -34,7 +34,7 @@ services:
         VCS_REF_SHORT: "305ef8b8"
         VCS_REF_DATE: "2026-03-31"
         VERSION: "0.32.0.dev"
-        BUILD_DATE: "2026-03-31T23:33:05+00:00"
+        BUILD_DATE: "2026-04-01T23:35:01+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -47,7 +47,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
+        UBUNTU_TAG: "22.04"
         DECIDIM_VERSION: "0.31.3"
         DECIDIM_BRANCH: "release/0.31-stable"
         NODE_MAJOR_VERSION: "22"
@@ -57,7 +57,7 @@ services:
         VCS_REF_SHORT: "f53e2e82"
         VCS_REF_DATE: "2026-03-27"
         VERSION: "0.31.3"
-        BUILD_DATE: "2026-03-31T23:33:05+00:00"
+        BUILD_DATE: "2026-04-01T23:35:01+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -70,7 +70,7 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
+        UBUNTU_TAG: "22.04"
         DECIDIM_VERSION: "0.30.7"
         DECIDIM_BRANCH: "release/0.30-stable"
         NODE_MAJOR_VERSION: "18"
@@ -80,7 +80,7 @@ services:
         VCS_REF_SHORT: "3389cc8b"
         VCS_REF_DATE: "2026-03-27"
         VERSION: "0.30.7"
-        BUILD_DATE: "2026-03-31T23:33:05+00:00"
+        BUILD_DATE: "2026-04-01T23:35:01+00:00"
     ports:
       - "3003:3000"
     environment:
