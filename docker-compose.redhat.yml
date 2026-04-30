@@ -35,7 +35,7 @@ services:
         VCS_REF_SHORT: "6998c429"
         VCS_REF_DATE: "2026-04-29"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-04-29T23:54:15+00:00"
+        BUILD_DATE: "2026-04-30T23:52:08+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -50,16 +50,16 @@ services:
       args:
         REDHAT_TAG: "9.7"
         REDHAT_REPO: "ubi9"
-        DECIDIM_VERSION: "0.32.0.rc1"
-        DECIDIM_BRANCH: "release/0.32-stable"
+        DECIDIM_VERSION: "0.31.4"
+        DECIDIM_BRANCH: "release/0.31-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
-        RUBY_VERSION: "3.4.7"
-        VCS_REF: "e772699137f262d83105952d46de8182c351d75f"
-        VCS_REF_SHORT: "e7726991"
-        VCS_REF_DATE: "2026-04-29"
-        VERSION: "0.32.0.rc1"
-        BUILD_DATE: "2026-04-29T23:54:16+00:00"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "9b1a32ebcabeb12bd3a8d6a951fd9f792a026828"
+        VCS_REF_SHORT: "9b1a32eb"
+        VCS_REF_DATE: "2026-04-30"
+        VERSION: "0.31.4"
+        BUILD_DATE: "2026-04-30T23:52:09+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -74,16 +74,16 @@ services:
       args:
         REDHAT_TAG: "9.7"
         REDHAT_REPO: "ubi9"
-        DECIDIM_VERSION: "0.31.4"
-        DECIDIM_BRANCH: "release/0.31-stable"
-        NODE_MAJOR_VERSION: "22"
+        DECIDIM_VERSION: "0.30.8"
+        DECIDIM_BRANCH: "release/0.30-stable"
+        NODE_MAJOR_VERSION: "18"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "b0512e1a0454d468ed07913b79cfab7359da0092"
-        VCS_REF_SHORT: "b0512e1a"
-        VCS_REF_DATE: "2026-04-29"
-        VERSION: "0.31.4"
-        BUILD_DATE: "2026-04-29T23:54:17+00:00"
+        VCS_REF: "6c3e86eae6f4d7b1083520282cbb8c028b98d74d"
+        VCS_REF_SHORT: "6c3e86ea"
+        VCS_REF_DATE: "2026-04-30"
+        VERSION: "0.30.8"
+        BUILD_DATE: "2026-04-30T23:52:10+00:00"
     ports:
       - "3003:3000"
     environment:
