@@ -27,19 +27,19 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.33.0.dev`) |
-| `:0.30.8` | Last version |
+| `:0.32.0.rc1` | Last version |
 | `:0.31.4` | Stable version, security and bug fixes only |
-| `:0.32.0.rc1` | Legacy version, previous stable release |
+| `:0.30.8` | Legacy version, previous stable release |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.30.8 | Decidim v0.31.4 | Decidim v0.32.0.rc1 |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.32.0.rc1 | Decidim v0.31.4 | Decidim v0.30.8 |
 | --- | --- | --- | --- | --- |
-| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.30.8` | `:noble-0.31.4` | `:noble-0.32.0.rc1` |
-| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.30.8` | `:jammy-0.31.4` | `:jammy-0.32.0.rc1` |
-| Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.30.8` | `:questing-0.31.4` | `:questing-0.32.0.rc1` |
-| Redhat ubi9 (9.7) | `:ubi9-0.33.0.dev` | `:ubi9-0.30.8` | `:ubi9-0.31.4` | `:ubi9-0.32.0.rc1` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.30.8` | `:ubi8-0.31.4` | `:ubi8-0.32.0.rc1` |
+| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.0.rc1` | `:noble-0.31.4` | `:noble-0.30.8` |
+| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.32.0.rc1` | `:jammy-0.31.4` | `:jammy-0.30.8` |
+| Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.32.0.rc1` | `:questing-0.31.4` | `:questing-0.30.8` |
+| Redhat ubi9 (9.7) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0.rc1` | `:ubi9-0.31.4` | `:ubi9-0.30.8` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.0.rc1` | `:ubi8-0.31.4` | `:ubi8-0.30.8` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
