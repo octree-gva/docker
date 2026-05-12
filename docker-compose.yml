@@ -30,11 +30,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "8f2db0c57869d928d9f2f6472154c5af8d1c766d"
-        VCS_REF_SHORT: "8f2db0c5"
-        VCS_REF_DATE: "2026-05-11"
+        VCS_REF: "be39c244035485e2eba7181252aea487f5897cef"
+        VCS_REF_SHORT: "be39c244"
+        VCS_REF_DATE: "2026-05-12"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-05-11T23:57:07+00:00"
+        BUILD_DATE: "2026-05-12T23:58:39+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -48,16 +48,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.32.0.rc1"
+        DECIDIM_VERSION: "0.32.0.rc2"
         DECIDIM_BRANCH: "release/0.32-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "60d2609accbd1513bce33651287814de13729889"
-        VCS_REF_SHORT: "60d2609a"
-        VCS_REF_DATE: "2026-05-11"
-        VERSION: "0.32.0.rc1"
-        BUILD_DATE: "2026-05-11T23:57:07+00:00"
+        VCS_REF: "67d1001260dde8bb8dac968d06ddbdddac3bb138"
+        VCS_REF_SHORT: "67d10012"
+        VCS_REF_DATE: "2026-05-12"
+        VERSION: "0.32.0.rc2"
+        BUILD_DATE: "2026-05-12T23:58:39+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -71,16 +71,16 @@ services:
       <<: *default-build
       args:
         UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.31.4"
+        DECIDIM_VERSION: "0.31.5"
         DECIDIM_BRANCH: "release/0.31-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "1d1189c1c2126422cde769bc79d7165586148a9f"
-        VCS_REF_SHORT: "1d1189c1"
-        VCS_REF_DATE: "2026-05-11"
-        VERSION: "0.31.4"
-        BUILD_DATE: "2026-05-11T23:57:07+00:00"
+        VCS_REF: "c9077140d9eb6dddd764138aede9fdb601755ba4"
+        VCS_REF_SHORT: "c9077140"
+        VCS_REF_DATE: "2026-05-12"
+        VERSION: "0.31.5"
+        BUILD_DATE: "2026-05-12T23:58:39+00:00"
     ports:
       - "3003:3000"
     environment:
