@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for four decidim versions, based on various distributions (default is `ubuntu:noble`).
+On a daily basis, we publish images for four decidim versions, based on various distributions (default is `ubuntu:resolute`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -35,8 +35,8 @@ To use other distributions, these are available:
 
 | Operating System | Decidim v0.33.0.dev | Decidim v0.32.0.rc2 | Decidim v0.31.5 | Decidim v0.30.9 |
 | --- | --- | --- | --- | --- |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.0.rc2` | `:resolute-0.31.5` | `:resolute-0.30.9` |
 | Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.0.rc2` | `:noble-0.31.5` | `:noble-0.30.9` |
-| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.32.0.rc2` | `:jammy-0.31.5` | `:jammy-0.30.9` |
 | Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.32.0.rc2` | `:questing-0.31.5` | `:questing-0.30.9` |
 | Redhat ubi9 (9.7) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0.rc2` | `:ubi9-0.31.5` | `:ubi9-0.30.9` |
 | Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.0.rc2` | `:ubi8-0.31.5` | `:ubi8-0.30.9` |
