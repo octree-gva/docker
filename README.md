@@ -27,19 +27,19 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.33.0.dev`) |
-| `:0.30.9` | Last version |
-| `:0.32.0.rc3` | Stable version, security and bug fixes only |
-| `:0.31.5` | Legacy version, previous stable release |
+| `:0.32.0.rc3` | Last version |
+| `:0.31.5` | Stable version, security and bug fixes only |
+| `:0.30.9` | Legacy version, previous stable release |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.30.9 | Decidim v0.32.0.rc3 | Decidim v0.31.5 |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.32.0.rc3 | Decidim v0.31.5 | Decidim v0.30.9 |
 | --- | --- | --- | --- | --- |
-| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.30.9` | `:jammy-0.32.0.rc3` | `:jammy-0.31.5` |
-| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.30.9` | `:resolute-0.32.0.rc3` | `:resolute-0.31.5` |
-| Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.30.9` | `:questing-0.32.0.rc3` | `:questing-0.31.5` |
-| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.30.9` | `:ubi9-0.32.0.rc3` | `:ubi9-0.31.5` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.30.9` | `:ubi8-0.32.0.rc3` | `:ubi8-0.31.5` |
+| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.32.0.rc3` | `:jammy-0.31.5` | `:jammy-0.30.9` |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.0.rc3` | `:resolute-0.31.5` | `:resolute-0.30.9` |
+| Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.32.0.rc3` | `:questing-0.31.5` | `:questing-0.30.9` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0.rc3` | `:ubi9-0.31.5` | `:ubi9-0.30.9` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.0.rc3` | `:ubi8-0.31.5` | `:ubi8-0.30.9` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -75,7 +75,7 @@ Ready to mount a Decidim installation locally in 5min?
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.32.0.rc3/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.31.5/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
