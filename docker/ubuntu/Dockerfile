@@ -124,8 +124,8 @@ RUN bundle config set path "vendor" --global \
   && GEMS="$(apply-version-deps list gems)" \
   && if [ -n "$GEMS" ]; then \
        while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
-       bundle update $GEMS || bundle install; \
      fi \
+  && bundle install \
   && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \

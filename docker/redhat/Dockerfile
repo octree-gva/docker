@@ -31,7 +31,9 @@ COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
 RUN chmod +x /usr/local/bin/apply-version-deps
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
-  && /usr/bin/crb enable
+  && /usr/bin/crb enable \
+  && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${OS_MAJOR_VERSION}.rpm \
+  && dnf config-manager --set-enabled remi
 
 RUN dnf install -y \
     gcc \
@@ -64,8 +66,7 @@ RUN dnf install -y \
         dnf install -y xz; \
      fi \
   && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
-        dnf install -y libraw || dnf install -y LibRaw || \
-        dnf install -y https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-1.el9.x86_64.rpm; \
+        dnf install -y https://download.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-2.el9_7.x86_64.rpm; \
      fi \
   && dnf install -y vips vips-tools \
   && EXTRA_PKGS="$(apply-version-deps list redhat)" \
@@ -113,9 +114,9 @@ RUN bundle config set path "vendor" --global \
   && GEMS="$(apply-version-deps list gems)" \
   && if [ -n "$GEMS" ]; then \
        while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
-       bundle update $GEMS || bundle install; \
      fi \
-  && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
+  && bundle install \
+  && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
   && bundle config unset path --global \
