@@ -24,7 +24,9 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
+        OS_NAME: "<%= latest_ubuntu.os_name %>"
+        OS_VERSION: "<%= latest_ubuntu.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_ubuntu.os_major_version %>"
         <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
@@ -38,7 +40,9 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
+        OS_NAME: "<%= latest_ubuntu.os_name %>"
+        OS_VERSION: "<%= latest_ubuntu.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_ubuntu.os_major_version %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -52,7 +56,9 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "<%= latest_ubuntu.os_version %>"
+        OS_NAME: "<%= latest_ubuntu.os_name %>"
+        OS_VERSION: "<%= latest_ubuntu.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_ubuntu.os_major_version %>"
         <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"

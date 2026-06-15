@@ -12,20 +12,20 @@ module Docker
       "library/ubuntu"
     end
 
+    def pinned_tags
+      Docker::OsMatrix.instance.ubuntu_tags
+    end
+
+    def versionned_tag_names
+      pinned_tags
+    end
+
     def versionned_tags
-      @versionned_tags ||= begin
-        picked_major_versions = []
-        tag_names = tags do |tag|
-          next unless !tag.name || "#{tag.name}".empty? || tag.name.match?(/^\d+\.\d+$/)
-          major_version = "#{tag.name}".split(".").first
-          next if picked_major_versions.include?(major_version)
-          picked_major_versions << major_version
-          tag.name
-        end.select { |tag| !tag.nil? }
-        tag_names.map do  |tag_name| 
-          TagPresenter.new(self, codename_for(tag_name), tag_name)
-        end
-      end
+      pinned_tags
+    end
+
+    def latest
+      pinned_tags.first
     end
   end
 end

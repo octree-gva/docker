@@ -1,0 +1,13 @@
+# ponytail: ceiling = manual bump when new LTS ships; upgrade path = renovate/cron PR to refresh pins.
+ubuntu:
+  - name: noble
+    version: "24.04"
+  - name: jammy
+    version: "22.04"
+  - name: questing
+    version: "25.10"
+redhat:
+  - name: ubi9
+    version: "9.7"
+  - name: ubi8
+    version: "8.10"
