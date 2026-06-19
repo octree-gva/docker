@@ -12,6 +12,10 @@ version-deps/
   0.31/npm.txt
   0.32/gems.txt
   0.32/npm.txt
+  0.32/redhat.txt
+  0.33/gems.txt
+  0.33/npm.txt
+  0.33/redhat.txt
 ```
 
 ## Files

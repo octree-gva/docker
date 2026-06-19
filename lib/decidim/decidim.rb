@@ -26,11 +26,12 @@ module Decidim
 
       def clone_repository
         @clone_repository ||= Docker::Task.system!(
-          "git", 
-          "clone", 
-          "--branch", "develop", 
-          "--no-single-branch", "https://github.com/decidim/decidim.git", 
-          clone_destination
+          "git",
+          "clone",
+          "--branch", "develop",
+          "--no-single-branch", "https://github.com/decidim/decidim.git",
+          clone_destination,
+          silent: true
         )
       end
 
