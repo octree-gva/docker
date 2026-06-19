@@ -14,12 +14,12 @@ require_relative 'docker/task'
 require_relative 'docker/docker_hub'
 require_relative 'docker/concern/docker_hub_image'
 require_relative 'docker/tag_presenter'
+require_relative 'docker/os_matrix'
 require_relative 'docker/ubuntu'
 require_relative 'docker/redhat'
 
 require_relative 'decidim/decidim-version'
 require_relative 'decidim/decidim'
-require_relative 'initializers/configure_docker_hub'
 
 module Docker
   include ActiveSupport::Configurable

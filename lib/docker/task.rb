@@ -3,7 +3,7 @@ require 'open3'
 module Docker
   module Task
     def self.verbose?
-      !ENV["VERBOSE"] || ENV["VERBOSE"] == "0"
+      ENV["VERBOSE"].to_s != "0" && !ENV["VERBOSE"].nil?
     end
     ## Print a message if VERBOSE is set
     def self.put(message)
@@ -12,8 +12,14 @@ module Docker
 
     ## Task help message
     def self.help
-      puts "`rake docker:build:ubuntu[dev|last|prev]`"
-      puts "  Build the development, last or previous stable version of the Docker image over the last three ubuntu versions"
+      puts "`rake docker:build:ubuntu[dev|last|prev|legacy]`"
+      puts "  Build all pinned Ubuntu images for a Decidim version slot"
+      puts "`rake docker:build:ubuntu_one[version,os_name]`"
+      puts "  Build one Ubuntu image (e.g. docker:build:ubuntu_one[last,noble])"
+      puts "`rake docker:build:redhat_one[version,os_name]`"
+      puts "  Build one Red Hat image (e.g. docker:build:redhat_one[last,ubi9])"
+      puts "`rake docker:image_ref[distribution,version,os_name]`"
+      puts "  Print local image reference (e.g. docker:image_ref[ubuntu,last,noble])"
       puts "  Options:"
       puts "    dev: Build the development version"
       puts "    last: Build the last stable version"

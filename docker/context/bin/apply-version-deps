@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION_DEPS_ROOT="${VERSION_DEPS_ROOT:-/tmp/version-deps}"
+DECIDIM_VERSION="${DECIDIM_VERSION:?DECIDIM_VERSION is required}"
+
+minor_version() {
+  local version="${DECIDIM_VERSION%.dev}"
+  echo "${version}" | sed -E 's/^([0-9]+\.[0-9]+).*/\1/'
+}
+
+list_overlay() {
+  local kind="$1"
+  local minor
+  minor="$(minor_version)"
+  local file="${VERSION_DEPS_ROOT}/${minor}/${kind}.txt"
+  if [[ -f "$file" ]]; then
+    grep -v '^#' "$file" | sed '/^[[:space:]]*$/d' || true
+  fi
+}
+
+case "${1:-}" in
+  list)
+    list_overlay "${2:-}"
+    ;;
+  *)
+    echo "usage: apply-version-deps list <gems|npm|ubuntu|redhat>" >&2
+    exit 1
+    ;;
+esac

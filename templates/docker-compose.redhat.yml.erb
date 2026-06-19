@@ -24,8 +24,9 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= latest_redhat.os_version %>"
-        REDHAT_REPO: "<%= latest_redhat.os_name %>"
+        OS_NAME: "<%= latest_redhat.os_name %>"
+        OS_VERSION: "<%= latest_redhat.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_redhat.os_major_version %>"
         <%= develop_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3001:3000"
@@ -39,8 +40,9 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= latest_redhat.os_version %>"
-        REDHAT_REPO: "<%= latest_redhat.os_name %>"
+        OS_NAME: "<%= latest_redhat.os_name %>"
+        OS_VERSION: "<%= latest_redhat.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_redhat.os_major_version %>"
         <%= last_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3002:3000"
@@ -54,8 +56,9 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "<%= latest_redhat.os_version %>"
-        REDHAT_REPO: "<%= latest_redhat.os_name %>"
+        OS_NAME: "<%= latest_redhat.os_name %>"
+        OS_VERSION: "<%= latest_redhat.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_redhat.os_major_version %>"
         <%= prev_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
     ports:
       - "3003:3000"

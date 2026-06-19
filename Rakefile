@@ -2,7 +2,6 @@ require 'dotenv/load'
 require 'erb'
 require 'active_support/core_ext/string'
 require_relative './lib/docker'
-require "byebug"
 ##
 # Get the decidim version from the args. 
 # This allows tasks like rake docker:build:redhat[dev] to build the dev version of the redhat image
@@ -30,42 +29,93 @@ def print_results(messages)
   end
   Docker::Task.put("*" * 80)
 end
+
+def fail_on_build_results!(messages)
+  built = messages.count { |m| m&.start_with?("✅ BUILT:") }
+  if built.zero?
+    Docker::Task.put("Error: no images were built")
+    exit 1
+  end
+  exit 1 if messages.any? { |m| m&.include?("ERROR:") }
+end
+
+def os_tag_for(distribution, os_name)
+  distribution = distribution.to_sym if distribution.is_a?(String)
+  tags = distribution == :ubuntu ? Docker::OsMatrix.instance.ubuntu_tags : Docker::OsMatrix.instance.redhat_tags
+  tag = tags.find { |t| t.os_name == os_name }
+  raise "Unknown OS name #{os_name} for #{distribution}" unless tag
+
+  tag
+end
 #
 ##
 # Build docker images
 # @param distribution_singleton [Docker::Redhat | Docker::Ubuntu]
 # @param version [Decidim::DecidimVersion]
 # @return [void]
-def build_docker_image(distribution_singleton, version, dockerfile_path)
-  last_command = nil
-  distribution_singleton.versionned_tag_names.map do |tag|
-    docker_args = {
-      OS_VERSION: tag.os_version,
-      OS_NAME: tag.os_name,
-      OS_MAJOR_VERSION: tag.os_major_version,
-    }.merge(version.docker_args)
-    docker_args = docker_args.map do |key, value|
-      "--build-arg=#{key}=#{value}"
-    end
-    last_command = [
-      "docker", 
-      "build", 
-      "--file=#{dockerfile_path}", 
-      "--tag=decidim:#{tag.docker_tag(version.decidim_version)}", 
-      *docker_args,
+def docker_build_command(dockerfile_path, tag_name, docker_args)
+  docker_arg_flags = docker_args.map { |key, value| "--build-arg=#{key}=#{value}" }
+  command = [
+    "docker",
+    "build",
+    "--file=#{dockerfile_path}",
+    "--tag=decidim:#{tag_name}",
+    *docker_arg_flags,
+    "./docker"
+  ]
+  if ENV["BUILDX_CACHE"] == "1"
+    command = [
+      "docker", "buildx", "build",
+      "--cache-from", "type=gha",
+      "--cache-to", "type=gha,mode=max",
+      "--load",
+      "--file=#{dockerfile_path}",
+      "--tag=decidim:#{tag_name}",
+      *docker_arg_flags,
       "./docker"
     ]
+  end
+  command
+end
+
+def build_docker_image_tag(tag, version, dockerfile_path)
+  docker_args = {
+    OS_VERSION: tag.os_version,
+    OS_NAME: tag.os_name,
+    OS_MAJOR_VERSION: tag.os_major_version,
+  }.merge(version.docker_args)
+  tag_name = tag.docker_tag(version.decidim_version)
+  command = docker_build_command(dockerfile_path, tag_name, docker_args)
+  Docker::Task.system!(*command)
+  "✅ BUILT: decidim:#{tag_name}"
+rescue => e
+  Docker::Task.put("Error: Failed to build decidim:#{tag_name}")
+  Docker::Task.put("Error: #{e.message}")
+  "❌ ERROR: decidim:#{tag_name}"
+end
+
+def build_docker_image(distribution_singleton, version, dockerfile_path)
+  last_command = nil
+  distribution_singleton.pinned_tags.map do |tag|
+    tag_name = tag.docker_tag(version.decidim_version)
+    last_command = docker_build_command(
+      dockerfile_path,
+      tag_name,
+      {
+        OS_VERSION: tag.os_version,
+        OS_NAME: tag.os_name,
+        OS_MAJOR_VERSION: tag.os_major_version,
+      }.merge(version.docker_args)
+    )
     begin
-      Docker::Task.system!(
-        *last_command
-      )
+      Docker::Task.system!(*last_command)
     rescue => e
-      Docker::Task.put("Error: Failed to build #{tag.docker_tag(version.decidim_version)}")
+      Docker::Task.put("Error: Failed to build #{tag_name}")
       Docker::Task.put("Error: #{e.message}")
-      next "❌ ERROR: decidim:#{tag.docker_tag(version.decidim_version)}"
+      next "❌ ERROR: decidim:#{tag_name}"
     end
     last_command = nil
-    "✅ BUILT: decidim:#{tag.docker_tag(version.decidim_version)}"
+    "✅ BUILT: decidim:#{tag_name}"
   end
 ensure
   Decidim::Decidim.instance.clean_clone
@@ -80,6 +130,15 @@ end
 # @param push_default [Boolean] If first version should be pushed without Distro name. if "dev" version, also push latest tag.
 # @return [void]
 def push_docker_images(distribution_singleton, args, push_default: false)
+  push_docker_images_for_tags(
+    distribution_singleton,
+    args,
+    distribution_singleton.pinned_tags,
+    push_default: push_default
+  )
+end
+
+def push_docker_images_for_tags(_distribution_singleton, args, tags, push_default: false)
   if ENV["DOCKER_HUB_REGISTRY"].nil?
     Docker::Task.put("DOCKER_HUB_REGISTRY is not set")
     Docker::Task.help
@@ -88,8 +147,8 @@ def push_docker_images(distribution_singleton, args, push_default: false)
   registry_username = ENV["DOCKER_HUB_REGISTRY"]
 
   messages = []
-  distribution_singleton.versionned_tag_names.each_with_index do |tag, index|
-    version = decidim_from_args(args)
+  version = decidim_from_args(args)
+  tags.each_with_index do |tag, index|
     source_tag = tag.docker_tag(version.decidim_version)
     Docker::Task.put("Prepare #{version.decidim_version}")
     if index == 0 && push_default
@@ -156,9 +215,31 @@ end
 task :"docker:build:redhat", [:version] do |_, args|
   messages = build_docker_image(Docker::Redhat.instance, decidim_from_args(args), "docker/redhat/Dockerfile")
   print_results(messages)
+  fail_on_build_results!(messages)
+end
+
+task :"docker:build:ubuntu_one", %i[version os_name] do |_, args|
+  version = decidim_from_args(args)
+  tag = os_tag_for(:ubuntu, args[:os_name])
+  messages = [build_docker_image_tag(tag, version, "docker/ubuntu/Dockerfile")]
+  print_results(messages)
+  fail_on_build_results!(messages)
+ensure
+  Decidim::Decidim.instance.clean_clone
+end
+
+task :"docker:build:redhat_one", %i[version os_name] do |_, args|
+  version = decidim_from_args(args)
+  tag = os_tag_for(:redhat, args[:os_name])
+  messages = [build_docker_image_tag(tag, version, "docker/redhat/Dockerfile")]
+  print_results(messages)
+  fail_on_build_results!(messages)
+ensure
+  Decidim::Decidim.instance.clean_clone
 end
 
 task :"docker:push:redhat", [:version] do |_, args|
+  Docker::DockerHub.configure!
   messages = push_docker_images(Docker::Redhat.instance, args, push_default: false)
   print_results(messages)
   if messages.any? { |message| message&.include?("ERROR:") }
@@ -169,9 +250,28 @@ end
 task :"docker:build:ubuntu", [:version] do |_, args|
   messages = build_docker_image(Docker::Ubuntu.instance, decidim_from_args(args), "docker/ubuntu/Dockerfile")
   print_results(messages)
+  fail_on_build_results!(messages)
+end
+
+task :"docker:push:ubuntu_one", %i[version os_name] do |_, args|
+  Docker::DockerHub.configure!
+  tag = os_tag_for(:ubuntu, args[:os_name])
+  push_default = ENV["PUSH_VERSION_ALIASES"] == "1"
+  messages = push_docker_images_for_tags(Docker::Ubuntu.instance, args, [tag], push_default: push_default)
+  print_results(messages)
+  exit 1 if messages.any? { |message| message&.include?("ERROR:") }
+end
+
+task :"docker:push:redhat_one", %i[version os_name] do |_, args|
+  Docker::DockerHub.configure!
+  tag = os_tag_for(:redhat, args[:os_name])
+  messages = push_docker_images_for_tags(Docker::Redhat.instance, args, [tag], push_default: false)
+  print_results(messages)
+  exit 1 if messages.any? { |message| message&.include?("ERROR:") }
 end
 
 task :"docker:push:ubuntu", [:version] do |_, args|
+  Docker::DockerHub.configure!
   messages = push_docker_images(Docker::Ubuntu.instance, args, push_default: true)
   print_results(messages)
   if messages.any? { |message| message&.include?("ERROR:") }
@@ -184,7 +284,16 @@ task :"docker:clean", [] do
   Docker::Task.put("decidim-clone directory removed")
 end
 
-task :"docker:docs", [] do 
+task :"docker:image_ref", %i[distribution version os_name] do |_, args|
+  version = decidim_from_args(args)
+  distribution = args[:distribution].to_sym
+  tag = os_tag_for(distribution, args[:os_name])
+  puts "decidim:#{tag.docker_tag(version.decidim_version)}"
+ensure
+  Decidim::Decidim.instance.clean_clone
+end
+
+task :"docker:docs", [] do
   versions = Decidim::Decidim.instance.versions
   template_vars = {
     github_repository: ENV.fetch("GITHUB_REPOSITORY", "decidim/docker"),

@@ -1,13 +1,13 @@
-ARG OS_NAME=ubi10
-ARG OS_MAJOR_VERSION=10
-ARG OS_VERSION=10.0
+ARG OS_NAME=ubi9
+ARG OS_MAJOR_VERSION=9
+ARG OS_VERSION=9.7
 ARG NODE_MAJOR_VERSION
 
 # Single base with all dependencies
 FROM redhat/${OS_NAME}:${OS_VERSION} AS base
 ARG OS_MAJOR_VERSION
 ARG DECIDIM_VERSION
-ARG DECIDIM_BRANCH  
+ARG DECIDIM_BRANCH
 ARG NODE_MAJOR_VERSION
 ARG BUNDLER_VERSION
 ARG RUBY_VERSION
@@ -26,16 +26,22 @@ ENV TZ=UTC \
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
-# Single comprehensive package installation
+COPY version-deps/ /tmp/version-deps/
+COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
+RUN chmod +x /usr/local/bin/apply-version-deps
+
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
   && /usr/bin/crb enable \
-  && dnf config-manager --set-enabled epel-testing \
   && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${OS_MAJOR_VERSION}.rpm \
-  && dnf config-manager --set-enabled remi \
-  && dnf install -y \
+  && dnf config-manager --set-enabled remi
+
+RUN dnf install -y \
     gcc \
     gcc-c++ \
     make \
+    pkg-config \
+    which \
+    file \
     ca-certificates \
     wget \
     git \
@@ -54,24 +60,24 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
     vim \
     zlib-devel \
     cronie \
-  # UBI8: Install orc, libraw (required by vips) and xz (required for Nokogiri compilation)
   && if [ "${OS_MAJOR_VERSION}" = "8" ]; then \
         dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/o/orc-0.4.28-3.el8.x86_64.rpm && \
-         dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/LibRaw-0.19.5-4.el8.x86_64.rpm && \
-         dnf install -y xz ; \
-    fi \
-  # Ubi9 does not have LibRaw, and ubi10 requires it.
+        dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/LibRaw-0.19.5-4.el8.x86_64.rpm && \
+        dnf install -y xz; \
+     fi \
   && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
-        dnf install -y libraw || dnf install -y LibRaw || \
-        dnf install -y https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-1.el9.x86_64.rpm ; \
-    fi \
-  && dnf install -y \
-    vips \
-    vips-tools \
-  # Install Node.js from NodeSource
-  && curl -fsSL https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
+        dnf install -y https://download.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-2.el9_7.x86_64.rpm; \
+     fi \
+  && dnf install -y vips vips-tools \
+  && EXTRA_PKGS="$(apply-version-deps list redhat)" \
+  && if [ -n "$EXTRA_PKGS" ]; then dnf install -y $EXTRA_PKGS; fi \
+  && dnf clean all
+
+RUN for attempt in 1 2 3; do \
+      curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash - && break; \
+      sleep 5; \
+    done \
   && dnf install -y nodejs \
-  # Install rbenv and Ruby
   && git clone --depth 1 https://github.com/rbenv/rbenv.git ~/.rbenv \
   && git clone --depth 1 https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
   && echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc \
@@ -79,19 +85,16 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${O
   && RUBY_CONFIGURE_OPTS="--disable-install-rdoc --enable-shared" rbenv install "$RUBY_VERSION" \
   && rbenv global "$RUBY_VERSION" \
   && rbenv rehash \
-  # Configure gems and bundler
   && echo "gem: --no-document" >> /etc/gemrc \
   && if [ "${OS_MAJOR_VERSION}" = "8" ]; then bundle config set force_ruby_platform true; fi \
   && ~/.rbenv/shims/gem install bundler -v $BUNDLER_VERSION \
   && ~/.rbenv/shims/bundle config set build.charlock_holmes -- --with-cxxflags='#' --global \
-  # Install Yarn
   && npm install -g yarn \
-  # Cleanup
   && dnf clean all \
   && rm -rf /tmp/* /var/tmp/* ~/.cache
 
 ##
-# Generator Image - NOW USES base INSTEAD OF DUPLICATING
+# Generator Image
 ##
 FROM base AS generator
 ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
@@ -104,14 +107,16 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 
-# Clone decidim to run generator from the good branch
 RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/decidim.git /home/generator
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && echo "gem 'commonmarker'" >> Gemfile \
-  && (bundle update commonmarker || bundle install) \
-  && bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
+  && GEMS="$(apply-version-deps list gems)" \
+  && if [ -n "$GEMS" ]; then \
+       while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
+     fi \
+  && bundle install \
+  && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
   && bundle config unset path --global \
@@ -119,16 +124,14 @@ RUN bundle config set path "vendor" --global \
 
 WORKDIR $WORK_DIR
 ENV BUNDLE_PATH="/home/decidim/vendor"
-# Clean up generated app
 RUN rm -rf .git node_modules .npm  .npmrc .yarnrc .yarn tmp \
     config/master.key config/credentials.yml.enc \
   && mkdir -p tmp/pids tmp/sockets \
   && npm cache clean --force \
-  && yarn cache clean --force 
+  && yarn cache clean --force
 
 COPY ./context .
 
-# Install app dependencies
 RUN bundle config set without "development:test" \
   && bundle config set path "/home/decidim/vendor" \
   && echo "ruby-$RUBY_VERSION" > $WORK_DIR/.ruby-version \
@@ -154,7 +157,8 @@ RUN bundle config set frozen false \
   && bundle config set without '' \
   && bundle check || bundle install \
   && npm install \
-  # Precompile assets
+  && NPM_LINES="$(apply-version-deps list npm)" \
+  && if [ -n "$NPM_LINES" ]; then while read -r args; do npm install $args; done <<< "$NPM_LINES"; fi \
   && bin/rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
@@ -163,7 +167,7 @@ RUN bundle config set frozen false \
 ##
 FROM base AS decidim
 ARG BUILD_DATE
-ARG VCS_REF  
+ARG VCS_REF
 ARG VERSION
 ARG OS_NAME
 ARG NODE_MAJOR_VERSION
@@ -206,21 +210,17 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
     PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
-  
-# SMTP Configuration
+
 ENV SMTP_ADDRESS="" \
     SMTP_DOMAIN="" \
     SMTP_USERNAME="" \
     SMTP_PASSWORD="" \
     SMTP_PORT=587 \
     SMTP_STARTTLS_AUTO=true \
-    SMTP_AUTHENTICATION=plain 
-# Maps Configuration  
+    SMTP_AUTHENTICATION=plain
 ENV MAPS_PROVIDER="" \
-    MAPS_API_KEY="" 
-# Storage Configuration
-ENV STORAGE_PROVIDER=local 
-# Rails Configuration
+    MAPS_API_KEY=""
+ENV STORAGE_PROVIDER=local
 ENV RAILS_ENV=production \
     RAILS_LOG_LEVEL=debug \
     RAILS_MAX_THREADS=5 \
@@ -229,7 +229,6 @@ ENV RAILS_ENV=production \
     PORT=3000 \
     EDITOR=vim \
     PATH="/home/decidim/bin:${PATH}"
-# Decidim Core Configuration
 ENV DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_MAILER_SENDER="change-me@example.org" \
     DECIDIM_AVAILABLE_LOCALES="en" \
@@ -237,12 +236,9 @@ ENV DECIDIM_APPLICATION_NAME="My Application Name" \
     DECIDIM_FORCE_SSL=auto \
     DECIDIM_TRACK_NEWSLETTER_LINKS=true \
     DECIDIM_ADMIN_PASSWORD_STRONG=true \
-    DECIDIM_SERVICE_WORKER_ENABLED=false 
-# Decidim Spam Detection
+    DECIDIM_SERVICE_WORKER_ENABLED=false
 ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
-
-# Decidim custom configuration 
 ENV DECIDIM_CRON_ENABLED=true \
     DECIDIM_SYSTEM_EMAIL=system@example.org \
     DECIDIM_SYSTEM_PASSWORD=my_insecure_password
@@ -250,7 +246,7 @@ ENV DECIDIM_CRON_ENABLED=true \
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1000 decidim \
     && useradd -m -u 1000 -g decidim -d $WORK_DIR -s /bin/bash decidim
-    
+
 WORKDIR $WORK_DIR
 
 COPY --chown=decidim:decidim --from=generator /home/decidim .
@@ -259,7 +255,7 @@ COPY ./scripts/write_motd bin/write_motd
 RUN bundle exec bin/write_motd && rm bin/write_motd \
     && crontab -u decidim /home/decidim/crontab.d/crontab
 USER decidim
-RUN bundle check || bundle install 
+RUN bundle check || bundle install
 
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]

@@ -29,6 +29,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
+COPY version-deps/ /tmp/version-deps/
+COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
+RUN chmod +x /usr/local/bin/apply-version-deps
+
 # Single comprehensive package installation
 RUN apt-get update -yq \
   && apt-get install -yq --no-install-recommends \
@@ -59,7 +63,12 @@ RUN apt-get update -yq \
     tzdata \
     vim \
     zlib1g-dev \
-    cron 
+    cron
+RUN EXTRA_PKGS="$(apply-version-deps list ubuntu)" \
+  && if [ -n "$EXTRA_PKGS" ]; then \
+       apt-get update -yq \
+       && apt-get install -yq --no-install-recommends $EXTRA_PKGS; \
+     fi
   # Install Node.js from NodeSource
 RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends nodejs \
@@ -112,8 +121,11 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && echo "gem 'commonmarker'" >> Gemfile \
-  && (bundle update commonmarker || bundle install) \
+  && GEMS="$(apply-version-deps list gems)" \
+  && if [ -n "$GEMS" ]; then \
+       while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
+     fi \
+  && bundle install \
   && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
   && cp -r rails_app/. $WORK_DIR  \
@@ -156,7 +168,9 @@ RUN bundle config set frozen false \
   && bundle config set deployment false \
   && bundle config set without '' \
   && bundle check || bundle install \
-  && npm install
+  && npm install \
+  && NPM_LINES="$(apply-version-deps list npm)" \
+  && if [ -n "$NPM_LINES" ]; then while read -r args; do npm install $args; done <<< "$NPM_LINES"; fi
 
 RUN bundle exec rails assets:precompile \
   && rm -rf node_modules .npmrc .yarnrc .yarn
