@@ -24,18 +24,19 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "9.8"
-        REDHAT_REPO: "ubi9"
+        OS_NAME: "ubi9"
+        OS_VERSION: "9.7"
+        OS_MAJOR_VERSION: "9"
         DECIDIM_VERSION: "0.33.0.dev"
         DECIDIM_BRANCH: "develop"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "b5cdfd2a94889ffc2523855a33a9ef78ce8c1548"
-        VCS_REF_SHORT: "b5cdfd2a"
-        VCS_REF_DATE: "2026-06-18"
+        VCS_REF: "48ea0ea388b13b50057bead0e526b6846b680279"
+        VCS_REF_SHORT: "48ea0ea3"
+        VCS_REF_DATE: "2026-06-20"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-06-19T00:25:30+00:00"
+        BUILD_DATE: "2026-06-20T00:08:03+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -48,18 +49,19 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "9.8"
-        REDHAT_REPO: "ubi9"
+        OS_NAME: "ubi9"
+        OS_VERSION: "9.7"
+        OS_MAJOR_VERSION: "9"
         DECIDIM_VERSION: "0.32.0.rc3"
         DECIDIM_BRANCH: "release/0.32-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "f0662f9dc54cad1a71f7022bb935e60236eddd13"
-        VCS_REF_SHORT: "f0662f9d"
-        VCS_REF_DATE: "2026-06-18"
+        VCS_REF: "2ea797a321486bbe9e474ff4211c9064ce1410f1"
+        VCS_REF_SHORT: "2ea797a3"
+        VCS_REF_DATE: "2026-06-19"
         VERSION: "0.32.0.rc3"
-        BUILD_DATE: "2026-06-19T00:25:31+00:00"
+        BUILD_DATE: "2026-06-20T00:08:03+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -72,18 +74,19 @@ services:
     build:
       <<: *default-build
       args:
-        REDHAT_TAG: "9.8"
-        REDHAT_REPO: "ubi9"
+        OS_NAME: "ubi9"
+        OS_VERSION: "9.7"
+        OS_MAJOR_VERSION: "9"
         DECIDIM_VERSION: "0.31.5"
         DECIDIM_BRANCH: "release/0.31-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "8452cee13091dca84b89cae0992d385437a9267f"
-        VCS_REF_SHORT: "8452cee1"
-        VCS_REF_DATE: "2026-06-18"
+        VCS_REF: "533ed55640b3ea3a8e45e4a3e1e03b1fc60ca2f5"
+        VCS_REF_SHORT: "533ed556"
+        VCS_REF_DATE: "2026-06-19"
         VERSION: "0.31.5"
-        BUILD_DATE: "2026-06-19T00:25:31+00:00"
+        BUILD_DATE: "2026-06-20T00:08:04+00:00"
     ports:
       - "3003:3000"
     environment:
