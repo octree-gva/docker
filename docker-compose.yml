@@ -32,11 +32,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "48ea0ea388b13b50057bead0e526b6846b680279"
-        VCS_REF_SHORT: "48ea0ea3"
-        VCS_REF_DATE: "2026-06-20"
+        VCS_REF: "ade2da34bc8ff81339ade6e4e8eb6aedf889da85"
+        VCS_REF_SHORT: "ade2da34"
+        VCS_REF_DATE: "2026-06-21"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-06-21T00:04:26+00:00"
+        BUILD_DATE: "2026-06-22T00:10:10+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -45,6 +45,31 @@ services:
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
   decidim-last-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.31.5"
+        DECIDIM_BRANCH: "release/0.31-stable"
+        NODE_MAJOR_VERSION: "22"
+        BUNDLER_VERSION: "2.4.20"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "ca285eb8545d6701fc59231905a1d06901401eb3"
+        VCS_REF_SHORT: "ca285eb8"
+        VCS_REF_DATE: "2026-06-21"
+        VERSION: "0.31.5"
+        BUILD_DATE: "2026-06-22T00:10:10+00:00"
+    ports:
+      - "3002:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/1
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
+
+  decidim-prev-stable:
     <<: *default
     build:
       <<: *default-build
@@ -61,32 +86,7 @@ services:
         VCS_REF_SHORT: "e229b0d0"
         VCS_REF_DATE: "2026-06-20"
         VERSION: "0.32.0.rc3"
-        BUILD_DATE: "2026-06-21T00:04:26+00:00"
-    ports:
-      - "3002:3000"
-    environment:
-      <<: *default-environment
-      REDIS_URL: redis://redis:6379/1
-      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
-
-  decidim-prev-stable:
-    <<: *default
-    build:
-      <<: *default-build
-      args:
-        OS_NAME: "noble"
-        OS_VERSION: "24.04"
-        OS_MAJOR_VERSION: "24"
-        DECIDIM_VERSION: "0.31.5"
-        DECIDIM_BRANCH: "release/0.31-stable"
-        NODE_MAJOR_VERSION: "22"
-        BUNDLER_VERSION: "2.4.20"
-        RUBY_VERSION: "3.3.4"
-        VCS_REF: "533ed55640b3ea3a8e45e4a3e1e03b1fc60ca2f5"
-        VCS_REF_SHORT: "533ed556"
-        VCS_REF_DATE: "2026-06-19"
-        VERSION: "0.31.5"
-        BUILD_DATE: "2026-06-21T00:04:26+00:00"
+        BUILD_DATE: "2026-06-22T00:10:10+00:00"
     ports:
       - "3003:3000"
     environment:
