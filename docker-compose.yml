@@ -24,17 +24,19 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.32.0.dev"
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.33.0.dev"
         DECIDIM_BRANCH: "develop"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "a6d9ee7f6a55424070a32a33a95f76fe37997e49"
-        VCS_REF_SHORT: "a6d9ee7f"
-        VCS_REF_DATE: "2026-02-09"
-        VERSION: "0.32.0.dev"
-        BUILD_DATE: "2026-02-09T23:35:50+00:00"
+        VCS_REF: "b2001fa7c9d26fa7b43aadd2d05353d67e5da889"
+        VCS_REF_SHORT: "b2001fa7"
+        VCS_REF_DATE: "2026-06-22"
+        VERSION: "0.33.0.dev"
+        BUILD_DATE: "2026-06-25T00:10:11+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -47,17 +49,19 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.31.1"
-        DECIDIM_BRANCH: "release/0.31-stable"
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.32.0.rc3"
+        DECIDIM_BRANCH: "release/0.32-stable"
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
-        RUBY_VERSION: "3.3.4"
-        VCS_REF: "cb58fc704695bace6adea8b34fc076581b7ac9ab"
-        VCS_REF_SHORT: "cb58fc70"
-        VCS_REF_DATE: "2026-02-09"
-        VERSION: "0.31.1"
-        BUILD_DATE: "2026-02-09T23:35:50+00:00"
+        RUBY_VERSION: "3.4.7"
+        VCS_REF: "c379c7874075aa1830bd6b3c117fea40260cc53e"
+        VCS_REF_SHORT: "c379c787"
+        VCS_REF_DATE: "2026-06-22"
+        VERSION: "0.32.0.rc3"
+        BUILD_DATE: "2026-06-25T00:10:11+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -70,17 +74,19 @@ services:
     build:
       <<: *default-build
       args:
-        UBUNTU_TAG: "24.04"
-        DECIDIM_VERSION: "0.30.5"
-        DECIDIM_BRANCH: "release/0.30-stable"
-        NODE_MAJOR_VERSION: "18"
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.31.5"
+        DECIDIM_BRANCH: "release/0.31-stable"
+        NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "40d7a9d7c5fcb16ac9fc5e7d84fc121cda526857"
-        VCS_REF_SHORT: "40d7a9d7"
-        VCS_REF_DATE: "2026-02-09"
-        VERSION: "0.30.5"
-        BUILD_DATE: "2026-02-09T23:35:50+00:00"
+        VCS_REF: "1d5c59406838f5b201a80a6a23d962df24a12add"
+        VCS_REF_SHORT: "1d5c5940"
+        VCS_REF_DATE: "2026-06-22"
+        VERSION: "0.31.5"
+        BUILD_DATE: "2026-06-25T00:10:11+00:00"
     ports:
       - "3003:3000"
     environment:
