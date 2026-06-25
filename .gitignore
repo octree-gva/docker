@@ -4,3 +4,4 @@ node_modules
 decidim-clone
 .DS_Store
 .byebug_history
+vendor
