@@ -121,6 +121,7 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
+  && bundle config set without "development:test" --global \
   && GEMS="$(apply-version-deps list gems)" \
   && if [ -n "$GEMS" ]; then \
        while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
@@ -166,7 +167,6 @@ ENV SECRET_KEY_BASE=assets \
 
 RUN bundle config set frozen false \
   && bundle config set deployment false \
-  && bundle config set without '' \
   && bundle check || bundle install \
   && npm install \
   && NPM_LINES="$(apply-version-deps list npm)" \
