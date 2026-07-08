@@ -8,6 +8,6 @@ ubuntu:
     version: "25.10"
 redhat:
   - name: ubi9
-    version: "9.7"
+    version: "9.8"
   - name: ubi8
     version: "8.10"

@@ -1,6 +1,6 @@
 ARG OS_NAME=ubi9
 ARG OS_MAJOR_VERSION=9
-ARG OS_VERSION=9.7
+ARG OS_VERSION=9.8
 ARG NODE_MAJOR_VERSION
 
 # Single base with all dependencies

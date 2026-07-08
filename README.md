@@ -38,7 +38,7 @@ To use other distributions, these are available:
 | Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.0` | `:noble-0.31.6` | `:noble-0.30.9` |
 | Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.32.0` | `:jammy-0.31.6` | `:jammy-0.30.9` |
 | Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.32.0` | `:questing-0.31.6` | `:questing-0.30.9` |
-| Redhat ubi9 (9.7) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0` | `:ubi9-0.31.6` | `:ubi9-0.30.9` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0` | `:ubi9-0.31.6` | `:ubi9-0.30.9` |
 | Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.0` | `:ubi8-0.31.6` | `:ubi8-0.30.9` |
 
 
