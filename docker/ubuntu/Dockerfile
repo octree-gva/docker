@@ -121,7 +121,6 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && bundle config set without "development:test" --global \
   && GEMS="$(apply-version-deps list gems)" \
   && if [ -n "$GEMS" ]; then \
        while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
@@ -138,6 +137,8 @@ ENV BUNDLE_PATH="/home/decidim/vendor"
 # Clean up generated app
 RUN rm -rf .git node_modules .npm  .npmrc .yarnrc .yarn \
     config/master.key config/credentials.yml.enc \
+  && rm -f bin/spring config/spring.rb \
+  && find bin -maxdepth 1 -type f -exec sed -i '/load File.expand_path("spring"/d' {} + \
   && mkdir -p tmp/pids tmp/sockets \
   && npm cache clean --force \
   && yarn cache clean --force 
@@ -161,7 +162,7 @@ RUN bundle config set without "development:test" \
 FROM generator AS assets
 ENV SECRET_KEY_BASE=assets \
     NODE_ENV=development \
-    RAILS_ENV=development \
+    RAILS_ENV=production \
     DISABLE_SPRING=1 \
     DECIDIM_SERVICE_WORKER_ENABLED=true
 
