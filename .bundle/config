@@ -1,4 +1,4 @@
 ---
 BUNDLE_JOBS: "4"
-BUNDLE_PATH: "vendor/bundle"
+BUNDLE_PATH: "/home/runner/work/docker/docker/vendor/bundle"
 BUNDLE_DEPLOYMENT: "true"
