@@ -18,7 +18,7 @@ module Docker
         # Get the versionned tag names
         # Will fetch the list of versionned tag names and return aan array
         # of [tag_name, codename]
-        # Example: [["1.0.0", "questing"], ["1.0.1", "questing"]]
+        # Example: [["1.0.0", "noble"], ["1.0.1", "noble"]]
         def versionned_tag_names
           versionned_tags[1..].first(version_count)
         end
@@ -115,7 +115,7 @@ module Docker
           ##
           # Foreach codename, get the revision and compose a hash
           # to retrieve the codename from the revision
-          # exemple: {"1234567890": "questing"}
+          # exemple: {"1234567890": "noble"}
           def codenames
             @codenames ||= begin
               picked_codenames = []

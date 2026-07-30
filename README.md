@@ -27,19 +27,18 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.33.0.dev`) |
-| `:0.32.0` | Last version |
+| `:0.32.1` | Last version |
 | `:0.31.6` | Stable version, security and bug fixes only |
 | `:0.30.9` | Legacy version, previous stable release |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.32.0 | Decidim v0.31.6 | Decidim v0.30.9 |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.32.1 | Decidim v0.31.6 | Decidim v0.30.9 |
 | --- | --- | --- | --- | --- |
-| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.0` | `:noble-0.31.6` | `:noble-0.30.9` |
-| Ubuntu jammy (22.04) | `:jammy-0.33.0.dev` | `:jammy-0.32.0` | `:jammy-0.31.6` | `:jammy-0.30.9` |
-| Ubuntu questing (25.10) | `:questing-0.33.0.dev` | `:questing-0.32.0` | `:questing-0.31.6` | `:questing-0.30.9` |
-| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.0` | `:ubi9-0.31.6` | `:ubi9-0.30.9` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.0` | `:ubi8-0.31.6` | `:ubi8-0.30.9` |
+| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.1` | `:noble-0.31.6` | `:noble-0.30.9` |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.1` | `:resolute-0.31.6` | `:resolute-0.30.9` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.1` | `:ubi9-0.31.6` | `:ubi9-0.30.9` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.1` | `:ubi8-0.31.6` | `:ubi8-0.30.9` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)

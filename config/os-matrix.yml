@@ -2,10 +2,8 @@
 ubuntu:
   - name: noble
     version: "24.04"
-  - name: jammy
-    version: "22.04"
-  - name: questing
-    version: "25.10"
+  - name: resolute
+    version: "26.04"
 redhat:
   - name: ubi9
     version: "9.8"

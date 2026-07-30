@@ -49,6 +49,7 @@ RUN apt-get update -yq \
     libreadline-dev \
     libssl-dev \
     libvips-dev \
+    libvips-tools \
     libxml2-dev \
     libxslt1-dev \
     libyaml-dev \
