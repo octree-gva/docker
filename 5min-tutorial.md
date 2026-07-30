@@ -22,12 +22,12 @@ docker compose version # should be >= 2.35
 ```
 
 ## Get the docker-compose
-In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/octree-gva/docker/refs/heads/feat/better-decidim-docker/quickstart.yml).
+In an empty directory, download the [docker-compose quickstart](https://raw.githubusercontent.com/octree-gva/docker/feat/better-decidim-docker/quickstart.yml).
 
 ```bash
 mkdir my-participatory-platform
 cd my-participatory-platform
-curl https://raw.githubusercontent.com/octree-gva/docker/refs/heads/feat/better-decidim-docker/quickstart.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/octree-gva/docker/feat/better-decidim-docker/quickstart.yml > docker-compose.yml
 ```
 
 ## Run the docker-compose
@@ -75,7 +75,7 @@ docker cp decidim:/home/decidim/db/migrate db/migrate
 And add these lines in your docker-compose.yml file:
 ```diff
     container_name: decidim
-    image: decidim/decidim:0.31.6
+    image: decidim/decidim:0.31.7
     volumes:
       - storage:/home/decidim/storage
 +     - ./db/migrate:/home/decidim/migrate
