@@ -36,7 +36,7 @@ services:
         VCS_REF_SHORT: "f6fff676"
         VCS_REF_DATE: "2026-07-30"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-08-01T00:00:00+00:00"
+        BUILD_DATE: "2026-08-01T23:55:37+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -45,6 +45,31 @@ services:
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_development
 
   redhat-decidim-last-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "ubi9"
+        OS_VERSION: "9.8"
+        OS_MAJOR_VERSION: "9"
+        DECIDIM_VERSION: "0.31.7"
+        DECIDIM_BRANCH: "release/0.31-stable"
+        NODE_MAJOR_VERSION: "22"
+        BUNDLER_VERSION: "2.4.20"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "cde0f448ff308113635d1f8e06700245dbba340a"
+        VCS_REF_SHORT: "cde0f448"
+        VCS_REF_DATE: "2026-08-02"
+        VERSION: "0.31.7"
+        BUILD_DATE: "2026-08-01T23:55:38+00:00"
+    ports:
+      - "3002:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/1
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
+
+  redhat-decidim-prev-stable:
     <<: *default
     build:
       <<: *default-build
@@ -61,32 +86,7 @@ services:
         VCS_REF_SHORT: "cca33ba2"
         VCS_REF_DATE: "2026-07-30"
         VERSION: "0.32.1"
-        BUILD_DATE: "2026-08-01T00:00:01+00:00"
-    ports:
-      - "3002:3000"
-    environment:
-      <<: *default-environment
-      REDIS_URL: redis://redis:6379/1
-      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_last
-
-  redhat-decidim-prev-stable:
-    <<: *default
-    build:
-      <<: *default-build
-      args:
-        OS_NAME: "ubi9"
-        OS_VERSION: "9.8"
-        OS_MAJOR_VERSION: "9"
-        DECIDIM_VERSION: "0.31.7"
-        DECIDIM_BRANCH: "release/0.31-stable"
-        NODE_MAJOR_VERSION: "22"
-        BUNDLER_VERSION: "2.4.20"
-        RUBY_VERSION: "3.3.4"
-        VCS_REF: "dd3677b288e829fdf0db3dd0685020238fada72f"
-        VCS_REF_SHORT: "dd3677b2"
-        VCS_REF_DATE: "2026-07-30"
-        VERSION: "0.31.7"
-        BUILD_DATE: "2026-08-01T00:00:01+00:00"
+        BUILD_DATE: "2026-08-01T23:55:38+00:00"
     ports:
       - "3003:3000"
     environment:

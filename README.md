@@ -27,18 +27,18 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.33.0.dev`) |
-| `:0.32.1` | Last version |
-| `:0.31.7` | Stable version, security and bug fixes only |
+| `:0.31.7` | Last version |
+| `:0.32.1` | Stable version, security and bug fixes only |
 | `:0.30.9` | Legacy version, previous stable release |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.32.1 | Decidim v0.31.7 | Decidim v0.30.9 |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.31.7 | Decidim v0.32.1 | Decidim v0.30.9 |
 | --- | --- | --- | --- | --- |
-| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.1` | `:noble-0.31.7` | `:noble-0.30.9` |
-| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.1` | `:resolute-0.31.7` | `:resolute-0.30.9` |
-| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.1` | `:ubi9-0.31.7` | `:ubi9-0.30.9` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.1` | `:ubi8-0.31.7` | `:ubi8-0.30.9` |
+| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.31.7` | `:noble-0.32.1` | `:noble-0.30.9` |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.31.7` | `:resolute-0.32.1` | `:resolute-0.30.9` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.31.7` | `:ubi9-0.32.1` | `:ubi9-0.30.9` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.31.7` | `:ubi8-0.32.1` | `:ubi8-0.30.9` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -74,7 +74,7 @@ Ready to mount a Decidim installation locally in 5min?
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.31.7/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.32.1/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
