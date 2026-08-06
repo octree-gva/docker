@@ -72,5 +72,33 @@ echo "bundle exec:  $V_BUNDLE"
 test "$V_RAILS" = "$V_BIN" || fail "rails != bin/rails ($V_RAILS vs $V_BIN)"
 test "$V_BIN" = "$V_BUNDLE" || fail "bin/rails != bundle exec rails ($V_BIN vs $V_BUNDLE)"
 
+echo "== shakapacker entrypoints =="
+cd /home/decidim
+SHAKA_CMD="$(command -v shakapacker || true)"
+test -n "$SHAKA_CMD" || fail "shakapacker not on PATH"
+test -x bin/shakapacker || fail "bin/shakapacker missing"
+V_SHAKA="$(shakapacker -v)"
+V_SHAKA_BIN="$(bin/shakapacker -v)"
+V_SHAKA_BUNDLE="$(bundle exec shakapacker -v)"
+echo "shakapacker:        $V_SHAKA ($SHAKA_CMD)"
+echo "bin/shakapacker:    $V_SHAKA_BIN"
+echo "bundle exec:        $V_SHAKA_BUNDLE"
+test "$V_SHAKA" = "$V_SHAKA_BIN" || fail "shakapacker != bin/shakapacker ($V_SHAKA vs $V_SHAKA_BIN)"
+test "$V_SHAKA_BIN" = "$V_SHAKA_BUNDLE" || fail "bin/shakapacker != bundle exec shakapacker ($V_SHAKA_BIN vs $V_SHAKA_BUNDLE)"
+
+echo "== shakapacker-dev-server entrypoints =="
+cd /home/decidim
+SHAKA_DS_CMD="$(command -v shakapacker-dev-server || true)"
+test -n "$SHAKA_DS_CMD" || fail "shakapacker-dev-server not on PATH"
+test -x bin/shakapacker-dev-server || fail "bin/shakapacker-dev-server missing"
+V_SHAKA_DS="$(shakapacker-dev-server -v)"
+V_SHAKA_DS_BIN="$(bin/shakapacker-dev-server -v)"
+V_SHAKA_DS_BUNDLE="$(bundle exec shakapacker-dev-server -v)"
+echo "shakapacker-dev-server:        $V_SHAKA_DS ($SHAKA_DS_CMD)"
+echo "bin/shakapacker-dev-server:    $V_SHAKA_DS_BIN"
+echo "bundle exec:                   $V_SHAKA_DS_BUNDLE"
+test "$V_SHAKA_DS" = "$V_SHAKA_DS_BIN" || fail "shakapacker-dev-server != bin/shakapacker-dev-server ($V_SHAKA_DS vs $V_SHAKA_DS_BIN)"
+test "$V_SHAKA_DS_BIN" = "$V_SHAKA_DS_BUNDLE" || fail "bin/shakapacker-dev-server != bundle exec shakapacker-dev-server ($V_SHAKA_DS_BIN vs $V_SHAKA_DS_BUNDLE)"
+
 echo "SMOKE OK"
 EOS

@@ -49,7 +49,7 @@ jobs:
           bundler-cache: true
       - name: Build image
         run: bundle exec rake "docker:build:redhat_one[${{ matrix.version }},${{ matrix.os_name }}]"
-      - name: Smoke test (libvips, codecs, no ImageMagick, rails PATH)
+      - name: Smoke test (libvips, codecs, no ImageMagick, rails/shakapacker PATH)
         run: |
           IMAGE="$(bundle exec rake -s "docker:image_ref[redhat,${{ matrix.version }},${{ matrix.os_name }}]")"
           chmod +x scripts/smoke.sh

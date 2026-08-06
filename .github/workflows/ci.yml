@@ -46,7 +46,7 @@ jobs:
           bundler-cache: true
       - name: Build Ubuntu image
         run: bundle exec rake "docker:build:ubuntu_one[last,noble]"
-      - name: Smoke test Ubuntu image (libvips, codecs, no ImageMagick, rails PATH)
+      - name: Smoke test Ubuntu image (libvips, codecs, no ImageMagick, rails/shakapacker PATH)
         run: |
           IMAGE="$(bundle exec rake -s "docker:image_ref[ubuntu,last,noble]")"
           chmod +x scripts/smoke.sh
@@ -68,7 +68,7 @@ jobs:
           bundler-cache: true
       - name: Build Red Hat image
         run: bundle exec rake "docker:build:redhat_one[last,ubi9]"
-      - name: Smoke test Red Hat image (libvips, codecs, no ImageMagick, rails PATH)
+      - name: Smoke test Red Hat image (libvips, codecs, no ImageMagick, rails/shakapacker PATH)
         run: |
           IMAGE="$(bundle exec rake -s "docker:image_ref[redhat,last,ubi9]")"
           chmod +x scripts/smoke.sh
