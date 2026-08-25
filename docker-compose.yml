@@ -32,11 +32,11 @@ services:
         NODE_MAJOR_VERSION: "24"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "356ef0b3bfbb8d491fc73c5c0c34eee82e2fa560"
-        VCS_REF_SHORT: "356ef0b3"
-        VCS_REF_DATE: "2026-08-24"
+        VCS_REF: "1bf59790e1043ad0faed974ca7480263f20c86e4"
+        VCS_REF_SHORT: "1bf59790"
+        VCS_REF_DATE: "2026-08-26"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-08-24T23:20:00+00:00"
+        BUILD_DATE: "2026-08-25T23:22:59+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -57,11 +57,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "aa95fdab8687976056eff30f97c470e42e274198"
-        VCS_REF_SHORT: "aa95fdab"
-        VCS_REF_DATE: "2026-08-21"
+        VCS_REF: "4d1f59a8b1935d8adea37632e805c9db66d227a9"
+        VCS_REF_SHORT: "4d1f59a8"
+        VCS_REF_DATE: "2026-08-25"
         VERSION: "0.32.1"
-        BUILD_DATE: "2026-08-24T23:20:00+00:00"
+        BUILD_DATE: "2026-08-25T23:22:59+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -82,11 +82,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "6e87078ba493081649ccf6b63e1a64968c10b242"
-        VCS_REF_SHORT: "6e87078b"
-        VCS_REF_DATE: "2026-08-21"
+        VCS_REF: "ccaf2c1f18244c99335cb69038224c50bfef1fdd"
+        VCS_REF_SHORT: "ccaf2c1f"
+        VCS_REF_DATE: "2026-08-25"
         VERSION: "0.31.7"
-        BUILD_DATE: "2026-08-24T23:20:00+00:00"
+        BUILD_DATE: "2026-08-25T23:22:59+00:00"
     ports:
       - "3003:3000"
     environment:
