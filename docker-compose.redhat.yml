@@ -36,7 +36,7 @@ services:
         VCS_REF_SHORT: "1bf59790"
         VCS_REF_DATE: "2026-08-26"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-08-25T23:22:58+00:00"
+        BUILD_DATE: "2026-08-27T04:13:25+00:00"
     ports:
       - "3001:3000"
     environment:
@@ -61,7 +61,7 @@ services:
         VCS_REF_SHORT: "4d1f59a8"
         VCS_REF_DATE: "2026-08-25"
         VERSION: "0.32.1"
-        BUILD_DATE: "2026-08-25T23:22:58+00:00"
+        BUILD_DATE: "2026-08-27T04:13:25+00:00"
     ports:
       - "3002:3000"
     environment:
@@ -86,7 +86,7 @@ services:
         VCS_REF_SHORT: "ccaf2c1f"
         VCS_REF_DATE: "2026-08-25"
         VERSION: "0.31.7"
-        BUILD_DATE: "2026-08-25T23:22:59+00:00"
+        BUILD_DATE: "2026-08-27T04:13:26+00:00"
     ports:
       - "3003:3000"
     environment:
