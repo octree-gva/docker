@@ -72,14 +72,33 @@ echo "bundle exec:  $V_BUNDLE"
 test "$V_RAILS" = "$V_BIN" || fail "rails != bin/rails ($V_RAILS vs $V_BIN)"
 test "$V_BIN" = "$V_BUNDLE" || fail "bin/rails != bundle exec rails ($V_BIN vs $V_BUNDLE)"
 
+# Shakapacker 7/8 `-v` boots webpack. Production images strip node_modules
+# (ENOTCACHED / "webpack not found"). Fall back to the gem version.
+gem_shaka_ver() {
+  bundle exec ruby -e 'puts Gem.loaded_specs.fetch("shakapacker").version'
+}
+
+cli_ver() {
+  local out rc
+  set +e
+  out="$("$@" -v 2>&1)"
+  rc=$?
+  set -e
+  if [ "$rc" -eq 0 ] && [ -n "$out" ] && ! echo "$out" | grep -Eqi 'webpack not found|ENOTCACHED|error Command'; then
+    printf '%s\n' "$out" | tail -n 1
+    return 0
+  fi
+  printf 'gem:%s\n' "$(gem_shaka_ver)"
+}
+
 echo "== shakapacker entrypoints =="
 cd /home/decidim
 SHAKA_CMD="$(command -v shakapacker || true)"
 test -n "$SHAKA_CMD" || fail "shakapacker not on PATH"
 test -x bin/shakapacker || fail "bin/shakapacker missing"
-V_SHAKA="$(shakapacker -v)"
-V_SHAKA_BIN="$(bin/shakapacker -v)"
-V_SHAKA_BUNDLE="$(bundle exec shakapacker -v)"
+V_SHAKA="$(cli_ver shakapacker)"
+V_SHAKA_BIN="$(cli_ver bin/shakapacker)"
+V_SHAKA_BUNDLE="$(cli_ver bundle exec shakapacker)"
 echo "shakapacker:        $V_SHAKA ($SHAKA_CMD)"
 echo "bin/shakapacker:    $V_SHAKA_BIN"
 echo "bundle exec:        $V_SHAKA_BUNDLE"
@@ -91,9 +110,9 @@ cd /home/decidim
 SHAKA_DS_CMD="$(command -v shakapacker-dev-server || true)"
 test -n "$SHAKA_DS_CMD" || fail "shakapacker-dev-server not on PATH"
 test -x bin/shakapacker-dev-server || fail "bin/shakapacker-dev-server missing"
-V_SHAKA_DS="$(shakapacker-dev-server -v)"
-V_SHAKA_DS_BIN="$(bin/shakapacker-dev-server -v)"
-V_SHAKA_DS_BUNDLE="$(bundle exec shakapacker-dev-server -v)"
+V_SHAKA_DS="$(cli_ver shakapacker-dev-server)"
+V_SHAKA_DS_BIN="$(cli_ver bin/shakapacker-dev-server)"
+V_SHAKA_DS_BUNDLE="$(cli_ver bundle exec shakapacker-dev-server)"
 echo "shakapacker-dev-server:        $V_SHAKA_DS ($SHAKA_DS_CMD)"
 echo "bin/shakapacker-dev-server:    $V_SHAKA_DS_BIN"
 echo "bundle exec:                   $V_SHAKA_DS_BUNDLE"
