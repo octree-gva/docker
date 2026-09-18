@@ -26,8 +26,9 @@ ENV TZ=UTC \
 SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
-COPY version-deps/ /tmp/version-deps/
+COPY version-deps/ /usr/local/share/version-deps/
 COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
+ENV VERSION_DEPS_ROOT=/usr/local/share/version-deps
 RUN chmod +x /usr/local/bin/apply-version-deps
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
@@ -111,10 +112,7 @@ RUN git clone --branch $DECIDIM_BRANCH --depth 1 https://github.com/decidim/deci
 WORKDIR /home/generator/decidim-generators
 
 RUN bundle config set path "vendor" --global \
-  && GEMS="$(apply-version-deps list gems)" \
-  && if [ -n "$GEMS" ]; then \
-       while read -r gem; do echo "gem '$gem'" >> Gemfile; done <<< "$GEMS"; \
-     fi \
+  && apply-version-deps append-gemfile Gemfile \
   && bundle install \
   && DISABLE_BOOTSNAP=1 bundle exec exe/decidim --branch $DECIDIM_BRANCH --skip-gemfile rails_app \
   && cp Gemfile Gemfile.lock rails_app/ \
@@ -140,6 +138,7 @@ RUN bundle config set without "development:test" \
   && sed -i "s|path: \"..\"|git: 'https://github.com/decidim/decidim.git', branch: '$DECIDIM_BRANCH'|" Gemfile \
   && bundle remove decidim-design \
   && echo "eval_gemfile 'Gemfile.modules' if File.exist?('Gemfile.modules')" >> Gemfile \
+  && apply-version-deps append-gemfile Gemfile \
   && bundle update \
   && bundle config set frozen true \
   && bundle config set deployment true

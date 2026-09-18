@@ -29,6 +29,15 @@ jobs:
           DECIDIM_VERSION=0.31.1 VERSION_DEPS_ROOT=./docker/version-deps \
             ./docker/context/bin/apply-version-deps list npm | grep -q workbox-webpack-plugin
           test -z "$(DECIDIM_VERSION=0.29.7 VERSION_DEPS_ROOT=./docker/version-deps ./docker/context/bin/apply-version-deps list npm)"
+          DECIDIM_VERSION=0.32.1 VERSION_DEPS_ROOT=./docker/version-deps \
+            ./docker/context/bin/apply-version-deps gemfile | grep -q "gem 'selma', '< 0.5'"
+          tmpgf="$(mktemp)"
+          echo "source 'https://rubygems.org'" > "$tmpgf"
+          DECIDIM_VERSION=0.32.1 VERSION_DEPS_ROOT=./docker/version-deps \
+            ./docker/context/bin/apply-version-deps append-gemfile "$tmpgf"
+          grep -q "gem 'selma', '< 0.5'" "$tmpgf"
+          rm -f "$tmpgf"
+          test -z "$(DECIDIM_VERSION=0.31.7 VERSION_DEPS_ROOT=./docker/version-deps ./docker/context/bin/apply-version-deps gemfile | grep selma || true)"
 
   build-ubuntu:
     runs-on: ubuntu-latest

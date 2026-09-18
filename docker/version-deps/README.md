@@ -2,6 +2,8 @@
 
 Overlays are keyed by **Decidim minor version** (`0.29`, `0.31`, …). Only the directory matching the image `DECIDIM_VERSION` is applied — there is no inheritance between minors.
 
+Images copy this tree to `/usr/local/share/version-deps` (not `/tmp`) so overlays still apply after base-stage `rm -rf /tmp/*`.
+
 ## Layout
 
 ```
@@ -22,7 +24,7 @@ version-deps/
 
 | File | Applied in Dockerfile stage | Line format |
 |------|-----------------------------|-------------|
-| `gems.txt` | generator | gem name |
+| `gems.txt` | generator | gem name, or `name <constraint>` (copied onto the app Gemfile before `bundle update`) |
 | `npm.txt` | assets | `npm install` arguments |
 | `ubuntu.txt` | base (Ubuntu) | apt package name |
 | `redhat.txt` | base (Red Hat) | dnf package name |

@@ -1,1 +1,2 @@
 commonmarker
+selma < 0.5

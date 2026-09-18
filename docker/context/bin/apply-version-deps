@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION_DEPS_ROOT="${VERSION_DEPS_ROOT:-/tmp/version-deps}"
+VERSION_DEPS_ROOT="${VERSION_DEPS_ROOT:-/usr/local/share/version-deps}"
 DECIDIM_VERSION="${DECIDIM_VERSION:?DECIDIM_VERSION is required}"
 
 minor_version() {
@@ -19,12 +19,37 @@ list_overlay() {
   fi
 }
 
+# gems.txt: "commonmarker" or "selma < 0.5" → Gemfile lines.
+emit_gemfile() {
+  list_overlay gems | while read -r name rest; do
+    [ -z "$name" ] && continue
+    if [ -n "$rest" ]; then
+      printf "gem '%s', '%s'\n" "$name" "$rest"
+    else
+      printf "gem '%s'\n" "$name"
+    fi
+  done
+}
+
+append_gemfile() {
+  local gf="${1:-Gemfile}"
+  emit_gemfile | while IFS= read -r line; do
+    grep -qxF "$line" "$gf" || echo "$line" >> "$gf"
+  done
+}
+
 case "${1:-}" in
   list)
     list_overlay "${2:-}"
     ;;
+  gemfile)
+    emit_gemfile
+    ;;
+  append-gemfile)
+    append_gemfile "${2:-Gemfile}"
+    ;;
   *)
-    echo "usage: apply-version-deps list <gems|npm|ubuntu|redhat>" >&2
+    echo "usage: apply-version-deps list <gems|npm|ubuntu|redhat> | gemfile | append-gemfile [Gemfile]" >&2
     exit 1
     ;;
 esac
