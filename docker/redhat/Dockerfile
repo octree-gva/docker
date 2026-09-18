@@ -205,44 +205,10 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLER_VERSION=$BUNDLER_VERSION \
     DECIDIM_BRANCH=$DECIDIM_BRANCH \
     DECIDIM_VERSION=$DECIDIM_VERSION \
-    DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
-    DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
     RAILS_ENV=production \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
     PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
-
-ENV SMTP_ADDRESS="" \
-    SMTP_DOMAIN="" \
-    SMTP_USERNAME="" \
-    SMTP_PASSWORD="" \
-    SMTP_PORT=587 \
-    SMTP_STARTTLS_AUTO=true \
-    SMTP_AUTHENTICATION=plain
-ENV MAPS_PROVIDER="" \
-    MAPS_API_KEY=""
-ENV STORAGE_PROVIDER=local
-ENV RAILS_ENV=production \
-    RAILS_LOG_LEVEL=debug \
-    RAILS_MAX_THREADS=5 \
-    RAILS_LOG_TO_STDOUT=true \
-    RAILS_SERVE_STATIC_FILES=false \
-    PORT=3000 \
-    EDITOR=vim \
-    PATH="/home/decidim/bin:${PATH}"
-ENV DECIDIM_APPLICATION_NAME="My Application Name" \
-    DECIDIM_MAILER_SENDER="change-me@example.org" \
-    DECIDIM_AVAILABLE_LOCALES="en" \
-    DECIDIM_DEFAULT_LOCALE=en \
-    DECIDIM_FORCE_SSL=auto \
-    DECIDIM_TRACK_NEWSLETTER_LINKS=true \
-    DECIDIM_ADMIN_PASSWORD_STRONG=true \
-    DECIDIM_SERVICE_WORKER_ENABLED=false
-ENV DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
-    DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
-ENV DECIDIM_CRON_ENABLED=true \
-    DECIDIM_SYSTEM_EMAIL=system@example.org \
-    DECIDIM_SYSTEM_PASSWORD=my_insecure_password
 
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1000 decidim \
