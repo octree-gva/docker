@@ -11,7 +11,10 @@ echo "[+] Container initializing."
 # > source: https://manpages.debian.org/jessie/debianutils/run-parts.8.en.html
 echo "  => [/bin/sh] Prepare environment to run $@"
 echo "  => [/bin/sh] Running ~/docker-entrypoint.d scripts"
-run-parts ~/docker-entrypoint.d
+for script in ~/docker-entrypoint.d/*; do
+  [ -x "$script" ] || continue
+  "$script" || exit $?
+done
 
 cd ~
 echo "  => [/bin/sh] Executing $@"

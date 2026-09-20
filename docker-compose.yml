@@ -13,6 +13,9 @@ x-default-environment: &default-environment
   NODE_ENV: production
   DECIDIM_FORCE_SSL: false
   SECRET_KEY_BASE: insecure_key_base
+  DATABASE_ADAPTER: postgresql
+  DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE: memory
+  DECIDIM_SPAM_DETECTION_BACKEND_USER: memory
 
 x-default-build: &default-build
   context: ./docker
@@ -32,11 +35,11 @@ services:
         NODE_MAJOR_VERSION: "24"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "3e9de1dc1bbbe210537c06cec1e2bedf8ebee3f3"
-        VCS_REF_SHORT: "3e9de1dc"
-        VCS_REF_DATE: "2026-09-17"
+        VCS_REF: "de7877021f57cc915810b5af7ccd936fc85d2c78"
+        VCS_REF_SHORT: "de787702"
+        VCS_REF_DATE: "2026-09-18"
         VERSION: "0.33.0.dev"
-        BUILD_DATE: "2026-09-18T01:01:02+00:00"
+        BUILD_DATE: "2026-09-19T11:37:49+01:00"
     ports:
       - "3001:3000"
     environment:
@@ -57,11 +60,11 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.4.7"
-        VCS_REF: "801fc6f705d7c97c3b590f6fd458a5d9a6088f7f"
-        VCS_REF_SHORT: "801fc6f7"
-        VCS_REF_DATE: "2026-09-17"
+        VCS_REF: "aaa136f97dccba69f8a74c0bd66695fcb47aabb2"
+        VCS_REF_SHORT: "aaa136f9"
+        VCS_REF_DATE: "2026-09-18"
         VERSION: "0.32.1"
-        BUILD_DATE: "2026-09-18T01:01:02+00:00"
+        BUILD_DATE: "2026-09-19T11:37:49+01:00"
     ports:
       - "3002:3000"
     environment:
@@ -82,17 +85,67 @@ services:
         NODE_MAJOR_VERSION: "22"
         BUNDLER_VERSION: "2.4.20"
         RUBY_VERSION: "3.3.4"
-        VCS_REF: "c7faf79f62cefea152736a7ab3fef72bce531bcf"
-        VCS_REF_SHORT: "c7faf79f"
-        VCS_REF_DATE: "2026-09-17"
+        VCS_REF: "46cd48c270994508456fe191ef6fbd4c34939bfc"
+        VCS_REF_SHORT: "46cd48c2"
+        VCS_REF_DATE: "2026-09-18"
         VERSION: "0.31.7"
-        BUILD_DATE: "2026-09-18T01:01:02+00:00"
+        BUILD_DATE: "2026-09-19T11:37:49+01:00"
     ports:
       - "3003:3000"
     environment:
       <<: *default-environment
       REDIS_URL: redis://redis:6379/2
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_prev
+
+  decidim-legacy-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.30.9"
+        DECIDIM_BRANCH: "release/0.30-stable"
+        NODE_MAJOR_VERSION: "18"
+        BUNDLER_VERSION: "2.4.20"
+        RUBY_VERSION: "3.3.4"
+        VCS_REF: "07c31c410fbf29314eae0cde2eb17d0725bdd7dc"
+        VCS_REF_SHORT: "07c31c41"
+        VCS_REF_DATE: "2026-07-01"
+        VERSION: "0.30.9"
+        BUILD_DATE: "2026-09-19T11:37:49+01:00"
+    ports:
+      - "3004:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/3
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_legacy
+
+  decidim-old-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "noble"
+        OS_VERSION: "24.04"
+        OS_MAJOR_VERSION: "24"
+        DECIDIM_VERSION: "0.29.7"
+        DECIDIM_BRANCH: "release/0.29-stable"
+        NODE_MAJOR_VERSION: "18"
+        BUNDLER_VERSION: "2.4.6"
+        RUBY_VERSION: "3.2.2"
+        VCS_REF: "c8535dac229b0d46138570694d28dd7ff37baf8c"
+        VCS_REF_SHORT: "c8535dac"
+        VCS_REF_DATE: "2025-12-09"
+        VERSION: "0.29.7"
+        BUILD_DATE: "2026-09-19T11:37:49+01:00"
+    ports:
+      - "3005:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/4
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_old
 
   redis:
     image: redis:7
@@ -106,7 +159,7 @@ services:
     environment:
       POSTGRES_PASSWORD: insecure_password
       POSTGRES_USER: decidim
-      POSTGRES_MULTIPLE_DATABASES: decidim_development,decidim_last,decidim_prev
+      POSTGRES_MULTIPLE_DATABASES: decidim_development,decidim_last,decidim_prev,decidim_legacy,decidim_old
     ports:
       - "5432:5432"
     volumes:

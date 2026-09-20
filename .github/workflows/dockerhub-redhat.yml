@@ -32,6 +32,8 @@ jobs:
           - { version: prev, os_name: ubi8 }
           - { version: legacy, os_name: ubi9 }
           - { version: legacy, os_name: ubi8 }
+          - { version: old, os_name: ubi9 }
+          - { version: old, os_name: ubi8 }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

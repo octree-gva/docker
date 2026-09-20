@@ -7,8 +7,11 @@ same variables for all the templates:
 - `last_version`: The `Decidim::DecidimVersion` for the last `release/*-stable` branch
 - `prev_version`: The `Decidim::DecidimVersion` for the previous `release/*-stable` branch
 - `legacy_version`: The `Decidim::DecidimVersion` for the legacy `release/*-stable` branch
+- `old_version`: The `Decidim::DecidimVersion` for the older legacy `release/*-stable` branch
 - `ubuntu`: A helper to get ubuntu base images in different versions (latest 3)
 - `redhat`: A helper to get redhat base images in different versions (lastest 2)
+
+Compose files (`docker-compose.yml`, `docker-compose.redhat.yml`) are generated from these templates so build args (`VCS_REF`, `DECIDIM_VERSION`, …) stay current.
 
 As `last_version` receives features requests, and `prev_version` receives only bugs and security fixes, 
 it is adviced to promote the use of the `prev_version` when new users comes in. `legacy` versions are for last stable, that is most probably unsupported Decidim's side.

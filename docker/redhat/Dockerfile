@@ -45,11 +45,14 @@ RUN dnf install -y \
     file \
     ca-certificates \
     wget \
+    lsof \
+    ripgrep \
     git \
     gnupg2 \
     libffi-devel \
     libicu-devel \
     postgresql-devel \
+    postgresql \
     openssl-devel \
     libxml2-devel \
     libxslt-devel \
@@ -199,15 +202,15 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLE_PATH="/home/decidim/vendor" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
-    NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
-    RUBY_VERSION=$RUBY_VERSION \
-    BUNDLER_VERSION=$BUNDLER_VERSION \
-    DECIDIM_BRANCH=$DECIDIM_BRANCH \
-    DECIDIM_VERSION=$DECIDIM_VERSION \
     RAILS_ENV=production \
+    RAILS_LOG_TO_STDOUT=true \
+    WEB_CONCURRENCY=2 \
+    RAILS_MIN_THREADS=1 \
+    RAILS_MAX_THREADS=5 \
+    DATABASE_MAX_POOL_SIZE=10 \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}"
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/bin:${PATH}"
 
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1000 decidim \

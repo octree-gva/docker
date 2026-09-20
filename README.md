@@ -20,7 +20,7 @@
 </p>
 
 # Decidim on Docker
-On a daily basis, we publish images for four decidim versions, based on various distributions (default is `ubuntu:noble`).
+On a daily basis, we publish images for five decidim versions, based on various distributions (default is `ubuntu:noble`).
 To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tutorial.md).
 
 ## Available tags
@@ -30,15 +30,16 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | `:0.32.1` | Last version |
 | `:0.31.7` | Stable version, security and bug fixes only |
 | `:0.30.9` | Legacy version, previous stable release |
+| `:0.29.7` | Older legacy |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.32.1 | Decidim v0.31.7 | Decidim v0.30.9 |
-| --- | --- | --- | --- | --- |
-| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.1` | `:noble-0.31.7` | `:noble-0.30.9` |
-| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.1` | `:resolute-0.31.7` | `:resolute-0.30.9` |
-| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.1` | `:ubi9-0.31.7` | `:ubi9-0.30.9` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.1` | `:ubi8-0.31.7` | `:ubi8-0.30.9` |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.32.1 | Decidim v0.31.7 | Decidim v0.30.9 | Decidim v0.29.7 |
+| --- | --- | --- | --- | --- | --- |
+| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.1` | `:noble-0.31.7` | `:noble-0.30.9` | `:noble-0.29.7` |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.1` | `:resolute-0.31.7` | `:resolute-0.30.9` | `:resolute-0.29.7` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.1` | `:ubi9-0.31.7` | `:ubi9-0.30.9` | `:ubi9-0.29.7` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.1` | `:ubi8-0.31.7` | `:ubi8-0.30.9` | `:ubi8-0.29.7` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -47,6 +48,8 @@ Ready to mount a Decidim installation locally in 5min?
 
 
 ## Environments configurations
+This section is for operators running Decidim with Docker Compose: set these variables on the app service, then `docker compose up`.
+
 >  🔐: be sure to read the [good practices](#good-practices) ;)
 
 | Env Name | Description | Default |
@@ -57,14 +60,19 @@ Ready to mount a Decidim installation locally in 5min?
 | SECRET_KEY_BASE | 🔐 Secret used to initialize application's key generator | `my_insecure_password` |
 | RAILS_MASTER_KEY | 🔐 Used to decrypt credentials file | `my_insecure_password` |
 | RAILS_FORCE_SSL | If rails should force SSL | `false` |
-| RAILS_MAX_THREADS | How many threads rails can use | `5` |
+| WEB_CONCURRENCY | Puma workers (cluster). `2` lets one worker recycle without taking the app down. | `2` |
+| RAILS_MIN_THREADS | Puma min threads per worker | `1` |
+| RAILS_MAX_THREADS | Puma max threads per worker | `5` |
 | RAILS_SERVE_STATIC_FILES | If rails should be accountable to serve assets | `false` |
 | RAILS_ASSET_HOST | If set, define the assets are loaded from (S3?) | `` |
-| SIDEKIQ_CONCURRENCY | Concurrency for sidekiq worker. MUST be <= DATABASE_MAX_POOL_SIZE | `RAILS_MAX_THREADS` |
-| DATABASE_MAX_POOL_SIZE | Max pool size for the database. | `RAILS_MAX_THREADS` |
-| DATABASE_URL | Host for the postgres database. | `pg` |
+| SIDEKIQ_CONCURRENCY | Sidekiq threads. Keep `<= DATABASE_MAX_POOL_SIZE`, or raise the pool to cover **Puma workers × max threads + Sidekiq** if they share one Postgres limit. | `RAILS_MAX_THREADS` |
+| DATABASE_MAX_POOL_SIZE | Active Record pool. Default covers Puma `WEB_CONCURRENCY × RAILS_MAX_THREADS` (`2 × 5`). | `10` |
+| DATABASE_ADAPTER | Active Record adapter (used when `config/database.yml` reads it) | `postgresql` |
+| DATABASE_URL | Optional Postgres URL. Wait-for-db uses Rails DB config (`DATABASE_URL`, `database.yml`, or credentials). | unset |
 | TZ | Timezone used | `Europe/Madrid` |
 | REDIS_URL | Redis url for sidekiq | `redis` |
+| DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE | Decidim AI resource Bayes adapter. Local compose uses `memory` so boot does not hit Redis localhost. | `memory` |
+| DECIDIM_SPAM_DETECTION_BACKEND_USER | Decidim AI user Bayes adapter. Same as resource for local compose. | `memory` |
 | SMTP_AUTHENTICATION | How rails should authenticate to SMTP | `plain`, `none` |
 | SMTP_USERNAME | Username for SMTP | `my-participatory-plateform@iredmail.org` |
 | SMTP_PASSWORD | 🔐 Password for SMTP | `my_insecure_password` |
@@ -126,9 +134,9 @@ Before running the docker command, we go through [entrypoints scripts](./docker/
 Theses commands will run on each container restart:
 
 * **10_remove_pids**: Remove old puma pids if exists.
-* **15_wait_for_it**: Run a [wait-for-it](./docker/bin/wait-for-it) for dependancies: `REDIS_URL`, `DATABASE_URL` and `MEMCACHE_SERVERS` are supported.
+* **15_wait_for_it**: Wait for Redis (`REDIS_URL`), Postgres/PostGIS (host from Rails DB config, then `pg_isready`), and Memcached (`MEMCACHE_SERVERS`).
 * **35_bundle_check**: Check if all your gems are installed.
-* **36_db_check**: Check if your database is up, and if not, try to migrate it.
+* **36_db_check**: Run `rails db:migrate` (same Rails config as the app: env, `database.yml`, or credentials).
 * **50_upsert-sysadmin**: From environment variables `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD`, update the first /system administrator.
 
 ### Command
@@ -157,8 +165,8 @@ This repository automates publishing Decidim versions as Docker containers and g
 
 **Docker Image Automation**
 
-* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, `prev`, or `legacy`).
-* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, `prev`, or `legacy`).
+* `bundle exec rake docker:build:ubuntu[version]`: Builds Ubuntu based images for a given Decidim version (`dev`, `last`, `prev`, `legacy`, or `old`).
+* `bundle exec rake docker:build:redhat[version]`: Builds Redhat based images for a given Decidim version (`dev`, `last`, `prev`, `legacy`, or `old`).
 
 **Documentation Generation**
 
@@ -173,7 +181,7 @@ This repository automates publishing Decidim versions as Docker containers and g
 * `docker/`: Docker context files, old aditional scripts like cron and entrypoints
 * `docker/{ubuntu,redhat}/Dockerfile`: Dockerfile for each distribution
 * `lib/`: Contains core classes and modules for version management and Docker image creation.
-* `templates/`: Holds ERB templates for Docker configurations and documentation.
+* `templates/`: Holds ERB templates for documentation (`README`, `5min-tutorial`, `quickstart.yml`) and local compose files (`docker-compose.yml`, `docker-compose.redhat.yml`).
 * `Rakefile`: Define the rake tasks of this repo.
 
 ## License

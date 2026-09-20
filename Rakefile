@@ -7,16 +7,21 @@ require_relative './lib/docker'
 # This allows tasks like rake docker:build:redhat[dev] to build the dev version of the redhat image
 # @param args [Hash]
 # @return [Decidim::DecidimVersion]
+VERSION_SLOTS = {
+  "dev" => 0,
+  "last" => 1,
+  "prev" => 2,
+  "legacy" => 3,
+  "old" => 4
+}.freeze
+
 def decidim_from_args(args)
-  case args[:version]
-  when "dev" then Decidim::Decidim.instance.versions[0]
-  when "last" then Decidim::Decidim.instance.versions[1]
-  when "prev" then Decidim::Decidim.instance.versions[2]
-  when "legacy" then Decidim::Decidim.instance.versions[3]
-  else
+  index = VERSION_SLOTS[args[:version]]
+  unless index
     Docker::Task.help
     exit 1
   end
+  Decidim::Decidim.instance.versions.fetch(index)
 end
 
 def print_results(messages)
@@ -302,6 +307,7 @@ task :"docker:docs", [] do
     last_version: versions[1],
     prev_version: versions[2],
     legacy_version: versions[3],
+    old_version: versions[4],
     ubuntu: Docker::Ubuntu.instance,
     redhat: Docker::Redhat.instance,
     registry_username: ENV.fetch("DOCKER_HUB_REGISTRY", "decidim"),

@@ -12,7 +12,7 @@ module Docker
 
     ## Task help message
     def self.help
-      puts "`rake docker:build:ubuntu[dev|last|prev|legacy]`"
+      puts "`rake docker:build:ubuntu[dev|last|prev|legacy|old]`"
       puts "  Build all pinned Ubuntu images for a Decidim version slot"
       puts "`rake docker:build:ubuntu_one[version,os_name]`"
       puts "  Build one Ubuntu image (e.g. docker:build:ubuntu_one[last,noble])"
@@ -25,6 +25,7 @@ module Docker
       puts "    last: Build the last stable version"
       puts "    prev: Build the previous stable version"
       puts "    legacy: Build the legacy version"
+      puts "    old: Build the older legacy version (fourth stable, currently 0.29)"
       puts "  Environment variables:"
       puts "    VERBOSE: `1` to print verbose output"
       puts ""
@@ -35,7 +36,7 @@ module Docker
       puts "    VERBOSE: `1` to print verbose output"
       puts ""
 
-      puts "`rake docker:push:ubuntu[dev|last|prev]`"
+      puts "`rake docker:push:ubuntu[dev|last|prev|legacy|old]`"
       puts "  Push the development, last or previous stable version to Docker Hub over the last three ubuntu versions,"
       puts "  You must be logged in to Docker Hub before running this task"
       puts "  Options:"
@@ -43,6 +44,7 @@ module Docker
       puts "    last: Push the last stable version"
       puts "    prev: Push the previous stable version"
       puts "    legacy: Push the legacy version"
+      puts "    old: Push the older legacy version"
       puts "  Environment variables:"
       puts "    DOCKER_HUB_REGISTRY: The Docker Hub registry"
       puts "    DRY_RUN: `1` to not push the image to Docker Hub"

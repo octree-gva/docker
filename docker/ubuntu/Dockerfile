@@ -39,7 +39,10 @@ RUN apt-get update -yq \
   && apt-get install -yq --no-install-recommends \
     build-essential \
     ca-certificates \
+    curl \
     wget \
+    lsof \
+    ripgrep \
     git \
     gnupg \
     libffi-dev \
@@ -47,6 +50,7 @@ RUN apt-get update -yq \
     libicu-dev \
     libncurses-dev \
     libpq-dev \
+    postgresql-client \
     libreadline-dev \
     libssl-dev \
     libvips-dev \
@@ -214,21 +218,16 @@ LABEL org.label-schema.build-date=${BUILD_DATE} \
 ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLE_PATH="/home/decidim/vendor" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
-    NODE_MAJOR_VERSION=$NODE_MAJOR_VERSION \
-    RUBY_VERSION=$RUBY_VERSION \
     RAILS_ENV=production \
+    RAILS_LOG_TO_STDOUT=true \
+    WEB_CONCURRENCY=2 \
+    RAILS_MIN_THREADS=1 \
+    RAILS_MAX_THREADS=5 \
+    DATABASE_MAX_POOL_SIZE=10 \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:${PATH}" \
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/bin:${PATH}" \
     DISABLE_BOOTSNAP=1
-  
-
-ENV RAILS_LOG_LEVEL=debug \
-    RAILS_MAX_THREADS=5 \
-    RAILS_LOG_TO_STDOUT=true \
-    PORT=3000 \
-    EDITOR=vim \
-    PATH="/home/decidim/bin:${PATH}"
 
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1001 decidim \
@@ -236,8 +235,8 @@ RUN rm -rf $WORK_DIR \
     
 WORKDIR $WORK_DIR
 
-COPY --from=generator /home/decidim .
-COPY --from=assets /home/decidim/public/decidim-packs public/decidim-packs
+COPY --chown=decidim:decidim --from=generator /home/decidim .
+COPY --chown=decidim:decidim --from=assets /home/decidim/public/decidim-packs public/decidim-packs
 COPY ./scripts/write_motd bin/write_motd
 
 RUN bundle exec bin/write_motd && rm bin/write_motd \

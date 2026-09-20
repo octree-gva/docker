@@ -5,3 +5,5 @@ decidim-clone
 .DS_Store
 .byebug_history
 vendor
+*.log
+.*-bundle

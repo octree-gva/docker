@@ -35,13 +35,15 @@ module Decidim
         )
       end
 
+      STABLE_SLOTS = 4
+
       def stable_branches
         on_cloned_repository do
           branches = %x(git branch -r | grep "origin/release/.*-stable")
           branches.split("\n").map do |branch|
             DecidimVersion.new(self, branch.strip.gsub('origin/', ''))
           end
-        end.sort_by(&:updated_at).reverse
+        end.sort_by { |v| Gem::Version.new(v.branch[/\d+\.\d+/]) }.reverse.first(STABLE_SLOTS)
       end
   end
 end

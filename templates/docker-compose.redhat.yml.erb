@@ -13,6 +13,9 @@ x-default-environment: &default-environment
   NODE_ENV: production
   DECIDIM_FORCE_SSL: false
   SECRET_KEY_BASE: insecure_key_base
+  DATABASE_ADAPTER: postgresql
+  DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE: memory
+  DECIDIM_SPAM_DETECTION_BACKEND_USER: memory
 
 x-default-build: &default-build
   context: ./docker
@@ -67,6 +70,38 @@ services:
       REDIS_URL: redis://redis:6379/2
       DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_prev
 
+  redhat-decidim-legacy-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "<%= latest_redhat.os_name %>"
+        OS_VERSION: "<%= latest_redhat.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_redhat.os_major_version %>"
+        <%= legacy_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
+    ports:
+      - "3004:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/3
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_legacy
+
+  redhat-decidim-old-stable:
+    <<: *default
+    build:
+      <<: *default-build
+      args:
+        OS_NAME: "<%= latest_redhat.os_name %>"
+        OS_VERSION: "<%= latest_redhat.os_version %>"
+        OS_MAJOR_VERSION: "<%= latest_redhat.os_major_version %>"
+        <%= old_version.docker_args.map { |k,v| "#{k}: \"#{v}\"" }.join("\n        ") %>
+    ports:
+      - "3005:3000"
+    environment:
+      <<: *default-environment
+      REDIS_URL: redis://redis:6379/4
+      DATABASE_URL: postgres://decidim:insecure_password@db:5432/decidim_old
+
   redis:
     image: redis:7
     ports:
@@ -79,7 +114,7 @@ services:
     environment:
       POSTGRES_PASSWORD: insecure_password
       POSTGRES_USER: decidim
-      POSTGRES_MULTIPLE_DATABASES: decidim_development,decidim_last,decidim_prev
+      POSTGRES_MULTIPLE_DATABASES: decidim_development,decidim_last,decidim_prev,decidim_legacy,decidim_old
     ports:
       - "5432:5432"
     volumes:

@@ -78,7 +78,7 @@ And add these lines in your docker-compose.yml file:
     image: decidim/decidim:<%= prev_version.decidim_version %>
     volumes:
       - storage:/home/decidim/storage
-+     - ./db/migrate:/home/decidim/migrate
++     - ./db/migrate:/home/decidim/db/migrate
 +   environment:
 -   environment:
 ```

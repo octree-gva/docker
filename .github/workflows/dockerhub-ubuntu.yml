@@ -32,6 +32,8 @@ jobs:
           - { version: prev, os_name: resolute }
           - { version: legacy, os_name: noble, push_aliases: true }
           - { version: legacy, os_name: resolute }
+          - { version: old, os_name: noble, push_aliases: true }
+          - { version: old, os_name: resolute }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
