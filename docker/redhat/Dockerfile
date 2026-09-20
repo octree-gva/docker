@@ -51,8 +51,6 @@ RUN dnf install -y \
     gnupg2 \
     libffi-devel \
     libicu-devel \
-    postgresql-devel \
-    postgresql \
     openssl-devel \
     libxml2-devel \
     libxslt-devel \
@@ -65,9 +63,12 @@ RUN dnf install -y \
     zlib-devel \
     cronie \
   && if [ "${OS_MAJOR_VERSION}" = "8" ]; then \
+        dnf install -y libpq libpq-devel && \
         dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/o/orc-0.4.28-3.el8.x86_64.rpm && \
         dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/LibRaw-0.19.5-4.el8.x86_64.rpm && \
         dnf install -y xz; \
+     else \
+        dnf install -y postgresql postgresql-devel; \
      fi \
   && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
         dnf install -y https://download.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-2.el9_7.x86_64.rpm; \
