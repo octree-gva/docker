@@ -1,0 +1,88 @@
+#!/bin/sh
+# ponytail: distro libvips hard-depends on gif and pulls poppler/heif/magick.
+# Rebuild without those until a gif-free distro package exists.
+set -eu
+
+VIPS_VERSION="${VIPS_VERSION:-8.18.7}"
+prefix="${VIPS_PREFIX:-/usr/local}"
+src="/tmp/vips-${VIPS_VERSION}"
+
+curl -fsSL "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz" \
+  | tar -xJ -C /tmp
+cd "$src"
+
+meson setup build \
+  --prefix="$prefix" \
+  --buildtype=release \
+  --strip \
+  --default-library=shared \
+  -Ddeprecated=false \
+  -Dexamples=false \
+  -Dcplusplus=false \
+  -Dmodules=disabled \
+  -Dintrospection=disabled \
+  -Dcfitsio=disabled \
+  -Dcgif=disabled \
+  -Dexif=enabled \
+  -Dfftw=disabled \
+  -Dfontconfig=disabled \
+  -Darchive=disabled \
+  -Dheif=disabled \
+  -Dheif-module=disabled \
+  -Dimagequant=disabled \
+  -Djpeg=enabled \
+  -Duhdr=disabled \
+  -Djpeg-xl=disabled \
+  -Djpeg-xl-module=disabled \
+  -Dlcms=disabled \
+  -Dmagick=disabled \
+  -Dmagick-module=disabled \
+  -Dmatio=disabled \
+  -Dnifti=disabled \
+  -Dopenexr=disabled \
+  -Dopenjpeg=disabled \
+  -Dopenslide=disabled \
+  -Dopenslide-module=disabled \
+  -Dhighway=disabled \
+  -Dorc=disabled \
+  -Dpangocairo=disabled \
+  -Dpdfium=disabled \
+  -Dpng=enabled \
+  -Dpoppler=disabled \
+  -Dpoppler-module=disabled \
+  -Dquantizr=disabled \
+  -Draw=disabled \
+  -Drsvg=disabled \
+  -Dspng=disabled \
+  -Dtiff=enabled \
+  -Dwebp=enabled \
+  -Dzlib=enabled \
+  -Dnsgif=false \
+  -Dppm=false \
+  -Danalyze=false \
+  -Dradiance=false
+
+meson compile -C build
+meson install -C build
+
+printf '%s\n%s\n' "${prefix}/lib" "${prefix}/lib64" > /etc/ld.so.conf.d/vips.conf
+ldconfig
+
+lib=$(find "${prefix}/lib" "${prefix}/lib64" -name 'libvips.so.*' -type f 2>/dev/null | head -1)
+test -n "$lib"
+if ldd "$lib" | grep -Ei 'gif|cgif'; then
+  echo "libvips is linked to a gif library" >&2
+  exit 1
+fi
+
+cfg=$(vips --vips-config)
+printf '%s\n' "$cfg"
+echo "$cfg" | grep -q "JPEG load/save with libjpeg: true"
+echo "$cfg" | grep -q "WebP load/save with libwebp: true"
+echo "$cfg" | grep -E -q "TIFF load/save with libtiff(-4)?: true"
+if echo "$cfg" | grep -Ei 'gif|nsgif|cgif' | grep -q ': true'; then
+  echo "gif codec is enabled" >&2
+  exit 1
+fi
+
+rm -rf "$src" /tmp/vips-*.tar.xz

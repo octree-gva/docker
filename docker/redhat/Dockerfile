@@ -27,9 +27,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
 COPY version-deps/ /usr/local/share/version-deps/
-COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
+COPY context/bin/apply-version-deps context/bin/install-vips context/bin/slim-runtime context/bin/configure-vips /usr/local/bin/
 ENV VERSION_DEPS_ROOT=/usr/local/share/version-deps
-RUN chmod +x /usr/local/bin/apply-version-deps
+RUN chmod +x /usr/local/bin/apply-version-deps /usr/local/bin/install-vips /usr/local/bin/slim-runtime /usr/local/bin/configure-vips
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
   && /usr/bin/crb enable \
@@ -62,20 +62,28 @@ RUN dnf install -y \
     vim \
     zlib-devel \
     cronie \
+    jemalloc \
+    libjpeg-turbo-devel \
+    libpng-devel \
+    libwebp-devel \
+    libtiff-devel \
+    libexif-devel \
+    expat-devel \
+    glib2-devel \
+    meson \
+    ninja-build \
+    xz \
   && if [ "${OS_MAJOR_VERSION}" = "8" ]; then \
-        dnf install -y libpq libpq-devel && \
-        dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/o/orc-0.4.28-3.el8.x86_64.rpm && \
-        dnf install -y https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/LibRaw-0.19.5-4.el8.x86_64.rpm && \
-        dnf install -y xz; \
+        dnf install -y libpq libpq-devel; \
      else \
         dnf install -y postgresql postgresql-devel; \
      fi \
-  && if [ "${OS_MAJOR_VERSION}" = "9" ]; then \
-        dnf install -y https://download.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/Packages/l/LibRaw-0.21.1-2.el9_7.x86_64.rpm; \
-     fi \
-  && dnf install -y vips vips-tools \
   && EXTRA_PKGS="$(apply-version-deps list redhat)" \
   && if [ -n "$EXTRA_PKGS" ]; then dnf install -y $EXTRA_PKGS; fi \
+  && so="$(find /usr/lib /usr/lib64 -name 'libjemalloc.so.2' -not -path '/usr/lib/libjemalloc.so.2' | head -1)" \
+  && test -n "$so" \
+  && ln -sfn "$so" /usr/lib/libjemalloc.so.2 \
+  && install-vips \
   && dnf clean all
 
 RUN for attempt in 1 2 3; do \
@@ -102,7 +110,9 @@ RUN for attempt in 1 2 3; do \
 # Generator Image
 ##
 FROM base AS generator
-ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
+ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,muzzy_decay_ms:1000,narenas:2,background_thread:true,abort_conf:true" \
+    BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
     DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
     DECIDIM_SPAM_DETECTION_BACKEND_USER=memory \
@@ -145,7 +155,9 @@ RUN bundle config set without "development:test" \
   && apply-version-deps append-gemfile Gemfile \
   && bundle update \
   && bundle config set frozen true \
-  && bundle config set deployment true
+  && bundle config set deployment true \
+  && configure-vips \
+  && chmod +x entrypoint.sh bin/check bin/check.d/* docker-entrypoint.d/* bin/wait-for-it
 
 ##
 # Assets
@@ -164,6 +176,8 @@ RUN bundle config set frozen false \
   && NPM_LINES="$(apply-version-deps list npm)" \
   && if [ -n "$NPM_LINES" ]; then while read -r args; do npm install $args; done <<< "$NPM_LINES"; fi \
   && bin/rails assets:precompile \
+  && test -n "$(find public/decidim-packs -type f -print -quit)" \
+  && mkdir -p public/assets \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
@@ -211,7 +225,9 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     DATABASE_MAX_POOL_SIZE=10 \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
-    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/bin:${PATH}"
+    PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/bin:${PATH}" \
+    LD_PRELOAD=/usr/lib/libjemalloc.so.2 \
+    MALLOC_CONF=dirty_decay_ms:1000,muzzy_decay_ms:1000,narenas:2,background_thread:true,abort_conf:true
 
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1000 decidim \
@@ -221,11 +237,14 @@ WORKDIR $WORK_DIR
 
 COPY --chown=decidim:decidim --from=generator /home/decidim .
 COPY --chown=decidim:decidim --from=assets /home/decidim/public/decidim-packs public/decidim-packs
+COPY --chown=decidim:decidim --from=assets /home/decidim/public/assets public/assets
 COPY ./scripts/write_motd bin/write_motd
-RUN bundle exec bin/write_motd && rm bin/write_motd \
-    && crontab -u decidim /home/decidim/crontab.d/crontab
+RUN slim-runtime \
+  && bundle exec bin/write_motd && rm bin/write_motd \
+  && crontab -u decidim /home/decidim/crontab.d/crontab
 USER decidim
-RUN bundle check || bundle install
+RUN bundle check \
+  && bundle exec bootsnap precompile --gemfile app config lib
 
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]

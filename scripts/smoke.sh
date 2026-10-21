@@ -12,33 +12,30 @@ fail() { echo "SMOKE FAIL: $*" >&2; exit 1; }
 echo "== bundle / ruby / assets =="
 bundle check
 ruby -v
-test -d public/decidim-packs || test -d public/assets
+test -n "$(find public/decidim-packs -type f -print -quit)" || fail "public/decidim-packs is empty"
+
+echo "== jemalloc / bootsnap / fast boot =="
+echo "${LD_PRELOAD:-}" | grep -q jemalloc || fail "LD_PRELOAD is not jemalloc"
+test -e /usr/lib/libjemalloc.so.2 || fail "libjemalloc.so.2 missing"
+test -d tmp/cache/bootsnap || fail "bootsnap cache missing"
+test -x bin/check || fail "bin/check missing"
+test ! -e docker-entrypoint.d/35_bundle_check || fail "bundle check still runs at boot"
+test ! -e docker-entrypoint.d/36_db_check || fail "db migrate still runs at boot"
+grep -q 'VIPS_CONCURRENCY' config/boot.rb || fail "boot.rb does not set VIPS_CONCURRENCY"
 
 echo "== libvips present =="
 command -v vips >/dev/null || fail "vips not on PATH"
 vips --version
 
-echo "== libvips at distro latest =="
-VIPS_BIN="$(command -v vips)"
-if command -v apt-get >/dev/null 2>&1; then
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get update -qq
-  PKG="$(dpkg -S "$VIPS_BIN" | head -1 | cut -d: -f1)"
-  INSTALLED="$(dpkg-query -W -f='${Version}' "$PKG")"
-  CANDIDATE="$(apt-cache policy "$PKG" | awk '/Candidate:/ {print $2; exit}')"
-  echo "package=$PKG installed=$INSTALLED candidate=$CANDIDATE"
-  test -n "$CANDIDATE" && test "$CANDIDATE" != "(none)" || fail "no apt candidate for $PKG"
-  test "$INSTALLED" = "$CANDIDATE" || fail "$PKG not at candidate ($INSTALLED != $CANDIDATE)"
-elif command -v dnf >/dev/null 2>&1; then
-  PKG="$(rpm -qf --qf '%{NAME}' "$VIPS_BIN")"
-  dnf -q makecache || true
-  INSTALLED="$(rpm -q --qf '%{EPOCH}:%{VERSION}-%{RELEASE}' "$PKG" | sed 's/^(none):/0:/')"
-  CANDIDATE="$(dnf -q repoquery --latest-limit 1 --qf '%{epoch}:%{version}-%{release}' "$PKG" | sed 's/^(none):/0:/' | head -1)"
-  echo "package=$PKG installed=$INSTALLED candidate=$CANDIDATE"
-  test -n "$CANDIDATE" || fail "no dnf candidate for $PKG"
-  test "$INSTALLED" = "$CANDIDATE" || fail "$PKG not at candidate ($INSTALLED != $CANDIDATE)"
-else
-  fail "unsupported package manager"
+echo "== libvips without gif libraries =="
+packages=""
+if command -v dpkg >/dev/null 2>&1; then
+  packages="$(dpkg -l || true)"
+elif command -v rpm >/dev/null 2>&1; then
+  packages="$(rpm -qa || true)"
+fi
+if echo "$packages" | grep -Eiq 'libgif|giflib|libcgif|libnsgif'; then
+  fail "gif library package installed"
 fi
 
 echo "== libvips codecs (mozjpeg/libjpeg, libexif, libtiff, libpng/spng, libwebp) =="
@@ -48,6 +45,14 @@ echo "$CFG" | grep -q "JPEG load/save with libjpeg: true" || fail "libjpeg/mozjp
 echo "$CFG" | grep -E -q "PNG load/save with lib(png|spng): true" || fail "libpng/libspng not enabled in vips"
 echo "$CFG" | grep -E -q "TIFF load/save with libtiff(-4)?: true" || fail "libtiff not enabled in vips"
 echo "$CFG" | grep -q "WebP load/save with libwebp: true" || fail "libwebp not enabled in vips"
+if echo "$CFG" | grep -Ei 'gif|nsgif|cgif' | grep -q ': true'; then
+  fail "gif codec is enabled in vips"
+fi
+libvips="$(find /usr/local/lib /usr/local/lib64 -name 'libvips.so.*' -type f | head -1)"
+test -n "$libvips" || fail "libvips shared library missing"
+if ldd "$libvips" | grep -Ei 'gif|cgif'; then
+  fail "libvips is linked to a gif library"
+fi
 
 echo "== ImageMagick absent =="
 if command -v convert >/dev/null 2>&1; then
@@ -121,3 +126,11 @@ test "$V_SHAKA_DS_BIN" = "$V_SHAKA_DS_BUNDLE" || fail "bin/shakapacker-dev-serve
 
 echo "SMOKE OK"
 EOS
+
+echo "== entrypoint =="
+vips_for() {
+  docker run --rm -e "WEB_CONCURRENCY=$1" "$IMAGE" sh -c 'printf %s "$VIPS_CONCURRENCY"'
+}
+test "$(vips_for 9)" = "3"
+test "$(vips_for 2)" = "1"
+test "$(vips_for 1)" = "1"

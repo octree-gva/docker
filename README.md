@@ -130,14 +130,32 @@ If you don't use docker image to run your cron and prefer using a schedulder,
 you can get the commands in the [crontab file](./docker/crontab.d/crontab)
 
 ## Entrypoints
-Before running the docker command, we go through [entrypoints scripts](./docker/docker-entrypoint.d).
-Theses commands will run on each container restart:
+Operators who start this image read this section to see what boot does and how to run migrations.
 
-* **10_remove_pids**: Remove old puma pids if exists.
+Boot runs [docker/context/docker-entrypoint.d/10_remove_pid](./docker/context/docker-entrypoint.d/10_remove_pid) and then the process you passed. It does not run Bundler or Rails. Migrations, dependency waits, Deface, and the system admin upsert run when you start them:
+
+```
+docker exec <container> bin/check
+```
+
+`bin/check` prints one JSON object. A failing check is `ERROR` and details go to `tmp/<UTC>-check.log`.
+
 * **15_wait_for_it**: Wait for Redis (`REDIS_URL`), Postgres/PostGIS (host from Rails DB config, then `pg_isready`), and Memcached (`MEMCACHE_SERVERS`).
-* **35_bundle_check**: Check if all your gems are installed.
-* **36_db_check**: Run `rails db:migrate` (same Rails config as the app: env, `database.yml`, or credentials).
-* **50_upsert-sysadmin**: From environment variables `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD`, update the first /system administrator.
+* **35_bundle_check**: Check that the image gems are installed.
+* **36_db_check**: Run `rails db:migrate`.
+* **39_deface_precompile**: Precompile Deface overrides when the gem is installed.
+* **50_upsert-sysadmin**: When `DECIDIM_SYSTEM_EMAIL` and `DECIDIM_SYSTEM_PASSWORD` are set, update the `/system` administrator. Both are optional; unset skips this check.
+
+### Runtime defaults
+
+| Variable | Default |
+| --- | --- |
+| `WEB_CONCURRENCY` | `2` |
+| `VIPS_CONCURRENCY` | `[1, WEB_CONCURRENCY / 3].max`, unless you set it |
+| `LD_PRELOAD` | `/usr/lib/libjemalloc.so.2` |
+| `MALLOC_CONF` | `dirty_decay_ms:1000,muzzy_decay_ms:1000,narenas:2,background_thread:true,abort_conf:true` |
+
+Override any of these in Compose. Unset `VIPS_CONCURRENCY` to keep the formula.
 
 ### Command
 You can update your docker-compose command to whatever you want.

@@ -30,9 +30,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-l", "-c"]
 WORKDIR $WORK_DIR
 
 COPY version-deps/ /usr/local/share/version-deps/
-COPY context/bin/apply-version-deps /usr/local/bin/apply-version-deps
+COPY context/bin/apply-version-deps context/bin/install-vips context/bin/slim-runtime context/bin/configure-vips /usr/local/bin/
 ENV VERSION_DEPS_ROOT=/usr/local/share/version-deps
-RUN chmod +x /usr/local/bin/apply-version-deps
+RUN chmod +x /usr/local/bin/apply-version-deps /usr/local/bin/install-vips /usr/local/bin/slim-runtime /usr/local/bin/configure-vips
 
 # Single comprehensive package installation
 RUN apt-get update -yq \
@@ -53,8 +53,17 @@ RUN apt-get update -yq \
     postgresql-client \
     libreadline-dev \
     libssl-dev \
-    libvips-dev \
-    libvips-tools \
+    libjpeg-dev \
+    libpng-dev \
+    libwebp-dev \
+    libtiff-dev \
+    libexif-dev \
+    libexpat1-dev \
+    libglib2.0-dev \
+    meson \
+    ninja-build \
+    pkg-config \
+    xz-utils \
     libxml2-dev \
     libxslt1-dev \
     libyaml-dev \
@@ -74,7 +83,11 @@ RUN EXTRA_PKGS="$(apply-version-deps list ubuntu)" \
   && if [ -n "$EXTRA_PKGS" ]; then \
        apt-get update -yq \
        && apt-get install -yq --no-install-recommends $EXTRA_PKGS; \
-     fi
+     fi \
+  && so="$(find /usr/lib /usr/lib64 -name 'libjemalloc.so.2' -not -path '/usr/lib/libjemalloc.so.2' | head -1)" \
+  && test -n "$so" \
+  && ln -sfn "$so" /usr/lib/libjemalloc.so.2 \
+  && install-vips
   # Install Node.js from NodeSource
 RUN wget -qO- https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash - \
   && apt-get install -yq --no-install-recommends nodejs \
@@ -108,8 +121,8 @@ RUN export PATH="/home/decidim/.rbenv/bin:$PATH" \
 # Generator Image 
 ##
 FROM base AS generator
-ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2" \
-    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
+ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,muzzy_decay_ms:1000,narenas:2,background_thread:true,abort_conf:true" \
     BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     BUNDLE_DISABLE_SHARED_GEMS=true \
     DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory \
@@ -158,7 +171,9 @@ RUN bundle config set without "development:test" \
   && apply-version-deps append-gemfile Gemfile \
   && bundle update \
   && bundle config set frozen true \
-  && bundle config set deployment true
+  && bundle config set deployment true \
+  && configure-vips \
+  && chmod +x entrypoint.sh bin/check bin/check.d/* docker-entrypoint.d/* bin/wait-for-it
 
 ##
 # Assets
@@ -178,6 +193,8 @@ RUN bundle config set frozen false \
   && if [ -n "$NPM_LINES" ]; then while read -r args; do npm install $args; done <<< "$NPM_LINES"; fi
 
 RUN bundle exec rails assets:precompile \
+  && test -n "$(find public/decidim-packs -type f -print -quit)" \
+  && mkdir -p public/assets \
   && rm -rf node_modules .npmrc .yarnrc .yarn
 
 ##
@@ -227,7 +244,8 @@ ENV BUNDLE_APP_CONFIG="/home/decidim/.bundle" \
     WORK_DIR=/home/decidim \
     HOME=/home/decidim \
     PATH="/home/decidim/.rbenv/bin:/home/decidim/.rbenv/shims:/home/decidim/bin:${PATH}" \
-    DISABLE_BOOTSNAP=1
+    LD_PRELOAD=/usr/lib/libjemalloc.so.2 \
+    MALLOC_CONF=dirty_decay_ms:1000,muzzy_decay_ms:1000,narenas:2,background_thread:true,abort_conf:true
 
 RUN rm -rf $WORK_DIR \
     && groupadd -g 1001 decidim \
@@ -237,13 +255,16 @@ WORKDIR $WORK_DIR
 
 COPY --chown=decidim:decidim --from=generator /home/decidim .
 COPY --chown=decidim:decidim --from=assets /home/decidim/public/decidim-packs public/decidim-packs
+COPY --chown=decidim:decidim --from=assets /home/decidim/public/assets public/assets
 COPY ./scripts/write_motd bin/write_motd
 
-RUN bundle exec bin/write_motd && rm bin/write_motd \
-    && crontab -u decidim /home/decidim/crontab.d/crontab
+RUN slim-runtime \
+  && bundle exec bin/write_motd && rm bin/write_motd \
+  && crontab -u decidim /home/decidim/crontab.d/crontab
 
 USER decidim
-RUN bundle check || bundle install 
+RUN bundle check \
+  && bundle exec bootsnap precompile --gemfile app config lib 
 
 EXPOSE 3000
 ENTRYPOINT ["/home/decidim/entrypoint.sh"]

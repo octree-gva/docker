@@ -1,0 +1,14 @@
+#!/bin/sh
+# Append the runtime vips limit to the generated boot.rb. Idempotent.
+set -eu
+
+boot=/home/decidim/config/boot.rb
+if grep -q VIPS_CONCURRENCY "$boot"; then
+  exit 0
+fi
+
+cat >> "$boot" <<'RUBY'
+
+workers = Integer(ENV.fetch("WEB_CONCURRENCY", "2"))
+ENV["VIPS_CONCURRENCY"] ||= [1, workers / 3].max.to_i.to_s
+RUBY

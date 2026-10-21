@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "json"
+require "open3"
+require "time"
+
+ROOT = "/home/decidim"
+CHECKS = [
+  ["wait_for_it", "15_wait_for_it"],
+  ["bundle_check", "35_bundle_check"],
+  ["db_check", "36_db_check"],
+  ["deface_precompile", "39_deface_precompile"],
+  ["upsert_sysadmin", "50_upsert-sysadmin"]
+].freeze
+
+def check_path(name)
+  File.join(ROOT, "bin", "check.d", name)
+end
+
+def run_one(path)
+  Open3.capture3(ENV.to_h, path)
+end
+
+def write_failure(log, key, stdout, stderr)
+  File.open(log, "a") do |file|
+    file.puts "=== #{key} ==="
+    file.puts stdout unless stdout.empty?
+    file.puts stderr unless stderr.empty?
+    file.puts
+  end
+end
+
+def record(results, key, status, log, stdout, stderr)
+  if status.success?
+    results[key] = "ok"
+    return
+  end
+
+  results[key] = "ERROR"
+  write_failure(log, key, stdout, stderr)
+end
+
+Dir.chdir(ROOT)
+stamp = Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
+log_rel = File.join("tmp", "#{stamp}-check.log")
+log_abs = File.join(ROOT, log_rel)
+FileUtils.mkdir_p(File.join(ROOT, "tmp"))
+results = {}
+
+CHECKS.each do |key, name|
+  stdout, stderr, status = run_one(check_path(name))
+  record(results, key, status, log_abs, stdout, stderr)
+end
+
+results["log"] = log_rel if results.value?("ERROR")
+puts JSON.generate(results)
+exit(results.value?("ERROR") ? 1 : 0)

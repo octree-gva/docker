@@ -1,9 +1,3 @@
-#!/usr/bin/env ruby
-# Remove puma pid file.
-Dir.chdir("/home/decidim") do 
-    pid_file = ENV.fetch("PIDFILE", "tmp/server.pid")
-    File.delete(pid_file) if File.exist?(pid_file)
-	puts "#{__FILE__}:"
-    puts "    ✅  Puma pid is removed"
-    exit 0
-end
+#!/bin/sh
+cd /home/decidim
+rm -f "${PIDFILE:-tmp/server.pid}"

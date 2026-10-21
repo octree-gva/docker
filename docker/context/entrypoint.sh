@@ -1,21 +1,22 @@
-#! /bin/bash -l
+#!/bin/sh
 set -e
-echo "[+] Container initializing."
-# Execute all the scripts in the docker-entrypoint.d
-# directory, in filename order. 
-# __run-parts__
-# The filenames needs to be in one of the following namespace:
-# > the LANANA-assigned namespace (^[a-z0-9]+$); 
-# > the LSB hierarchical and reserved namespaces (^_?([a-z0-9_.]+-)+[a-z0-9]+$); 
-# > the Debian cron script namespace (^[a-zA-Z0-9_-]+$).
-# > source: https://manpages.debian.org/jessie/debianutils/run-parts.8.en.html
-echo "  => [/bin/sh] Prepare environment to run $@"
-echo "  => [/bin/sh] Running ~/docker-entrypoint.d scripts"
-for script in ~/docker-entrypoint.d/*; do
+cd /home/decidim
+
+if [ -z "${VIPS_CONCURRENCY:-}" ]; then
+  wc=${WEB_CONCURRENCY:-2}
+  case "$wc" in
+    ''|*[!0-9]*) wc=2 ;;
+  esac
+  vips=$((wc / 3))
+  if [ "$vips" -lt 1 ]; then
+    vips=1
+  fi
+  export VIPS_CONCURRENCY=$vips
+fi
+
+for script in /home/decidim/docker-entrypoint.d/*; do
   [ -x "$script" ] || continue
-  "$script" || exit $?
+  "$script"
 done
 
-cd ~
-echo "  => [/bin/sh] Executing $@"
 exec "$@"

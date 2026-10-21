@@ -1,0 +1,81 @@
+#!/bin/sh
+# Drop compilers, headers, and gif packages after native gems are built.
+set -eu
+
+pkgs=$(mktemp)
+trap 'rm -f "$pkgs"' EXIT
+
+record() {
+  if command -v dpkg >/dev/null 2>&1; then
+    dpkg -S "$1" 2>/dev/null | cut -d: -f1 | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' >> "$pkgs" || true
+  elif command -v rpm >/dev/null 2>&1; then
+    rpm -qf --qf '%{NAME}\n' "$1" >> "$pkgs" 2>/dev/null || true
+  fi
+}
+
+scan() {
+  [ -f "$1" ] || return 0
+  record "$1"
+  ldd "$1" 2>/dev/null | awk '/=> \// {print $3}' | while read -r so; do
+    [ -f "$so" ] || continue
+    record "$so"
+  done
+}
+
+ruby=$(find /home/decidim/.rbenv/versions -type f -path '*/bin/ruby' | head -1)
+scan "$ruby"
+find /usr/local/lib /usr/local/lib64 -name 'libvips.so*' -type f 2>/dev/null | while read -r lib; do
+  scan "$lib"
+done
+find /home/decidim/vendor -name '*.so' -type f 2>/dev/null | while read -r lib; do
+  scan "$lib"
+done
+
+keep=$(sort -u "$pkgs" | grep -v '^$' || true)
+
+if command -v apt-get >/dev/null 2>&1; then
+  # shellcheck disable=SC2086
+  apt-mark manual $keep ca-certificates curl tzdata cron postgresql-client libjemalloc2 shared-mime-info || true
+  for pkg in build-essential gcc g++ make rustc cargo python3-pip python3-setuptools \
+    vim git nodejs npm meson ninja-build pkg-config wget gnupg lsof ripgrep \
+    libgif7 giflib libcgif0; do
+    dpkg -s "$pkg" >/dev/null 2>&1 && apt-get purge -y "$pkg" || true
+  done
+  devs=$(dpkg-query -W -f='${Package}\n' | grep -E -- '-dev$' || true)
+  for pkg in $devs; do
+    apt-get purge -y "$pkg" || true
+  done
+  apt-get autoremove -y --purge
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+elif command -v dnf >/dev/null 2>&1; then
+  # shellcheck disable=SC2086
+  dnf mark install $keep ca-certificates curl tzdata cronie postgresql jemalloc shared-mime-info || true
+  for pkg in gcc gcc-c++ make rust cargo python3-pip python3-setuptools \
+    vim git nodejs npm meson ninja-build pkgconf-pkg-config pkgconfig wget gnupg2 lsof ripgrep \
+    giflib libcgif; do
+    rpm -q "$pkg" >/dev/null 2>&1 && dnf remove -y "$pkg" || true
+  done
+  dnf remove -y '*-devel' || true
+  dnf autoremove -y || true
+  dnf clean all
+fi
+
+rm -rf /usr/share/doc /usr/share/man /usr/share/info \
+  /home/decidim/.rbenv/plugins /home/decidim/.rbenv/.git /root/.cache /root/.npm /root/.gem
+find /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+ldconfig
+
+"$ruby" -e 'puts RUBY_VERSION'
+vips --version
+cfg=$(vips --vips-config)
+echo "$cfg" | grep -q "JPEG load/save with libjpeg: true"
+if echo "$cfg" | grep -Ei 'gif|nsgif|cgif' | grep -q ': true'; then
+  echo "gif codec still enabled after slim" >&2
+  exit 1
+fi
+lib=$(find /usr/local/lib /usr/local/lib64 -name 'libvips.so.*' -type f | head -1)
+if ldd "$lib" | grep -Ei 'gif|cgif'; then
+  echo "gif library still linked after slim" >&2
+  exit 1
+fi
