@@ -15,6 +15,8 @@ services:
       - decidim
     ports:
       - 8080:8080
+      # Invitation links use the organization host with no port.
+      - 80:8080
     depends_on:
       - decidim
     volumes:
@@ -23,6 +25,7 @@ services:
   decidim:
     container_name: decidim
     image: <%= registry_username %>/decidim:<%= prev_version.decidim_version %>
+    command: ["sh", "-c", "bin/check && exec bundle exec rails s -b 0.0.0.0"]
     ports:
       - "3000:3000"
     environment:
@@ -31,7 +34,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE=memory
       - DECIDIM_SPAM_DETECTION_BACKEND_USER=memory
-      - SECRET_KEY_BASE=insecure_key_base
+      - SECRET_KEY_BASE=00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
       - RAILS_ENV=production
       - NODE_ENV=production
       - DECIDIM_FORCE_SSL=false
@@ -42,6 +45,7 @@ services:
       - SMTP_ADDRESS=mailcatcher
       - SMTP_PORT=1025
       - SMTP_AUTHENTICATION=plain
+      - SMTP_STARTTLS_AUTO=false
     volumes:
       - decidim_public:/home/decidim/public
     networks:

@@ -47,6 +47,7 @@ Once connected, you can go in [/system](http://127.0.0.1:8080/system/organizatio
 Then you can define your new organization:
 
 - **Name**: Your application name
+- **Short name**: 3 to 12 characters
 - **Reference prefix**: A small prefix for the uploaded files and documents.
 - **Host**: `127.0.0.1`
 - **Secondary host**: Leave empty
@@ -54,7 +55,7 @@ Then you can define your new organization:
 - **Organization admin email**: Your email
 - **Locale**: Choose your own
 - **Force authentication**: don't select
-- **Users registration mode**: `Allow participants to register and login`
+- **Users registration mode**: `Allow participants to create an account and log in`
 - **Available Authorizations**: Leave empty
 
 And click on `Create organization & invite admin`.
@@ -67,23 +68,19 @@ But the migrations files will change in the image published everyday on docker h
 In order to be resilient to re-build, keep a copy of your migrations files and bind them as volume: 
 
 ```
-# Ensure you still have a docker-compose up running. 
+# Ensure you still have a docker compose up running.
 # Copy files from the decidim container in a local `db/migrate` directory
 docker cp decidim:/home/decidim/db/migrate db/migrate
 ```
 
 And add these lines in your docker-compose.yml file:
 ```diff
-    container_name: decidim
-    image: decidim/decidim:0.31.7
     volumes:
-      - storage:/home/decidim/storage
+      - decidim_public:/home/decidim/public
 +     - ./db/migrate:/home/decidim/db/migrate
-+   environment:
--   environment:
 ```
 
-You can now `docker-compose up` again and have a safer place to tweak decidim.
+You can now `docker compose up` again and have a safer place to tweak decidim.
 
 # Welcome to Decidim 🎉
 That's it, you've got your participatory platform!
@@ -92,7 +89,7 @@ That's it, you've got your participatory platform!
 |---|---|
 | [http://127.0.0.1:1080](http://127.0.0.1:1080) | ✉️ A Mailcatcher instance, all emails will be sent there |
 | [http://127.0.0.1:8080](http://127.0.0.1:8080) | 🌱 Decidim instance |
-| [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin) | Decidim administration, your credentials are `admin@example.org`/`123456` |
+| [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin) | Decidim administration, with the email you invited and the password you set when accepting the invite |
 | [http://127.0.0.1:8080/system](http://127.0.0.1:8080/system) | Decidim system, see environments: `DECIDIM_SYSTEM_EMAIL`/`DECIDIM_SYSTEM_PASSWORD` |
 
 Before going to production, be sure to read the [good practices](./good-practices).

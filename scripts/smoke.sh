@@ -48,7 +48,7 @@ echo "$CFG" | grep -q "WebP load/save with libwebp: true" || fail "libwebp not e
 if echo "$CFG" | grep -Ei 'gif|nsgif|cgif' | grep -q ': true'; then
   fail "gif codec is enabled in vips"
 fi
-libvips="$(find /usr/local/lib /usr/local/lib64 -name 'libvips.so.*' -type f | head -1)"
+libvips="$(find /usr/local -name 'libvips.so.*' \( -type f -o -type l \) 2>/dev/null | head -1 || true)"
 test -n "$libvips" || fail "libvips shared library missing"
 if ldd "$libvips" | grep -Ei 'gif|cgif'; then
   fail "libvips is linked to a gif library"

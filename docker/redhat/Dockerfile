@@ -33,10 +33,9 @@ RUN chmod +x /usr/local/bin/apply-version-deps /usr/local/bin/install-vips /usr/
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_MAJOR_VERSION}.noarch.rpm \
   && /usr/bin/crb enable \
-  && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-${OS_MAJOR_VERSION}.rpm \
-  && dnf config-manager --set-enabled remi
+  && dnf config-manager --set-disabled epel-cisco-openh264 || true
 
-RUN dnf install -y \
+RUN dnf install -y --setopt=skip_if_unavailable=True \
     gcc \
     gcc-c++ \
     make \
@@ -239,9 +238,9 @@ COPY --chown=decidim:decidim --from=generator /home/decidim .
 COPY --chown=decidim:decidim --from=assets /home/decidim/public/decidim-packs public/decidim-packs
 COPY --chown=decidim:decidim --from=assets /home/decidim/public/assets public/assets
 COPY ./scripts/write_motd bin/write_motd
-RUN slim-runtime \
-  && bundle exec bin/write_motd && rm bin/write_motd \
-  && crontab -u decidim /home/decidim/crontab.d/crontab
+RUN bundle exec bin/write_motd && rm bin/write_motd \
+  && crontab -u decidim /home/decidim/crontab.d/crontab \
+  && slim-runtime
 USER decidim
 RUN bundle check \
   && bundle exec bootsnap precompile --gemfile app config lib

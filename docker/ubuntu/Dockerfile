@@ -258,9 +258,9 @@ COPY --chown=decidim:decidim --from=assets /home/decidim/public/decidim-packs pu
 COPY --chown=decidim:decidim --from=assets /home/decidim/public/assets public/assets
 COPY ./scripts/write_motd bin/write_motd
 
-RUN slim-runtime \
-  && bundle exec bin/write_motd && rm bin/write_motd \
-  && crontab -u decidim /home/decidim/crontab.d/crontab
+RUN bundle exec bin/write_motd && rm bin/write_motd \
+  && crontab -u decidim /home/decidim/crontab.d/crontab \
+  && slim-runtime
 
 USER decidim
 RUN bundle check \
