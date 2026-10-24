@@ -24,7 +24,7 @@ services:
 
   decidim:
     container_name: decidim
-    image: hfroger/decidim:0.31.7
+    image: hfroger/decidim:0.31.8
     command: ["sh", "-c", "bin/check && exec bundle exec rails s -b 0.0.0.0"]
     ports:
       - "3000:3000"

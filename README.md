@@ -27,19 +27,19 @@ To start with decidim in a breeze, follow our [▶️ 5min tutorial](./5min-tuto
 | Tag | Description |
 | ---  | ---|
 | `:latest` | Unstable `development` version. (alias for `0.33.0.dev`) |
-| `:0.32.1` | Last version |
-| `:0.31.7` | Stable version, security and bug fixes only |
+| `:0.32.2` | Last version |
+| `:0.31.8` | Stable version, security and bug fixes only |
 | `:0.30.9` | Legacy version, previous stable release |
 | `:0.29.7` | Older legacy |
 
 To use other distributions, these are available: 
 
-| Operating System | Decidim v0.33.0.dev | Decidim v0.32.1 | Decidim v0.31.7 | Decidim v0.30.9 | Decidim v0.29.7 |
+| Operating System | Decidim v0.33.0.dev | Decidim v0.32.2 | Decidim v0.31.8 | Decidim v0.30.9 | Decidim v0.29.7 |
 | --- | --- | --- | --- | --- | --- |
-| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.1` | `:noble-0.31.7` | `:noble-0.30.9` | `:noble-0.29.7` |
-| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.1` | `:resolute-0.31.7` | `:resolute-0.30.9` | `:resolute-0.29.7` |
-| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.1` | `:ubi9-0.31.7` | `:ubi9-0.30.9` | `:ubi9-0.29.7` |
-| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.1` | `:ubi8-0.31.7` | `:ubi8-0.30.9` | `:ubi8-0.29.7` |
+| Ubuntu noble (24.04) | `:noble-0.33.0.dev` | `:noble-0.32.2` | `:noble-0.31.8` | `:noble-0.30.9` | `:noble-0.29.7` |
+| Ubuntu resolute (26.04) | `:resolute-0.33.0.dev` | `:resolute-0.32.2` | `:resolute-0.31.8` | `:resolute-0.30.9` | `:resolute-0.29.7` |
+| Redhat ubi9 (9.8) | `:ubi9-0.33.0.dev` | `:ubi9-0.32.2` | `:ubi9-0.31.8` | `:ubi9-0.30.9` | `:ubi9-0.29.7` |
+| Redhat ubi8 (8.10) | `:ubi8-0.33.0.dev` | `:ubi8-0.32.2` | `:ubi8-0.31.8` | `:ubi8-0.30.9` | `:ubi8-0.29.7` |
 
 
 # [▶️ 5min tutorial](./5min-tutorial.md)
@@ -82,7 +82,7 @@ This section is for operators running Decidim with Docker Compose: set these var
 | SMTP_STARTTLS_AUTO | If TLS should start automatically | `enabled` |
 | SMTP_VERIFY_MODE | How smtp certificates are verified | `none` |
 
-All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.31.7/docs/modules/configure/pages/environment_variables.adoc).
+All the `DECIDIM_` variables are available. [See the documentation on default environments variables](https://github.com/decidim/decidim/blob/v0.31.8/docs/modules/configure/pages/environment_variables.adoc).
 
 
 ## Cron configurations
